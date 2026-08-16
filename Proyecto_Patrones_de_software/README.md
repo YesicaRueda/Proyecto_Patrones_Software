@@ -69,4 +69,4 @@ Desarrollar un Sistema de Control de Producción (MES) que permita gestionar los
 
 Estado del proyecto
 
-🚧 En desarrollo
+🚧 En desarrollo.
