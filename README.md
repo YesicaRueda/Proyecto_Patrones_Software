@@ -1,1 +1,0 @@
-# Proyecto_Patrones_Software
