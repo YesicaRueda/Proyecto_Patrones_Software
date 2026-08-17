@@ -4,6 +4,7 @@ Patrones de software E-195
 
 Integrantes: 
 Yesica Dayana Rueda Saldarriaga
+Sergio Andrés Mendoza Osorio
 
 Sistema de Control de Producción (MES)
 
