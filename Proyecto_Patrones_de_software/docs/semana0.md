@@ -1,9 +1,3 @@
-
----
-
-# `docs/semana-00/contextualizacion.md`
-
-```markdown
 # Semana 0 - Contextualización del Proyecto
 
 ## Sistema de Control de Producción (MES)
@@ -79,7 +73,7 @@ El indicador considera tres factores:
 - **Rendimiento:** relación entre la producción obtenida y la producción esperada.
 - **Calidad:** proporción de productos correctos frente al total producido.
 
-La fórmula general es:
+### Fórmula
 
 **OEE = Disponibilidad × Rendimiento × Calidad**
 
@@ -105,16 +99,20 @@ Estos patrones corresponden a una propuesta inicial. Su aplicación será analiz
 
 Se plantea inicialmente una organización por capas:
 
-**Presentación**  
+### Presentación
+
 Interfaz mediante la cual los usuarios interactúan con el sistema.
 
-**Lógica de negocio**  
+### Lógica de negocio
+
 Contiene las reglas y procesos relacionados con la producción, calidad, máquinas e indicadores.
 
-**Acceso a datos**  
+### Acceso a datos
+
 Gestiona las operaciones necesarias para consultar y modificar la información.
 
-**Persistencia**  
+### Persistencia
+
 Se encarga del almacenamiento de los datos del sistema.
 
 ---
