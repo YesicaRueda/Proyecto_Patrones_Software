@@ -1,84 +1,150 @@
-# Sistema de Control de Producción (MES)
 
-## Patrones de software E-195
+---
 
-### Integrantes: 
-Yesica Dayana Rueda Saldarriaga -- Sergio Andrés Mendoza Osorio
+# `docs/semana-00/contextualizacion.md`
 
+```markdown
+# Semana 0 - Contextualización del Proyecto
 
-## Sistema MES para la gestión, control y monitoreo de una linea de producción. 
+## Sistema de Control de Producción (MES)
 
-### Descripción
+**Asignatura:** Patrones de Software E-195
 
-El Sistema de Control de Producción (MES - Manufacturing Execution System) es una solución de software diseñada para gestionar, supervisar y controlar los procesos de producción de una empresa industrial.
+**Integrantes:**
+- Yesica Dayana Rueda Saldarriaga
+- Sergio Andrés Mendoza Osorio
 
-El sistema permitirá administrar la planificación de la producción, controlar la calidad y trazabilidad de los productos, integrar información proveniente de máquinas CNC y robots, y analizar la eficiencia de los equipos mediante el indicador OEE.
+---
 
-### Funcionalidades principales
+## 1. Contextualización
 
-#### 1. Planificación y programación de producción
+En una empresa industrial se generan constantemente diferentes procesos e información relacionados con la producción, como órdenes de fabricación, programación de actividades, control de calidad, estado de las máquinas, tiempos de operación y trazabilidad de los productos.
 
-  -Gestión de órdenes de producción.
-  -Programación de actividades.
-  -Seguimiento del estado de las órdenes.
-  -Control del avance de la producción.
+La gestión organizada de esta información permite realizar un mejor seguimiento de la producción, identificar problemas y analizar el rendimiento de los equipos.
 
-#### 2. Control de calidad y trazabilidad
+A partir de esta necesidad se propone desarrollar un **Sistema de Control de Producción (MES - Manufacturing Execution System)** que permita centralizar y gestionar información relacionada con los procesos productivos.
 
-  -Registro de inspecciones de calidad.
-  -Control de productos aprobados y rechazados.
-  -Seguimiento de lotes.
-  -Trazabilidad de materias primas y productos.
-  -Consulta del historial de producción.
+El proyecto se desarrollará durante el semestre como una aplicación práctica de los conceptos de **patrones de diseño de software**, buscando que la solución tenga una estructura organizada, mantenible y escalable.
 
-#### 3. Integración con máquinas CNC y robots
+---
 
-  -Monitoreo del estado de las máquinas.
-  -Registro de datos de producción.
-  -Control de tiempos de operación y paradas.
-  -Integración con equipos industriales.
+## 2. Descripción del proyecto
 
-#### 4. Análisis de OEE
+El sistema MES permitirá gestionar, supervisar y controlar diferentes aspectos del proceso productivo de una empresa.
 
-El sistema permitirá calcular y analizar el indicador OEE (Overall Equipment Effectiveness) para evaluar la eficiencia de los equipos.
+Inicialmente se contemplan las siguientes áreas:
 
-El OEE se calcula mediante:
+- Planificación y programación de la producción.
+- Gestión y seguimiento de órdenes de producción.
+- Control de calidad.
+- Trazabilidad de productos y lotes.
+- Monitoreo del estado de máquinas y equipos.
+- Registro de información de producción.
+- Análisis de eficiencia mediante OEE.
 
-OEE = Disponibilidad × Rendimiento × Calidad
+Estas funcionalidades representan el alcance inicial y podrán ser ajustadas a medida que avance el análisis y desarrollo del proyecto.
 
-Donde OEE considera tres factores:
+---
 
-- Disponibilidad: porcentaje de tiempo en que el equipo está operativo.
-- Rendimiento: eficiencia respecto a la velocidad de producción esperada.
-- Calidad: proporción de productos correctos frente al total producido.
+## 3. Objetivo general
 
+Desarrollar un Sistema de Control de Producción (MES) que permita gestionar y supervisar diferentes procesos productivos, integrando planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
 
-### Patrones de software
+---
 
-Para el desarrollo del sistema se analizará y aplicará el uso de diferentes patrones de diseño que permitan mejorar la organización, reutilización, mantenimiento y escalabilidad del software.
+## 4. Alcance inicial
 
-Entre los posibles patrones seleccionados se encuentran:
+El sistema contempla inicialmente:
 
--Factory: Se utilizará para crear diferentes tipos de órdenes de producción dependiendo del proceso requerido.
--Observer: Permitirá notificar automáticamente a los componentes del sistema cuando cambie el estado de una máquina.
--Strategy: Permitirá implementar diferentes estrategias para calcular indicadores de producción y eficiencia.
--Repository: Se utilizará para separar el acceso a la base de datos de la lógica de negocio.
--Singleton: Permitirá garantizar una única instancia de componentes centralizados del sistema, como la configuración general del MES.
+- Crear y gestionar órdenes de producción.
+- Realizar seguimiento al estado y avance de las órdenes.
+- Registrar controles de calidad.
+- Gestionar información de productos y lotes.
+- Mantener la trazabilidad de la producción.
+- Representar el estado de máquinas y equipos.
+- Registrar tiempos de operación y paradas.
+- Calcular indicadores de eficiencia relacionados con la producción.
 
+La integración con equipos industriales reales y otras funcionalidades avanzadas serán evaluadas durante las siguientes etapas del proyecto.
 
-### Arquitectura
+---
 
-El sistema estará organizado en diferentes capas:
+## 5. Indicador OEE
 
-- Presentación
-- Lógica de negocio
-- Acceso a datos
-- Persistencia
+El sistema contempla el cálculo del indicador **OEE (Overall Equipment Effectiveness)**, utilizado para analizar la eficiencia de los equipos de producción.
 
-### Objetivo
+El indicador considera tres factores:
 
-Desarrollar un Sistema de Control de Producción (MES) que permita gestionar los procesos productivos de una empresa, integrando planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia mediante OEE.
+- **Disponibilidad:** porcentaje de tiempo en que el equipo se encuentra operativo.
+- **Rendimiento:** relación entre la producción obtenida y la producción esperada.
+- **Calidad:** proporción de productos correctos frente al total producido.
 
-## Estado del proyecto
+La fórmula general es:
 
-🚧 En desarrollo.
+**OEE = Disponibilidad × Rendimiento × Calidad**
+
+---
+
+## 6. Patrones de diseño propuestos
+
+Como primera aproximación se identificaron los siguientes patrones:
+
+| Patrón | Aplicación propuesta |
+|---|---|
+| **Factory** | Crear diferentes tipos de órdenes de producción. |
+| **Observer** | Notificar cambios en el estado de máquinas y equipos. |
+| **Strategy** | Implementar diferentes estrategias para cálculos de producción y eficiencia. |
+| **Repository** | Separar el acceso a datos de la lógica de negocio. |
+| **Singleton** | Gestionar componentes centralizados que requieran una única instancia. |
+
+Estos patrones corresponden a una propuesta inicial. Su aplicación será analizada durante el desarrollo de acuerdo con las necesidades reales del sistema.
+
+---
+
+## 7. Arquitectura inicial
+
+Se plantea inicialmente una organización por capas:
+
+**Presentación**  
+Interfaz mediante la cual los usuarios interactúan con el sistema.
+
+**Lógica de negocio**  
+Contiene las reglas y procesos relacionados con la producción, calidad, máquinas e indicadores.
+
+**Acceso a datos**  
+Gestiona las operaciones necesarias para consultar y modificar la información.
+
+**Persistencia**  
+Se encarga del almacenamiento de los datos del sistema.
+
+---
+
+## 8. Estado inicial
+
+El proyecto se encuentra en la etapa de **contextualización y planificación inicial**.
+
+Durante esta etapa se ha definido:
+
+- El problema general que se busca abordar.
+- La propuesta del sistema MES.
+- El objetivo general.
+- Las principales funcionalidades.
+- El alcance inicial.
+- El indicador OEE como elemento de análisis.
+- Una propuesta inicial de patrones de diseño.
+- Una arquitectura inicial.
+- La estructura básica del repositorio.
+
+---
+
+## 9. Próximos pasos
+
+Como continuación del proyecto se plantea:
+
+1. Definir los requisitos funcionales y no funcionales.
+2. Identificar los actores y casos de uso.
+3. Refinar la arquitectura del sistema.
+4. Definir el modelo de datos.
+5. Analizar detalladamente la aplicación de los patrones de diseño.
+6. Iniciar el desarrollo de los primeros componentes.
+7. Documentar los avances realizados durante cada etapa.
