@@ -1,72 +1,85 @@
-# Patrones_de_software
+# Sistema de Control de Producción (MES)
 
-Patrones de software E-195
+**Asignatura:** Patrones de Software E-195
 
-Integrantes: 
-Yesica Dayana Rueda Saldarriaga -- Sergio Andrés Mendoza Osorio
+**Integrantes:**
+- Yesica Dayana Rueda Saldarriaga
+- Sergio Andrés Mendoza Osorio
 
-Sistema de Control de Producción (MES)
+## Descripción
 
-Descripción
+El **Sistema de Control de Producción (MES - Manufacturing Execution System)** es una solución de software orientada a gestionar, supervisar y controlar los procesos de producción de una empresa industrial.
 
-El Sistema de Control de Producción (MES - Manufacturing Execution System) es una solución de software diseñada para gestionar, supervisar y controlar los procesos de producción de una empresa industrial.
+El sistema permitirá administrar la planificación de la producción, realizar seguimiento a las órdenes, gestionar el control de calidad y la trazabilidad de los productos, monitorear el estado de máquinas y equipos, y analizar la eficiencia de la producción mediante el indicador OEE.
 
-El sistema permitirá administrar la planificación de la producción, controlar la calidad y trazabilidad de los productos, integrar información proveniente de máquinas CNC y robots, y analizar la eficiencia de los equipos mediante el indicador OEE.
+## Objetivo
 
-Funcionalidades principales
+Desarrollar un Sistema de Control de Producción (MES) que permita gestionar y supervisar diferentes procesos productivos, integrando funcionalidades de planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
 
-1. Planificación y programación de producción
+## Funcionalidades principales
 
-Gestión de órdenes de producción.
-Programación de actividades.
-Seguimiento del estado de las órdenes.
-Control del avance de la producción.
+### Planificación y producción
+- Gestión de órdenes de producción.
+- Programación de actividades.
+- Seguimiento del estado de las órdenes.
+- Control del avance de la producción.
 
-2. Control de calidad y trazabilidad
+### Calidad y trazabilidad
+- Registro de inspecciones de calidad.
+- Control de productos aprobados y rechazados.
+- Seguimiento de lotes.
+- Trazabilidad de materias primas y productos.
+- Consulta del historial de producción.
 
-Registro de inspecciones de calidad.
-Control de productos aprobados y rechazados.
-Seguimiento de lotes.
-Trazabilidad de materias primas y productos.
-Consulta del historial de producción.
+### Monitoreo de equipos
+- Consulta del estado de las máquinas.
+- Registro de información de producción.
+- Control de tiempos de operación y paradas.
+- Representación de información relacionada con máquinas CNC y robots.
 
-3. Integración con máquinas CNC y robots
+### Análisis OEE
 
-Monitoreo del estado de las máquinas.
-Registro de datos de producción.
-Control de tiempos de operación y paradas.
-Integración con equipos industriales.
+El sistema permitirá calcular y analizar el indicador **OEE (Overall Equipment Effectiveness)** para evaluar la eficiencia de los equipos.
 
-4. Análisis de OEE
+**OEE = Disponibilidad × Rendimiento × Calidad**
 
-El sistema permitirá calcular y analizar el indicador OEE (Overall Equipment Effectiveness) para evaluar la eficiencia de los equipos.
+## Patrones de diseño
 
-El OEE considera tres factores principales:
+Como propuesta inicial se plantea analizar y aplicar los siguientes patrones:
 
-Disponibilidad
-Rendimiento
-Calidad
+| Patrón | Aplicación |
+|---|---|
+| **Factory** | Creación de diferentes tipos de órdenes de producción. |
+| **Observer** | Notificación de cambios en el estado de máquinas y equipos. |
+| **Strategy** | Implementación de diferentes estrategias para cálculos de producción y eficiencia. |
+| **Repository** | Separación del acceso a datos de la lógica de negocio. |
+| **Singleton** | Gestión de componentes centralizados que requieran una única instancia. |
 
-La fórmula utilizada es:
+La selección de patrones podrá ajustarse durante el desarrollo según las necesidades identificadas en el sistema.
 
-OEE = Disponibilidad × Rendimiento × Calidad
+## Arquitectura inicial
 
+El sistema se plantea inicialmente mediante las siguientes capas:
 
-Patrones de software
+- **Presentación:** interacción del usuario con el sistema.
+- **Lógica de negocio:** reglas y procesos relacionados con la producción.
+- **Acceso a datos:** gestión de operaciones sobre la información.
+- **Persistencia:** almacenamiento de los datos del sistema.
 
-Para el desarrollo del sistema se analizará y aplicará el uso de diferentes patrones de diseño que permitan mejorar la organización, reutilización, mantenimiento y escalabilidad del software.
+## Estructura del proyecto
 
-Entre los posibles patrones se encuentran:
-
-Factory: creación de diferentes tipos de objetos del sistema.
-Observer: notificaciones ante cambios en el estado de máquinas o procesos.
-Strategy: implementación de diferentes estrategias de cálculo o procesamiento.
-Repository: separación de la lógica de acceso a datos.
-Singleton: gestión de componentes que requieren una única instancia.
-Objetivo
-
-Desarrollar un Sistema de Control de Producción (MES) que permita gestionar los procesos productivos de una empresa, integrando planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia mediante OEE.
-
-Estado del proyecto
-
-🚧 En desarrollo.
+```text
+Proyecto_Patrones_de_software/
+│
+├── src/
+│   ├── css/
+│   │   └── styles.css
+│   ├── js/
+│   │   └── main.js
+│   └── index.html
+│
+├── docs/
+│   └── semana-00/
+│       └── contextualizacion.md
+│
+└── README.md
