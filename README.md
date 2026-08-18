@@ -3,8 +3,8 @@
 **Asignatura:** Patrones de Software E-195
 
 **Integrantes:**
-- Yesica Dayana Rueda Saldarriaga
-- Sergio Andrés Mendoza Osorio
+- Yesica Dayana Rueda Saldarriaga.
+- Sergio Andrés Mendoza Osorio.
 
 ## Descripción
 
