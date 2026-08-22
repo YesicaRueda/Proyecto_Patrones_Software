@@ -12,9 +12,23 @@ El **Sistema de Control de Producción (MES - Manufacturing Execution System)** 
 
 El sistema permitirá administrar la planificación de la producción, realizar seguimiento a las órdenes, gestionar el control de calidad y la trazabilidad de los productos, monitorear el estado de máquinas y equipos, y analizar la eficiencia de la producción mediante el indicador OEE.
 
-## Objetivo
+## 🎯 Objetivos
 
-Desarrollar un Sistema de Control de Producción (MES) que permita gestionar y supervisar diferentes procesos productivos, integrando funcionalidades de planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
+### Objetivo general
+
+Desarrollar un **Sistema de Control de Producción (MES)** que permita gestionar y supervisar diferentes procesos productivos, integrando funcionalidades de planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
+
+### Objetivos específicos
+
+- **Gestionar** las órdenes y actividades de producción, permitiendo realizar seguimiento al avance y estado de los procesos.
+
+- **Implementar** funcionalidades para el control de calidad y la trazabilidad de materias primas, lotes y productos.
+
+- **Monitorear** el estado y desempeño de las máquinas y equipos, incluyendo el cálculo del indicador **OEE** para evaluar la eficiencia de la producción.
+
+- **Aplicar** patrones de diseño de software que permitan desarrollar un sistema organizado, reutilizable y fácil de mantener.
+
+
 
 ## Funcionalidades principales
 
