@@ -6,7 +6,7 @@
 - Yesica Dayana Rueda Saldarriaga.
 - Sergio Andrés Mendoza Osorio.
 
-## Descripción
+## Descripción del proyecto
 
 El **Sistema de Control de Producción (MES - Manufacturing Execution System)** es una solución de software orientada a gestionar, supervisar y controlar los procesos de producción de una empresa industrial.
 
