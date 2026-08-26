@@ -79,23 +79,7 @@ El indicador considera tres factores:
 
 ---
 
-## 6. Patrones de diseño propuestos
-
-Como primera aproximación se identificaron los siguientes patrones:
-
-| Patrón | Aplicación propuesta |
-|---|---|
-| **Factory** | Crear diferentes tipos de órdenes de producción. |
-| **Observer** | Notificar cambios en el estado de máquinas y equipos. |
-| **Strategy** | Implementar diferentes estrategias para cálculos de producción y eficiencia. |
-| **Repository** | Separar el acceso a datos de la lógica de negocio. |
-| **Singleton** | Gestionar componentes centralizados que requieran una única instancia. |
-
-Estos patrones corresponden a una propuesta inicial. Su aplicación será analizada durante el desarrollo de acuerdo con las necesidades reales del sistema.
-
----
-
-## 7. Arquitectura inicial
+## 6. Arquitectura inicial
 
 Se plantea inicialmente una organización por capas:
 
@@ -117,7 +101,7 @@ Se encarga del almacenamiento de los datos del sistema.
 
 ---
 
-## 8. Estado inicial
+## 7. Estado inicial
 
 El proyecto se encuentra en la etapa de **contextualización y planificación inicial**.
 
