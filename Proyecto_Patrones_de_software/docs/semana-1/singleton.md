@@ -1,132 +1,63 @@
-# Semana 0 - Contextualización del Proyecto
-
-## Sistema de Control de Producción (MES)
+# Semana 1 - Implementación del patrón Singleton
 
 **Asignatura:** Patrones de Software E-195
+
+**Proyecto:** Sistema de Control de Producción (MES)
 
 **Integrantes:**
 - Yesica Dayana Rueda Saldarriaga
 - Sergio Andrés Mendoza Osorio
 
----
+## 1. Objetivo
 
-## 1. Contextualización
+Implementar el patrón de diseño Singleton dentro del Sistema de Control de Producción (MES), utilizando una instancia única para centralizar el registro de eventos del sistema.
 
-En una empresa industrial se generan constantemente diferentes procesos e información relacionados con la producción, como órdenes de fabricación, programación de actividades, control de calidad, estado de las máquinas, tiempos de operación y trazabilidad de los productos.
+## 2. Problema identificado
 
-La gestión organizada de esta información permite realizar un mejor seguimiento de la producción, identificar problemas y analizar el rendimiento de los equipos.
+El sistema MES cuenta con diferentes componentes, como producción y monitoreo de equipos, que necesitan registrar eventos durante la ejecución.
 
-A partir de esta necesidad se propone desarrollar un **Sistema de Control de Producción (MES - Manufacturing Execution System)** que permita centralizar y gestionar información relacionada con los procesos productivos.
+Si cada componente utilizara una instancia diferente del sistema de registro, se podría perder la centralización y consistencia de la información.
 
-El proyecto se desarrollará durante el semestre como una aplicación práctica de los conceptos de **patrones de diseño de software**, buscando que la solución tenga una estructura organizada, mantenible y escalable.
+Por esta razón, se requiere un único objeto Logger que pueda ser utilizado desde diferentes partes del sistema.
 
----
+## 3. Implementación
 
-## 2. Descripción del proyecto
+Se implementó la clase `Logger` utilizando una instancia única almacenada en `_instance` y un método `getInstance()` encargado de crearla únicamente cuando sea necesaria y devolverla posteriormente.
 
-El sistema MES permitirá gestionar, supervisar y controlar diferentes aspectos del proceso productivo de una empresa.
+![Implementación del patrón Singleton](codigo-singleton.jpeg)
 
-Inicialmente se contemplan las siguientes áreas:
+La implementación corresponde a una inicialización Lazy, ya que la instancia se crea solamente cuando se solicita por primera vez mediante `getInstance()`.
 
-- Planificación y programación de la producción.
-- Gestión y seguimiento de órdenes de producción.
-- Control de calidad.
-- Trazabilidad de productos y lotes.
-- Monitoreo del estado de máquinas y equipos.
-- Registro de información de producción.
-- Análisis de eficiencia mediante OEE.
+## 4. Interpretación dentro del MES
 
-Estas funcionalidades representan el alcance inicial y podrán ser ajustadas a medida que avance el análisis y desarrollo del proyecto.
+El patrón Singleton se utiliza para implementar un Logger centralizado.
 
----
+Los componentes de producción y equipos pueden acceder al mismo Logger para registrar eventos del sistema. De esta manera, diferentes partes del MES utilizan una única instancia compartida.
 
-## 3. Objetivo general
+La implementación permite evidenciar las características principales del patrón:
 
-Desarrollar un Sistema de Control de Producción (MES) que permita gestionar y supervisar diferentes procesos productivos, integrando planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
+- **Una única instancia:** el sistema mantiene un solo objeto `Logger`.
+- **Acceso global:** diferentes componentes pueden obtenerlo mediante `getInstance()`.
+- **Estado consistente:** todos los componentes utilizan la misma instancia para registrar eventos.
 
----
+## 5. Uso del Singleton
 
-## 4. Alcance inicial
+Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-El sistema contempla inicialmente:
+![Uso del Singleton](uso-singleton.jpeg)
 
-- Crear y gestionar órdenes de producción.
-- Realizar seguimiento al estado y avance de las órdenes.
-- Registrar controles de calidad.
-- Gestionar información de productos y lotes.
-- Mantener la trazabilidad de la producción.
-- Representar el estado de máquinas y equipos.
-- Registrar tiempos de operación y paradas.
-- Calcular indicadores de eficiencia relacionados con la producción.
+La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método, permitiendo comprobar que ambas referencias corresponden al mismo objeto.
 
-La integración con equipos industriales reales y otras funcionalidades avanzadas serán evaluadas durante las siguientes etapas del proyecto.
+## 6. Prueba de ejecución
 
----
+Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-## 5. Indicador OEE
+![Prueba de ejecución](prueba-singleton.jpeg)
 
-El sistema contempla el cálculo del indicador **OEE (Overall Equipment Effectiveness)**, utilizado para analizar la eficiencia de los equipos de producción.
+El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
-El indicador considera tres factores:
+Además, se comprobó su utilización desde diferentes componentes del MES, registrando eventos relacionados con una orden de producción y una máquina CNC.
 
-- **Disponibilidad:** porcentaje de tiempo en que el equipo se encuentra operativo.
-- **Rendimiento:** relación entre la producción obtenida y la producción esperada.
-- **Calidad:** proporción de productos correctos frente al total producido.
+## 7. Conclusión
 
-### Fórmula
-
-**OEE = Disponibilidad × Rendimiento × Calidad**
-
----
-
-## 6. Arquitectura inicial
-
-Se plantea inicialmente una organización por capas:
-
-### Presentación
-
-Interfaz mediante la cual los usuarios interactúan con el sistema.
-
-### Lógica de negocio
-
-Contiene las reglas y procesos relacionados con la producción, calidad, máquinas e indicadores.
-
-### Acceso a datos
-
-Gestiona las operaciones necesarias para consultar y modificar la información.
-
-### Persistencia
-
-Se encarga del almacenamiento de los datos del sistema.
-
----
-
-## 7. Estado inicial
-
-El proyecto se encuentra en la etapa de **contextualización y planificación inicial**.
-
-Durante esta etapa se ha definido:
-
-- El problema general que se busca abordar.
-- La propuesta del sistema MES.
-- El objetivo general.
-- Las principales funcionalidades.
-- El alcance inicial.
-- El indicador OEE como elemento de análisis.
-- Una propuesta inicial de patrones de diseño.
-- Una arquitectura inicial.
-- La estructura básica del repositorio.
-
----
-
-## 9. Próximos pasos
-
-Como continuación del proyecto se plantea:
-
-1. Definir los requisitos funcionales y no funcionales.
-2. Identificar los actores y casos de uso.
-3. Refinar la arquitectura del sistema.
-4. Definir el modelo de datos.
-5. Analizar detalladamente la aplicación de los patrones de diseño.
-6. Iniciar el desarrollo de los primeros componentes.
-7. Documentar los avances realizados durante cada etapa.
+La implementación del patrón Singleton permitió centralizar el Logger del MES mediante una única instancia compartida. Esta solución resulta apropiada debido a que diferentes componentes del sistema requieren acceso al mismo servicio de registro.
