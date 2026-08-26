@@ -3,85 +3,204 @@
 **Asignatura:** Patrones de Software E-195
 
 **Integrantes:**
-- Yesica Dayana Rueda Saldarriaga.
-- Sergio Andrés Mendoza Osorio.
+- Yesica Dayana Rueda Saldarriaga
+- Sergio Andrés Mendoza Osorio
+
+---
 
 ## Descripción del proyecto
 
-El **Sistema de Control de Producción (MES - Manufacturing Execution System)** es una solución de software orientada a gestionar, supervisar y controlar los procesos de producción de una empresa industrial.
+El **Sistema de Control de Producción (MES - Manufacturing Execution System)** es una solución de software orientada a gestionar, supervisar y controlar diferentes procesos de producción de una empresa industrial.
 
-El sistema permitirá administrar la planificación de la producción, realizar seguimiento a las órdenes, gestionar el control de calidad y la trazabilidad de los productos, monitorear el estado de máquinas y equipos, y analizar la eficiencia de la producción mediante el indicador OEE.
+El sistema busca centralizar información relacionada con la planificación y programación de la producción, el control de calidad y la trazabilidad, el monitoreo de equipos y la integración simulada con máquinas CNC y robots, además del análisis de eficiencia mediante el indicador OEE.
 
-## Objetivos
+El proyecto se desarrollará progresivamente durante el semestre como aplicación práctica de los conceptos de diseño de software y patrones de diseño.
 
-### Objetivo general
+---
 
-Desarrollar un **Sistema de Control de Producción (MES)** que permita gestionar y supervisar diferentes procesos productivos, integrando funcionalidades de planificación, control de calidad, trazabilidad, monitoreo de equipos y análisis de eficiencia.
+## Objetivo general
 
-### Objetivos específicos
+Desarrollar un **Sistema de Control de Producción (MES)** que permita gestionar y supervisar procesos productivos, aplicando patrones de diseño de software para construir una solución organizada, mantenible y adaptable.
 
-- **Gestionar** las órdenes y actividades de producción, permitiendo realizar seguimiento al avance y estado de los procesos.
+---
 
-- **Implementar** funcionalidades para el control de calidad y la trazabilidad de materias primas, lotes y productos.
+## Objetivos específicos
 
-- **Monitorear** el estado y desempeño de las máquinas y equipos, incluyendo el cálculo del indicador **OEE** para evaluar la eficiencia de la producción.
+- Gestionar órdenes y actividades de producción, permitiendo realizar seguimiento a su estado y avance.
 
-- **Aplicar** patrones de diseño de software que permitan desarrollar un sistema organizado, reutilizable y fácil de mantener.
+- Implementar funcionalidades relacionadas con el control de calidad y la trazabilidad de productos y lotes.
 
+- Representar y monitorear máquinas y equipos de producción, incluyendo una simulación de dispositivos CNC y robots.
 
+- Calcular y analizar el indicador **OEE** para evaluar la eficiencia de los equipos.
 
-## Funcionalidades principales
+- Identificar problemas de diseño durante el desarrollo y aplicar patrones de diseño cuando representen una solución apropiada.
 
-### Planificación y producción
+---
+
+## Alcance funcional
+
+El proyecto se desarrolla alrededor de cuatro ejes principales:
+
+### 1. Planificación y producción
+
 - Gestión de órdenes de producción.
 - Programación de actividades.
 - Seguimiento del estado de las órdenes.
 - Control del avance de la producción.
 
-### Calidad y trazabilidad
+### 2. Calidad y trazabilidad
+
 - Registro de inspecciones de calidad.
 - Control de productos aprobados y rechazados.
-- Seguimiento de lotes.
+- Gestión de lotes.
 - Trazabilidad de materias primas y productos.
 - Consulta del historial de producción.
 
-### Monitoreo de equipos
-- Consulta del estado de las máquinas.
-- Registro de información de producción.
-- Control de tiempos de operación y paradas.
-- Representación de información relacionada con máquinas CNC y robots.
+### 3. Máquinas y equipos
 
-### Análisis OEE
+- Representación del estado de máquinas y equipos.
+- Registro de tiempos de operación y paradas.
+- Simulación de máquinas CNC y robots.
+- Registro de información relacionada con la producción.
 
-El sistema permitirá calcular y analizar el indicador **OEE (Overall Equipment Effectiveness)** para evaluar la eficiencia de los equipos.
+La integración con hardware industrial real no forma parte del alcance inicial. Los dispositivos serán representados mediante abstracciones y simulaciones de software.
+
+### 4. Análisis OEE
+
+El sistema permitirá calcular y analizar el indicador **OEE (Overall Equipment Effectiveness)**.
+
+El indicador considera:
+
+- **Disponibilidad:** proporción del tiempo en que el equipo se encuentra operativo.
+- **Rendimiento:** relación entre la producción obtenida y la producción esperada.
+- **Calidad:** proporción de productos correctos frente al total producido.
 
 **OEE = Disponibilidad × Rendimiento × Calidad**
 
+---
+
 ## Patrones de diseño
 
-Como propuesta inicial se plantea analizar y aplicar los siguientes patrones:
+Los patrones se incorporarán progresivamente durante el desarrollo a partir de problemas de diseño identificados en el sistema.
 
-| Patrón | Aplicación |
-|---|---|
-| **Factory** | Creación de diferentes tipos de órdenes de producción. |
-| **Observer** | Notificación de cambios en el estado de máquinas y equipos. |
-| **Strategy** | Implementación de diferentes estrategias para cálculos de producción y eficiencia. |
-| **Repository** | Separación del acceso a datos de la lógica de negocio. |
-| **Singleton** | Gestión de componentes centralizados que requieran una única instancia. |
+No se considera obligatorio utilizar un patrón si no existe una necesidad que justifique su aplicación.
 
-La selección de patrones podrá ajustarse durante el desarrollo según las necesidades identificadas en el sistema.
+Entre los patrones que podrán analizarse se encuentran:
 
-## Arquitectura inicial
+- **Singleton**
+- **Factory Method**
+- **Abstract Factory**
+- **Builder**
+- **Prototype**
+- **Observer**
+- **Strategy**
+- Otros patrones GoF que resulten pertinentes durante el desarrollo.
 
-El sistema se plantea inicialmente mediante las siguientes capas:
+La selección y aplicación de los patrones se justificará mediante la relación:
 
-- **Presentación:** interacción del usuario con el sistema.
-- **Lógica de negocio:** reglas y procesos relacionados con la producción.
-- **Acceso a datos:** gestión de operaciones sobre la información.
-- **Persistencia:** almacenamiento de los datos del sistema.
+**Problema → Necesidad → Alternativas → Patrón → Diseño → Implementación → Prueba**
 
-## Estructura del proyecto
+### Singleton implementado
 
-lizacion.md
+Actualmente se implementó el patrón **Singleton** para construir un **Logger centralizado** del sistema.
+
+Los componentes de producción y equipos pueden acceder a una única instancia mediante `getInstance()`, permitiendo centralizar el registro de eventos del MES.
+
+La implementación actual utiliza **Lazy Initialization**.
+
+---
+
+## Tecnología
+
+El desarrollo del sistema se realizará principalmente utilizando:
+
+- **Python 3.11**
+- **Visual Studio Code**
+- **Git y GitHub** para el control de versiones.
+
+El entorno y las herramientas podrán evolucionar durante el desarrollo de acuerdo con las necesidades del proyecto y los requisitos de la asignatura.
+
+---
+
+## Arquitectura
+
+La arquitectura definitiva del sistema será definida y refinada durante el desarrollo.
+
+Como requisito del proyecto se deberá analizar e implementar una arquitectura basada en **microservicios y/o arquitectura hexagonal**, seleccionando la alternativa que resulte adecuada para el alcance académico del sistema.
+
+La arquitectura no se considera todavía definitiva, ya que su diseño será desarrollado progresivamente junto con la evolución del sistema.
+
+---
+
+## Estructura actual del proyecto
+
+```text
+Proyecto_Patrones_de_software/
+│
+├── src/
+│   ├── production/
+│   │   └── prod_service.py
+│   │
+│   ├── quality/
+│   │
+│   ├── equipment/
+│   │   └── equi_service.py
+│   │
+│   ├── oee/
+│   │
+│   ├── infrastructure/
+│   │   └── logger.py
+│   │
+│   └── main.py
+│
+├── tests/
+│
+├── docs/
+│   ├── semana-00/
+│   │   └── contextualizacion.md
+│   │
+│   └── semana-01/
+│       ├── singleton.md
+│       ├── codigo-singleton.png
+│       ├── uso-singleton.png
+│       └── prueba-singleton.png
 │
 └── README.md
+```
+
+Las carpetas y componentes podrán modificarse a medida que evolucione el diseño del sistema.
+
+---
+
+## Estado actual del proyecto
+
+**Semana 1 — Implementación de Singleton**
+
+Actualmente se cuenta con:
+
+- Estructura inicial del proyecto en Python.
+- Módulo de producción.
+- Módulo de equipos.
+- Módulo de infraestructura.
+- Logger centralizado implementado mediante Singleton.
+- Lazy Initialization mediante `getInstance()`.
+- Prueba de instancia única.
+- Uso del Logger desde diferentes componentes del MES.
+- Documentación correspondiente a la Semana 1.
+
+---
+
+## Documentación
+
+La documentación del desarrollo se organiza por semanas dentro de la carpeta `docs/`.
+
+Cada etapa registra los avances, decisiones de diseño, implementaciones y pruebas realizadas durante el desarrollo del proyecto.
+
+---
+
+## Control de versiones
+
+El proyecto utiliza **Git y GitHub** para gestionar el código fuente y documentar la evolución del sistema mediante ramas y commits.
+
+La rama principal se utilizará como versión integrada del proyecto, mientras que las ramas de trabajo permitirán desarrollar y validar cambios antes de su integración.
