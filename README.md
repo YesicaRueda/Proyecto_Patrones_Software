@@ -163,9 +163,6 @@ Proyecto_Patrones_de_software/
 │       ├── uso-singleton.png
 │       └── prueba-singleton.png
 │
-├── videos/
-│   └── semana-01-singleton.mp4
-│
 └── README.md
 ```
 
@@ -196,17 +193,6 @@ Actualmente se cuenta con:
 La documentación del desarrollo se organiza por semanas dentro de la carpeta `docs/`.
 
 Cada etapa registra los avances, decisiones de diseño, implementaciones y pruebas realizadas durante el desarrollo del proyecto.
-
----
-
-## Videos de demostración
-
-Los videos presentan las evidencias de funcionamiento de las implementaciones realizadas durante el desarrollo del proyecto.
-
-* Semana 1 — Patrón Singleton
-Video de demostración del Singleton
-
-El video muestra la implementación del Logger mediante el patrón Singleton, la validación de que se obtiene una única instancia y su utilización desde los componentes de producción y equipos del sistema MES.
 
 ---
 
