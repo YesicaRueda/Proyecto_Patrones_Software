@@ -162,8 +162,8 @@ Proyecto_Patrones_de_software/
 │       ├── codigo-singleton.png
 │       ├── uso-singleton.png
 │       └── prueba-singleton.png
-│ ├── videos/ │ 
-        └── semana-01-singleton.mp4
+├── videos/ 
+│         └── semana-01-singleton.mp4
 │
 └── README.md
 ```
