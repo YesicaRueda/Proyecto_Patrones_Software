@@ -164,6 +164,7 @@ Proyecto_Patrones_de_software/
 │       └── prueba-singleton.png
 ├── videos/ 
 │         └── semana-01-singleton.mp4
+├── .gitignore
 │
 └── README.md
 ```
