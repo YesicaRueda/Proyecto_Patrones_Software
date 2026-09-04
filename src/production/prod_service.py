@@ -1,18 +1,8 @@
 
 
-from infrastructure.logger import Logger
+from src.infrastructure.logger import Logger
 
-class ProductionService:
-
-    #  -antes que era el main quien creaba la orden
-    # def start_order(self, order): 
-    #     logger = Logger.getInstance()
-
-    #     order.start()
-
-    #     logger.log(
-    #         f"Orden de producción {order.order_id} iniciada"
-    #     )        
+class ProductionService:     
 
     def __init__(self):
         self.orders = {}
@@ -48,4 +38,13 @@ class ProductionService:
         logger = Logger.getInstance()
         logger.log(f"Orden de producción {order_id} completada")
 
-    
+    def get_pending_queue(self):
+        pending = [
+            order for order in self.orders.values()
+            if order.status == "Pendiente"
+        ]
+        return sorted(
+            pending,
+            key=lambda order: order.get_priority_score(),
+            reverse=True
+        )
