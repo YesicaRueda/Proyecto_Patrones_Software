@@ -1,5 +1,4 @@
 
-
 from src.infrastructure.logger import Logger
 from src.production.prod_service import ProductionService
 from src.equipment.equi_service import EquipmentService
