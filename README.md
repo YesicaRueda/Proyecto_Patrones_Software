@@ -226,24 +226,30 @@ Proyecto_Patrones_de_software/
 ├── tests/
 │   └── pruebas del sistema
 │
-├── docs/
-│   ├── semana-00/
-│   │   └── contextualizacion.md
-│   │
-│   ├── semana-01/
-│   │   ├── singleton.md
-│   │   ├── codigo-singleton.png
-│   │   ├── uso-singleton.png
-│   │   └── prueba-singleton.png
-│   │
-│   └── semana-04/
-│       ├── factory-method.md
-│       ├── codigo-factory-creator.jpeg
-│       ├── codigo-priority-score.jpeg
-│       ├── uso-factory-main.jpeg
-│       ├── codigo-pending-queue.jpeg
-│       ├── ejecucion-main.jpeg
-│       └── prueba-pytest-factory.jpeg
+docs/
+│
+├── semana-01/
+│   └── contextualizacion.md
+│
+├── semana-02/
+│   └── contextualizacion2.md
+│
+├── semana-03/
+│   ├── singleton.md
+│   ├── codigo-singleton.jpeg
+│   ├── prueba-singleton.jpeg
+│   └── uso-singleton.jpeg
+│
+└── semana-04/
+    ├── Factory-Method.md
+    ├── codigo-factory-creator.jpg
+    ├── codigo-pending-queue.jpg
+    ├── codigo-priority-score.jpg
+    ├── codigo-singleton.jpeg
+    ├── ejecucion-main.jpg
+    ├── prueba-pytest-factory.jpg
+    ├── prueba-singleton.jpeg
+    └── uso-factory-main.jpg
 │
 ├── videos/
 │   ├── semana-01-singleton.mp4
