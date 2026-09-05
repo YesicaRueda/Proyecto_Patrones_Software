@@ -260,10 +260,6 @@ docs/
 └── README.md
 ```
 
-La estructura podrá modificarse a medida que evolucione el diseño del sistema.
-
----
-
 ## Documentación
 
 La documentación del desarrollo se organiza por semanas dentro de la carpeta `docs/`.
