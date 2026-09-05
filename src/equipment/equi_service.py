@@ -1,4 +1,5 @@
-from infrastructure.logger import Logger
+
+from src.infrastructure.logger import Logger
 
 
 class EquipmentService:
