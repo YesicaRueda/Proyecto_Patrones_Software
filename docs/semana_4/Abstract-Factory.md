@@ -448,27 +448,6 @@ El resultado obtenido fue de **3 pruebas superadas**.
 
 [Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
 
----
-
-
-# 20. Correcciones y cambios respecto a la semana anterior
-
-Durante esta etapa se realizaron algunos ajustes relacionados con la estructura del proyecto.
-
-* Se configuró `pytest.ini` en la raíz del proyecto con:
-
-```ini
-[pytest]
-pythonpath = .
-```
-
-Esto permite que las pruebas resuelvan correctamente los imports internos del paquete `src`.
-
-* `ProductionOrder` se convirtió en clase abstracta real (`ABC`), con `get_priority_score()` como método abstracto. Esto impide instanciar `ProductionOrder` directamente y obliga a que cualquier subclase nueva implemente su propio score.
-
-* Se agregaron validaciones de reglas de negocio en `ProductionService`: `add_order()` rechaza un `order_id` duplicado, `start_order()` solo es válido si la orden está en estado `"Pendiente"`, y `complete_order()` solo si está en estado `"En producción"`. Antes de esta corrección era posible completar una orden sin iniciarla, o repetir una transición de estado.
-
-* Todas estas correcciones quedaron cubiertas por pruebas automatizadas nuevas.
 
 ---
 
@@ -565,9 +544,27 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ## 23.8 Diagrama UML
 
-*(Espacio reservado para el diagrama de clases UML del patrón Abstract Factory, generado en PlantUML.)*
-
 ![Diagrama UML de Abstract Factory](img/uml-abstract-factory.png)
+
+---
+# 23.9 Correcciones y cambios respecto a la semana anterior
+
+Durante esta etapa se realizaron algunos ajustes relacionados con la estructura del proyecto.
+
+* Se configuró `pytest.ini` en la raíz del proyecto con:
+
+```ini
+[pytest]
+pythonpath = .
+```
+
+Esto permite que las pruebas resuelvan correctamente los imports internos del paquete `src`.
+
+* `ProductionOrder` se convirtió en clase abstracta real (`ABC`), con `get_priority_score()` como método abstracto. Esto impide instanciar `ProductionOrder` directamente y obliga a que cualquier subclase nueva implemente su propio score.
+
+* Se agregaron validaciones de reglas de negocio en `ProductionService`: `add_order()` rechaza un `order_id` duplicado, `start_order()` solo es válido si la orden está en estado `"Pendiente"`, y `complete_order()` solo si está en estado `"En producción"`. Antes de esta corrección era posible completar una orden sin iniciarla, o repetir una transición de estado.
+
+* Todas estas correcciones quedaron cubiertas por pruebas automatizadas nuevas.
 
 ---
 
@@ -586,8 +583,6 @@ Implementado para separar la creación de diferentes tipos de órdenes de produc
 ### Abstract Factory
 
 Implementado para la creación de familias completas de equipos de producción (línea CNC y línea robótica), garantizando la consistencia entre el equipo y su inspección asociada.
-
-Los patrones **Observer**, **Strategy** y **Repository** continúan pendientes y serán evaluados e implementados progresivamente según las necesidades del sistema.
 
 ---
 
