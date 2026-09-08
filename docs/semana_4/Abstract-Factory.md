@@ -1,4 +1,4 @@
-# Semana X - Aplicación del patrón Abstract Factory
+# Semana IV - Aplicación del patrón Abstract Factory
 
 **Asignatura:** Patrones de Software E-195
 
@@ -276,11 +276,6 @@ Además, se comprobó su utilización desde diferentes componentes del MES, regi
 
 ---
 
-## 13.6 Evidencia de Video
-
-![Ver video de la prueba](../../videos/singleton.mp4)
-
----
 
 ## 13.7 Integración con los componentes del MES
 
@@ -438,29 +433,11 @@ Las pruebas verifican:
 El resultado obtenido fue de **3 pruebas superadas**.
 
 ---
-## 19.2 Evidencia de Video
 
-![Ver video de la prueba](../../videos/factory-method.mp4)
-
----
 
 # 20. Correcciones y cambios respecto a la semana anterior
 
 Durante esta etapa se realizaron algunos ajustes relacionados con la estructura del proyecto.
-
-* Se corrigió un import inconsistente del `Logger` en `prod_service.py`:
-
-```python
-from infrastructure.logger import Logger
-```
-
-por:
-
-```python
-from src.infrastructure.logger import Logger
-```
-
-Esta corrección permitió solucionar el error que se generaba al ejecutar las pruebas desde la raíz del proyecto.
 
 * Se configuró `pytest.ini` en la raíz del proyecto con:
 
@@ -470,8 +447,6 @@ pythonpath = .
 ```
 
 Esto permite que las pruebas resuelvan correctamente los imports internos del paquete `src`.
-
-* Se realizó limpieza de los comentarios de código muerto en `prod_service.py` y `main.py`, correspondientes a la implementación previa a la introducción del patrón Factory Method.
 
 * `ProductionOrder` se convirtió en clase abstracta real (`ABC`), con `get_priority_score()` como método abstracto. Esto impide instanciar `ProductionOrder` directamente y obliga a que cualquier subclase nueva implemente su propio score.
 
@@ -566,9 +541,9 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ## 23.7 Evidencia de video
 
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se recomienda subirlo a un servicio externo como Google Drive o YouTube en modo no listado, y enlazarlo aquí en lugar de incrustarlo.)*
+*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
 
-[Ver video de la prueba](ENLACE_PENDIENTE)
+[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
 
 ---
 
