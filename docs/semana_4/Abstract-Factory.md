@@ -275,6 +275,13 @@ El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma 
 Además, se comprobó su utilización desde diferentes componentes del MES, registrando eventos relacionados con una orden de producción y una máquina CNC.
 
 ---
+## 13.6 Evidencia de video
+
+*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
+
+[Ver video de la prueba](https://www.youtube.com/watch?v=rjtVx3nIVDs)
+
+---
 
 
 ## 13.7 Integración con los componentes del MES
@@ -435,6 +442,15 @@ El resultado obtenido fue de **3 pruebas superadas**.
 ---
 
 
+## 19.2 Evidencia de video
+
+*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
+
+[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
+
+---
+
+
 # 20. Correcciones y cambios respecto a la semana anterior
 
 Durante esta etapa se realizaron algunos ajustes relacionados con la estructura del proyecto.
@@ -543,7 +559,7 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 *(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
 
-[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
+[Ver video de la prueba](www.youtube.com)
 
 ---
 
