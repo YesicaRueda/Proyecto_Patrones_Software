@@ -282,9 +282,14 @@ Además, se comprobó su utilización desde diferentes componentes del MES, regi
 [Ver video de la prueba](https://www.youtube.com/watch?v=rjtVx3nIVDs)
 
 ---
+## 13.7 Diagrama UML
+
+![Diagrama UML de Singleton](img/uml-singleton.png)
+
+---
 
 
-## 13.7 Integración con los componentes del MES
+## 13.8 Integración con los componentes del MES
 
 La implementación del Singleton se relacionó con los componentes desarrollados para representar el proceso productivo.
 
@@ -300,7 +305,7 @@ Esto permite demostrar que el patrón no se implementa de forma aislada, sino co
 
 ---
 
-## 13.8 Corrección posterior
+## 13.9 Corrección posterior
 
 Se identificó que la garantía de instancia única no estaba completamente asegurada: el control se realizaba en `__init__`, por lo que instanciar `Logger()` directamente (sin pasar por `getInstance()`) podía generar una segunda instancia.
 
@@ -448,18 +453,22 @@ El resultado obtenido fue de **3 pruebas superadas**.
 
 [Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
 
+---
+## 19.3 Diagrama UML
+
+![Diagrama UML de Factory Method](img/uml-factory.png)
 
 ---
 
-# 23. Aplicación del patrón Abstract Factory
+# 20. Aplicación del patrón Abstract Factory
 
-## 23.1 Objetivo
+## 20.1 Objetivo
 
 Aplicar el patrón Abstract Factory para la creación de familias de equipos de producción (línea CNC y línea robótica) del MES, garantizando que los componentes de una misma familia (equipo + inspección) se creen siempre de forma consistente, sin mezclarse con los de otra familia.
 
 ---
 
-## 23.2 Problema identificado
+## 20.2 Problema identificado
 
 El sistema necesita representar distintas tecnologías de producción (por ejemplo, celdas CNC y celdas robóticas), cada una compuesta por un equipo y un tipo de inspección asociado que deben ser coherentes entre sí (una máquina CNC no debe combinarse con una inspección pensada para ensamble robótico).
 
@@ -469,15 +478,15 @@ Antes de esta implementación, `EquipmentService` no representaba ningún equipo
 
 ---
 
-## 23.3 Implementación
+## 20.3 Implementación
 
-### 23.3.1 Productos abstractos
+### 20.3.1 Productos abstractos
 
 Se definieron dos interfaces base: `Equipment` (con `start()`, `stop()` y estado) e `Inspection` (con `inspect()`).
 
 ![Interfaces Equipment e Inspection](img/codigo-equipment-inspection-base.jpeg)
 
-### 23.3.2 Productos concretos y fábricas concretas
+### 20.3.2 Productos concretos y fábricas concretas
 
 Se implementaron dos familias:
 
@@ -493,7 +502,7 @@ Cada familia se agrupa mediante una fábrica concreta que hereda de `AbstractPro
 
 ---
 
-## 23.4 Interpretación dentro del MES
+## 20.4 Interpretación dentro del MES
 
 * **Productos abstractos:** `Equipment`, `Inspection`.
 * **Productos concretos:** `CNCMachine`/`CNCInspection` (familia CNC), `RobotArm`/`RobotInspection` (familia robótica).
@@ -505,7 +514,7 @@ Agregar una nueva línea de producción en el futuro implicaría únicamente cre
 
 ---
 
-## 23.5 Uso del patrón
+## 20.5 Uso del patrón
 
 `EquipmentService` recibe la fábrica en su constructor y delega en ella la creación del equipo y la inspección. También se actualizó para registrar sus eventos a través del `Logger` centralizado, en lugar de mensajes de consola independientes.
 
@@ -513,13 +522,13 @@ Agregar una nueva línea de producción en el futuro implicaría únicamente cre
 
 ---
 
-## 23.6 Prueba de ejecución
+## 20.6 Prueba de ejecución
 
 Se ejecutó `main.py` utilizando `CNCCellFactory`, verificando que el equipo y la inspección creados correspondan a la misma familia y que los eventos se registren mediante el Logger.
 
 ![Ejecución de main.py con Abstract Factory](img/ejecucion-abstract-factory.jpeg)
 
-### 23.6.1 Pruebas automatizadas
+### 20.6.1 Pruebas automatizadas
 
 Se implementaron pruebas que verifican:
 
@@ -534,7 +543,7 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ---
 
-## 23.7 Evidencia de video
+## 20.7 Evidencia de video
 
 *(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
 
@@ -542,12 +551,12 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ---
 
-## 23.8 Diagrama UML
+## 20.8 Diagrama UML
 
 ![Diagrama UML de Abstract Factory](img/uml-abstract-factory.png)
 
 ---
-# 23.9 Correcciones y cambios respecto a la semana anterior
+# 20.9 Correcciones y cambios respecto a la semana anterior
 
 Durante esta etapa se realizaron algunos ajustes relacionados con la estructura del proyecto.
 
@@ -568,7 +577,7 @@ Esto permite que las pruebas resuelvan correctamente los imports internos del pa
 
 ---
 
-# 24. Estado del proyecto
+# 21. Estado del proyecto
 
 Con este avance, el proyecto cuenta con tres patrones de diseño implementados:
 
@@ -586,7 +595,7 @@ Implementado para la creación de familias completas de equipos de producción (
 
 ---
 
-# 25. Conclusión general
+# 22. Conclusión general
 
 La implementación del patrón Factory Method permitió desacoplar la creación de órdenes de producción del resto del sistema, dándole un comportamiento real mediante `get_priority_score()`:
 
