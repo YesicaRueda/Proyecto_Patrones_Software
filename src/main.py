@@ -1,7 +1,8 @@
 
 from src.infrastructure.logger import Logger
 from src.production.prod_service import ProductionService
-from src.equipment.equi_service import EquipmentService
+from src.equipment.equipment_service import EquipmentService
+from src.equipment.cell_factory import CNCCellFactory
 from src.production.prod_factory import (
     StandardOrderCreator,
     UrgentOrderCreator
@@ -14,7 +15,7 @@ logger2 = Logger.getInstance()
 print("¿Logger 1 y Logger 2 son la misma instancia?", logger1 is logger2)
 
 production = ProductionService()
-equipment = EquipmentService()
+equipment = EquipmentService(CNCCellFactory())
 
 standard_creator = StandardOrderCreator()
 urgent_creator = UrgentOrderCreator()
@@ -31,11 +32,16 @@ urgent_order = urgent_creator.create_order(
     50
 )
 
+
+equipment.start_machine()
+
 production.add_order(standard_order)
 production.add_order(urgent_order)
 
 production.start_order("OP-001")
 production.start_order("OP-002")
+
+
 
 print(
     "Estado OP-001:",
@@ -55,4 +61,3 @@ print(
 )
 
 
-equipment.start_machine("CNC-01")

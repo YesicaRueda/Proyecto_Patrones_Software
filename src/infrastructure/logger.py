@@ -1,15 +1,14 @@
 class Logger:
     _instance = None
 
-    def __init__(self):
-        if Logger._instance is not None:
-            raise Exception("Esta clase es un Singleton. Use getInstance().")
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     @classmethod
     def getInstance(cls):
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
+        return cls()
 
     def log(self, message):
         print(f"[MES] {message}")

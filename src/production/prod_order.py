@@ -1,6 +1,7 @@
+from abc import ABC, abstractmethod
 
 
-class ProductionOrder:
+class ProductionOrder(ABC):
 
     def __init__(self, order_id, product, quantity):
         self.order_id = order_id
@@ -14,7 +15,9 @@ class ProductionOrder:
     def complete(self):
         self.status = "Completada"
 
-    def get_priority_score(self) -> int: raise NotImplementedError("Cada tipo de orden debe definir su propio score")
+    @abstractmethod
+    def get_priority_score(self) -> int:
+        pass
 
 class StandardOrder(ProductionOrder):
 

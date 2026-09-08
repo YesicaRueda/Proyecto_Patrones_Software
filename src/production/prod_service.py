@@ -1,5 +1,5 @@
 
-from src.production.prod_order import StandardOrder, UrgentOrder
+
 from src.infrastructure.logger import Logger
 
 class ProductionService:     
@@ -8,6 +8,9 @@ class ProductionService:
         self.orders = {}
 
     def add_order(self, order):
+        if order.order_id in self.orders:
+            raise ValueError(f"La orden {order.order_id} ya existe")
+
         self.orders[order.order_id] = order
 
         logger = Logger.getInstance()
@@ -22,6 +25,11 @@ class ProductionService:
         if order is None:
             raise ValueError(f"Orden {order_id} no encontrada")
 
+        if order.status != "Pendiente":
+            raise ValueError(
+                f"La orden {order_id} no se puede iniciar porque su estado es '{order.status}'"
+            )
+
         order.start()
 
         logger = Logger.getInstance()
@@ -32,6 +40,11 @@ class ProductionService:
 
         if order is None:
             raise ValueError(f"Orden {order_id} no encontrada")
+
+        if order.status != "En producción":
+            raise ValueError(
+                f"La orden {order_id} no se puede completar porque su estado es '{order.status}'"
+            )
 
         order.complete()
 

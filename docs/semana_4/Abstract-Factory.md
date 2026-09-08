@@ -1,4 +1,4 @@
-# Semana 4 - Aplicación del patrón Factory Method
+# Semana X - Aplicación del patrón Abstract Factory
 
 **Asignatura:** Patrones de Software E-195
 
@@ -21,7 +21,9 @@ Durante la segunda semana se profundizó en la problemática, las necesidades de
 
 En la tercera semana se inició la implementación de los patrones de diseño mediante el patrón **Singleton**, aplicado al componente `Logger` para centralizar el registro de eventos.
 
-En esta cuarta etapa se continúa con la implementación de los patrones de diseño identificados previamente, aplicando el patrón **Factory Method** para la creación de diferentes tipos de órdenes de producción.
+En la cuarta etapa se continuó con la implementación de los patrones de diseño mediante el patrón **Factory Method**, aplicado a la creación de diferentes tipos de órdenes de producción.
+
+En esta nueva etapa se incorpora el patrón **Abstract Factory**, aplicado a la creación de familias de equipos de producción (línea CNC y línea robótica), garantizando que los componentes de una misma familia no se mezclen entre sí.
 
 ---
 
@@ -118,6 +120,7 @@ Los módulos de calidad, trazabilidad y cálculo de OEE continuarán desarrollá
 | ------------------ | ------------ | -------------------------------------------------- |
 | **Singleton**      | Implementado | Centralización del Logger.                         |
 | **Factory Method** | Implementado | Creación de diferentes tipos de órdenes.           |
+| **Abstract Factory** | Implementado | Creación de familias de equipos (línea CNC / línea robótica). |
 | **Observer**       | Pendiente    | Notificación de cambios en equipos.                |
 | **Strategy**       | Pendiente    | Diferentes estrategias de producción y eficiencia. |
 | **Repository**     | Pendiente    | Separación del acceso a datos.                     |
@@ -295,6 +298,14 @@ Esto permite demostrar que el patrón no se implementa de forma aislada, sino co
 
 ---
 
+## 13.8 Corrección posterior
+
+Se identificó que la garantía de instancia única no estaba completamente asegurada: el control se realizaba en `__init__`, por lo que instanciar `Logger()` directamente (sin pasar por `getInstance()`) podía generar una segunda instancia.
+
+Se corrigió trasladando el control a `__new__`, de forma que tanto `Logger()` como `getInstance()` devuelven siempre el mismo objeto. Se agregó una prueba automatizada que valida esta garantía.
+
+---
+
 # 14. Aplicación del patrón Factory Method
 
 ## 14.1 Objetivo
@@ -427,6 +438,11 @@ Las pruebas verifican:
 El resultado obtenido fue de **3 pruebas superadas**.
 
 ---
+## 19.2 Evidencia de Video
+
+![Ver video de la prueba](../../videos/factory-method.mp4)
+
+---
 
 # 20. Correcciones y cambios respecto a la semana anterior
 
@@ -455,45 +471,149 @@ pythonpath = .
 
 Esto permite que las pruebas resuelvan correctamente los imports internos del paquete `src`.
 
-* Quedan pendientes de limpieza algunos comentarios de código muerto en `prod_service.py` y `main.py`, correspondientes a la implementación previa a la introducción del patrón Factory Method.
+* Se realizó limpieza de los comentarios de código muerto en `prod_service.py` y `main.py`, correspondientes a la implementación previa a la introducción del patrón Factory Method.
+
+* `ProductionOrder` se convirtió en clase abstracta real (`ABC`), con `get_priority_score()` como método abstracto. Esto impide instanciar `ProductionOrder` directamente y obliga a que cualquier subclase nueva implemente su propio score.
+
+* Se agregaron validaciones de reglas de negocio en `ProductionService`: `add_order()` rechaza un `order_id` duplicado, `start_order()` solo es válido si la orden está en estado `"Pendiente"`, y `complete_order()` solo si está en estado `"En producción"`. Antes de esta corrección era posible completar una orden sin iniciarla, o repetir una transición de estado.
+
+* Todas estas correcciones quedaron cubiertas por pruebas automatizadas nuevas.
 
 ---
 
-# 21. Estado del proyecto
+# 23. Aplicación del patrón Abstract Factory
 
-Con el avance de esta cuarta semana, el proyecto cuenta con dos patrones de diseño implementados:
+## 23.1 Objetivo
+
+Aplicar el patrón Abstract Factory para la creación de familias de equipos de producción (línea CNC y línea robótica) del MES, garantizando que los componentes de una misma familia (equipo + inspección) se creen siempre de forma consistente, sin mezclarse con los de otra familia.
+
+---
+
+## 23.2 Problema identificado
+
+El sistema necesita representar distintas tecnologías de producción (por ejemplo, celdas CNC y celdas robóticas), cada una compuesta por un equipo y un tipo de inspección asociado que deben ser coherentes entre sí (una máquina CNC no debe combinarse con una inspección pensada para ensamble robótico).
+
+Aplicar nuevamente Factory Method sobre este problema no resolvería la necesidad real, ya que ese patrón crea un único producto a la vez; aquí se requiere crear **familias completas de productos relacionados** desde un mismo punto de creación.
+
+Antes de esta implementación, `EquipmentService` no representaba ningún equipo real: `start_machine()` solo registraba un mensaje a partir de un identificador de texto, sin ningún objeto de dominio detrás.
+
+---
+
+## 23.3 Implementación
+
+### 23.3.1 Productos abstractos
+
+Se definieron dos interfaces base: `Equipment` (con `start()`, `stop()` y estado) e `Inspection` (con `inspect()`).
+
+![Interfaces Equipment e Inspection](img/codigo-equipment-inspection-base.jpeg)
+
+### 23.3.2 Productos concretos y fábricas concretas
+
+Se implementaron dos familias:
+
+* **Línea CNC:** `CNCMachine` + `CNCInspection`.
+* **Línea robótica:** `RobotArm` + `RobotInspection`.
+
+Cada familia se agrupa mediante una fábrica concreta que hereda de `AbstractProductionCellFactory`:
+
+* `CNCCellFactory` → crea `CNCMachine` + `CNCInspection`.
+* `RobotCellFactory` → crea `RobotArm` + `RobotInspection`.
+
+![Productos concretos y fábricas concretas de Abstract Factory](img/codigo-abstract-factory.jpeg)
+
+---
+
+## 23.4 Interpretación dentro del MES
+
+* **Productos abstractos:** `Equipment`, `Inspection`.
+* **Productos concretos:** `CNCMachine`/`CNCInspection` (familia CNC), `RobotArm`/`RobotInspection` (familia robótica).
+* **Fábrica abstracta:** `AbstractProductionCellFactory`.
+* **Fábricas concretas:** `CNCCellFactory`, `RobotCellFactory`.
+* **Cliente:** `EquipmentService`, que recibe una única fábrica en su constructor y crea a partir de ella tanto el equipo como la inspección, garantizando que ambos pertenezcan a la misma familia.
+
+Agregar una nueva línea de producción en el futuro implicaría únicamente crear sus productos concretos y su fábrica concreta, sin modificar `EquipmentService`.
+
+---
+
+## 23.5 Uso del patrón
+
+`EquipmentService` recibe la fábrica en su constructor y delega en ella la creación del equipo y la inspección. También se actualizó para registrar sus eventos a través del `Logger` centralizado, en lugar de mensajes de consola independientes.
+
+![Uso de EquipmentService con la fábrica concreta desde main.py](img/uso-equipment-service.jpeg)
+
+---
+
+## 23.6 Prueba de ejecución
+
+Se ejecutó `main.py` utilizando `CNCCellFactory`, verificando que el equipo y la inspección creados correspondan a la misma familia y que los eventos se registren mediante el Logger.
+
+![Ejecución de main.py con Abstract Factory](img/ejecucion-abstract-factory.jpeg)
+
+### 23.6.1 Pruebas automatizadas
+
+Se implementaron pruebas que verifican:
+
+* Que cada fábrica concreta crea los productos correspondientes a su propia familia.
+* Que ninguna fábrica combina productos de familias distintas (por ejemplo, un `CNCMachine` con una `RobotInspection`).
+* Que `EquipmentService` refleja correctamente la familia de la fábrica recibida.
+* Que `start_machine()`/`stop_machine()` cambian correctamente el estado del equipo.
+
+![Resultado de la ejecución de pytest para Abstract Factory](img/prueba-pytest-abstract-factory.jpeg)
+
+El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto.
+
+---
+
+## 23.7 Evidencia de video
+
+*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se recomienda subirlo a un servicio externo como Google Drive o YouTube en modo no listado, y enlazarlo aquí en lugar de incrustarlo.)*
+
+[Ver video de la prueba](ENLACE_PENDIENTE)
+
+---
+
+## 23.8 Diagrama UML
+
+*(Espacio reservado para el diagrama de clases UML del patrón Abstract Factory, generado en PlantUML.)*
+
+![Diagrama UML de Abstract Factory](img/uml-abstract-factory.png)
+
+---
+
+# 24. Estado del proyecto
+
+Con este avance, el proyecto cuenta con tres patrones de diseño implementados:
 
 ### Singleton
 
-Implementado para centralizar el registro de eventos mediante `Logger`.
+Implementado para centralizar el registro de eventos mediante `Logger`, con garantía de instancia única reforzada en `__new__`.
 
 ### Factory Method
 
-Implementado para separar la creación de diferentes tipos de órdenes de producción y permitir que cada tipo tenga un comportamiento específico.
+Implementado para separar la creación de diferentes tipos de órdenes de producción y permitir que cada tipo tenga un comportamiento específico. Se reforzó adicionalmente con `ProductionOrder` como clase abstracta y validaciones de transición de estado en `ProductionService`.
+
+### Abstract Factory
+
+Implementado para la creación de familias completas de equipos de producción (línea CNC y línea robótica), garantizando la consistencia entre el equipo y su inspección asociada.
 
 Los patrones **Observer**, **Strategy** y **Repository** continúan pendientes y serán evaluados e implementados progresivamente según las necesidades del sistema.
 
 ---
 
+# 25. Conclusión general
 
-# 22. Conclusión
-
-La implementación del patrón Factory Method permitió desacoplar la creación de órdenes de producción del resto del sistema.
-
-Tras identificar que la primera versión del patrón no aportaba un comportamiento real, se complementó con `get_priority_score()` para que el tipo de orden creado tenga un efecto verificable sobre el comportamiento del sistema.
-
-De esta manera:
+La implementación del patrón Factory Method permitió desacoplar la creación de órdenes de producción del resto del sistema, dándole un comportamiento real mediante `get_priority_score()`:
 
 ```text
 StandardOrder → prioridad 1
 UrgentOrder   → prioridad 10
 ```
 
-La cola de producción utiliza estos valores para establecer el orden de atención.
+La cola de producción utiliza estos valores para establecer el orden de atención, validado mediante pruebas automatizadas.
 
-La solución se validó mediante pruebas automatizadas y permite aplicar el principio de abierto/cerrado, ya que agregar un nuevo tipo de orden no requeriría modificar `ProductionService`.
+Sobre esa base, la implementación del patrón Abstract Factory permitió representar familias completas de equipos de producción, asegurando que sus componentes (equipo e inspección) no se mezclen entre sí, y evitando repetir el mismo patrón de creación ya resuelto por Factory Method.
 
-Este avance, junto con la implementación previa del patrón Singleton, permite continuar construyendo una arquitectura organizada, reutilizable y escalable para el Sistema de Control de Producción.
+Con los patrones Singleton, Factory Method y Abstract Factory implementados y probados (14 pruebas automatizadas en total), el proyecto cuenta con una base organizada, reutilizable y escalable para continuar incorporando los patrones y módulos pendientes (Observer, Strategy, Repository, calidad, trazabilidad y OEE).
 
 ---
 
