@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional
+import copy
 
 class ProductionOrder(ABC):
 
@@ -26,6 +27,18 @@ class ProductionOrder(ABC):
     @abstractmethod
     def get_priority_score(self) -> int:
         pass
+
+    def clone(self, new_order_id, new_quantity=None):
+        clone = copy.deepcopy(self)
+
+        clone.order_id = new_order_id
+
+        if new_quantity is not None:
+            clone.quantity = new_quantity
+
+        clone.status = "Pendiente"
+
+        return clone
 
 class StandardOrder(ProductionOrder):
 
