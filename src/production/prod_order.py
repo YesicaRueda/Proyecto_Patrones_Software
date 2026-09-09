@@ -1,13 +1,21 @@
 from abc import ABC, abstractmethod
-
+from datetime import datetime
+from typing import Optional
 
 class ProductionOrder(ABC):
 
-    def __init__(self, order_id, product, quantity):
+    def __init__(self, order_id, product, quantity, lote=None,
+                 fecha_ingreso=None, fecha_entrega=None,
+                 descripcion=None, equipo_asignado=None):
         self.order_id = order_id
         self.product = product
         self.quantity = quantity
         self.status = "Pendiente"
+        self.lote = lote
+        self.fecha_ingreso = fecha_ingreso
+        self.fecha_entrega = fecha_entrega
+        self.descripcion = descripcion
+        self.equipo_asignado = equipo_asignado
 
     def start(self):
         self.status = "En producción"
@@ -21,8 +29,12 @@ class ProductionOrder(ABC):
 
 class StandardOrder(ProductionOrder):
 
-    def __init__(self, order_id, product, quantity):
-        super().__init__(order_id, product, quantity)
+    def __init__(self, order_id, product, quantity, lote=None,
+                 fecha_ingreso=None, fecha_entrega=None,
+                 descripcion=None, equipo_asignado=None):
+        super().__init__(order_id, product, quantity, lote,
+                          fecha_ingreso, fecha_entrega,
+                          descripcion, equipo_asignado)
         self.priority = "Normal"
 
     def get_priority_score(self) -> int:
@@ -31,8 +43,12 @@ class StandardOrder(ProductionOrder):
 
 class UrgentOrder(ProductionOrder):
 
-    def __init__(self, order_id, product, quantity):
-        super().__init__(order_id, product, quantity)
+    def __init__(self, order_id, product, quantity, lote=None,
+                 fecha_ingreso=None, fecha_entrega=None,
+                 descripcion=None, equipo_asignado=None):
+        super().__init__(order_id, product, quantity, lote,
+                          fecha_ingreso, fecha_entrega,
+                          descripcion, equipo_asignado)
         self.priority = "Alta"
 
     def get_priority_score(self) -> int:

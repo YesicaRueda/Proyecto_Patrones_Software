@@ -9,12 +9,10 @@ class OrderCreator(ABC):
 
 
 class StandardOrderCreator(OrderCreator):
-
-    def create_order(self, order_id, product, quantity):
-        return StandardOrder(order_id, product, quantity)
+    def create_order(self, order_data: dict):
+        return StandardOrder(**order_data)
 
 
 class UrgentOrderCreator(OrderCreator):
-
-    def create_order(self, order_id, product, quantity):
-        return UrgentOrder(order_id, product, quantity)
+    def create_order(self, order_data: dict):
+        return UrgentOrder(**order_data)

@@ -61,3 +61,14 @@ class ProductionService:
             key=lambda order: order.get_priority_score(),
             reverse=True
         )
+    
+    def start_order_with_equipment(self, order_id, equipment_service):
+        equipment_status = equipment_service.equipment.status
+
+        if equipment_status != "Operando":
+            raise ValueError(
+                f"No se puede iniciar la orden {order_id}: "
+                f"el equipo asignado no está operando (estado actual: {equipment_status})"
+            )
+
+        self.start_order(order_id)
