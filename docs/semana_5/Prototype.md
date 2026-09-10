@@ -279,6 +279,26 @@ Además, se comprobó su utilización desde diferentes componentes del MES, regi
 
 ![Diagrama UML de Singleton](../img/uml-singleton.png)
 
+Código PlantUML utilizado para generar el diagrama (planttext.com):
+
+```plantuml
+@startuml
+class Logger {
+  -{static} _instance: Logger
+  +{static} getInstance(): Logger
+  +log(message: str)
+}
+
+note right of Logger
+  Instancia única garantizada
+  en __new__(); getInstance()
+  y Logger() devuelven siempre
+  el mismo objeto.
+end note
+
+@enduml
+```
+
 ---
 
 
@@ -451,6 +471,54 @@ El resultado obtenido fue de **3 pruebas superadas**.
 
 ![Diagrama UML de Factory Method](../img/uml-factory.png)
 
+Código PlantUML utilizado para generar el diagrama (planttext.com):
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Producto (Orden)" {
+  abstract class ProductionOrder {
+    #order_id
+    #product
+    #quantity
+    #status
+    +start()
+    +complete()
+    +{abstract} get_priority_score(): int
+  }
+  class StandardOrder {
+    +priority: str
+    +get_priority_score(): int
+  }
+  class UrgentOrder {
+    +priority: str
+    +get_priority_score(): int
+  }
+  StandardOrder --|> ProductionOrder
+  UrgentOrder --|> ProductionOrder
+}
+
+package "Creator" {
+  abstract class OrderCreator {
+    +{abstract} create_order(order_id, product, quantity): ProductionOrder
+  }
+  class StandardOrderCreator {
+    +create_order(order_id, product, quantity): ProductionOrder
+  }
+  class UrgentOrderCreator {
+    +create_order(order_id, product, quantity): ProductionOrder
+  }
+  StandardOrderCreator --|> OrderCreator
+  UrgentOrderCreator --|> OrderCreator
+}
+
+StandardOrderCreator ..> StandardOrder : crea
+UrgentOrderCreator ..> UrgentOrder : crea
+
+@enduml
+```
+
 ---
 
 # 20. Aplicación del patrón Abstract Factory
@@ -548,6 +616,63 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ![Diagrama UML de Abstract Factory](../img/uml-abstract-factory.png)
 
+Código PlantUML utilizado para generar el diagrama (planttext.com):
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Familia Equipo" {
+  abstract class Equipment {
+    -status: str
+    +start()
+    +stop()
+  }
+  class CNCMachine
+  class RobotArm
+  CNCMachine --|> Equipment
+  RobotArm --|> Equipment
+}
+
+package "Familia Inspección" {
+  abstract class Inspection {
+    +inspect(order): bool
+  }
+  class CNCInspection
+  class RobotInspection
+  CNCInspection --|> Inspection
+  RobotInspection --|> Inspection
+}
+
+package "Fábricas" {
+  abstract class AbstractProductionCellFactory {
+    +create_equipment(): Equipment
+    +create_inspection(): Inspection
+  }
+  class CNCCellFactory
+  class RobotCellFactory
+  CNCCellFactory --|> AbstractProductionCellFactory
+  RobotCellFactory --|> AbstractProductionCellFactory
+}
+
+class EquipmentService {
+  -factory: AbstractProductionCellFactory
+  -equipment: Equipment
+  -inspection: Inspection
+  +start_machine()
+  +stop_machine()
+  +run_inspection(order)
+}
+
+EquipmentService --> AbstractProductionCellFactory : usa
+CNCCellFactory ..> CNCMachine : crea
+CNCCellFactory ..> CNCInspection : crea
+RobotCellFactory ..> RobotArm : crea
+RobotCellFactory ..> RobotInspection : crea
+@enduml
+```
+
+
 ---
 # 21. Aplicación del patrón Builder
 
@@ -610,6 +735,69 @@ Se implementaron pruebas que verifican que el Builder produce correctamente los 
 *(Incluye únicamente las clases que participan en este patrón: `OrderBuilder`, `ProductionOrder` y los creadores concretos que consumen sus datos.)*
 
 ![Diagrama UML de Builder](../img/uml-builder.png)
+
+Código PlantUML utilizado para generar el diagrama (planttext.com):
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+
+package "Builder" {
+  class OrderBuilder {
+    -_order_id
+    -_product
+    -_quantity
+    -_lote
+    -_fecha_ingreso
+    -_fecha_entrega
+    -_descripcion
+    -_equipo_asignado
+    +with_lote(lote): OrderBuilder
+    +with_fecha_ingreso(fecha): OrderBuilder
+    +with_fecha_entrega(fecha): OrderBuilder
+    +with_descripcion(descripcion): OrderBuilder
+    +with_equipo_asignado(equipo): OrderBuilder
+    +build(): dict
+  }
+}
+
+package "Factory Method (consumidor de los datos)" {
+  abstract class OrderCreator {
+    +{abstract} create_order(order_data: dict): ProductionOrder
+  }
+  class StandardOrderCreator {
+    +create_order(order_data: dict): ProductionOrder
+  }
+  class UrgentOrderCreator {
+    +create_order(order_data: dict): ProductionOrder
+  }
+  StandardOrderCreator --|> OrderCreator
+  UrgentOrderCreator --|> OrderCreator
+}
+
+abstract class ProductionOrder {
+  #order_id
+  #product
+  #quantity
+  #lote
+  #fecha_ingreso
+  #fecha_entrega
+  #descripcion
+  #equipo_asignado
+}
+class StandardOrder
+class UrgentOrder
+StandardOrder --|> ProductionOrder
+UrgentOrder --|> ProductionOrder
+
+OrderBuilder ..> StandardOrderCreator : build() -> dict
+OrderBuilder ..> UrgentOrderCreator : build() -> dict
+StandardOrderCreator ..> StandardOrder : crea
+UrgentOrderCreator ..> UrgentOrder : crea
+
+@enduml
+```
+
 
 ---
 
