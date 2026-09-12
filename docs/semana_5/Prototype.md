@@ -261,7 +261,7 @@ Esto permite comprobar que ambas referencias corresponden al mismo objeto.
 
 Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-![Prueba de ejecución](../img/prueba-singleton.jpeg)
+![Prueba de ejecución](./img/prueba-singleton.jpeg)
 
 El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
