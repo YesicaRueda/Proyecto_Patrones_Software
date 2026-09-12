@@ -249,7 +249,7 @@ La implementación permite evidenciar:
 
 Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-![Uso del Singleton](../img/uso-singleton.jpeg)
+![Uso del Singleton](./img/uso-singleton.jpeg)
 
 La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método.
 
@@ -261,7 +261,7 @@ Esto permite comprobar que ambas referencias corresponden al mismo objeto.
 
 Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-![Prueba de ejecución](./img/prueba-singleton.jpeg)
+![Prueba de ejecución](../img/prueba-singleton.jpeg)
 
 El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
