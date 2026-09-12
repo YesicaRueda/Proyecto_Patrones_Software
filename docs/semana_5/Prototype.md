@@ -451,17 +451,9 @@ Las pruebas verifican:
 
 El resultado obtenido fue de **3 pruebas superadas**.
 
----
-
-
-## 19.2 Evidencia de video
-
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
 
 ---
-## 19.3 Diagrama UML
+## 19.2 Diagrama UML
 
 ![Diagrama UML de Factory Method](../img/uml-factory.png)
 
