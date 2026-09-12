@@ -338,7 +338,6 @@ Proyecto_Patrones_de_software/
 ├── videos/
 │   ├── semana-01-singleton.mp4
 │   ├── semana-04-factory-method.mp4
-│   ├── semana-05-abstract-factory.mp4
 │   └── semana-05-builder.mp4
 │
 ├── pytest.ini
