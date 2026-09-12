@@ -232,7 +232,7 @@ Por esta razón, se requiere un único objeto `Logger` que pueda ser utilizado d
 
 Se implementó la clase `Logger` utilizando una instancia única almacenada en `_instance` y un método `getInstance()` encargado de crearla únicamente cuando sea necesaria y devolverla posteriormente.
 
-![Implementación del patrón Singleton](img/codigo-singleton.jpeg)
+![Implementación del patrón Singleton](evidencia/codigo-singleton.jpeg)
 
 La implementación corresponde a una inicialización **Lazy**, ya que la instancia se crea solamente cuando se solicita por primera vez mediante `getInstance()`.
 
