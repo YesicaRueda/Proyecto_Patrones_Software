@@ -249,7 +249,7 @@ La implementación permite evidenciar:
 
 Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-![Uso del Singleton](/img/uso-singleton.jpeg)
+![Uso del Singleton](../img/uso-singleton.jpeg)
 
 La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método.
 
