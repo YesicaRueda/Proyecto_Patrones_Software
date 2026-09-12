@@ -1,159 +1,157 @@
-**# Sistema de Control de Producción (MES)**
+# Sistema de Control de Producción (MES)
 
-**\*\*Asignatura:\*\*** Patrones de Software E-195
+**Asignatura:** Patrones de Software E-195
 
-**\*\*Integrantes:\*\***
+**Integrantes:**
 
-\* Yesica Dayana Rueda Saldarriaga
+- Yesica Dayana Rueda Saldarriaga
+- Sergio Andrés Mendoza Osorio
 
-\* Sergio Andrés Mendoza Osorio
+---
 
-\---
+## Descripción del proyecto
 
-**## Descripción del proyecto**
+El proyecto consiste en el desarrollo de un **Sistema de Control de Producción (MES)** orientado a la gestión y seguimiento de órdenes de producción dentro de un entorno industrial.
 
-El **\*\*Sistema de Control de Producción (MES - Manufacturing Execution System)\*\*** es una solución de software orientada a gestionar, supervisar y controlar diferentes procesos de producción de una empresa industrial.
+El sistema permite representar diferentes procesos relacionados con la producción, como la creación y gestión de órdenes, asignación de equipos, inspecciones y registro de eventos.
 
-El sistema busca centralizar la información relacionada con la planificación y programación de la producción, el control de calidad y la trazabilidad, el monitoreo de equipos y la integración simulada con máquinas CNC y robots. Además, permitirá analizar la eficiencia de los equipos mediante el indicador **\*\*OEE\*\***.
+Durante el desarrollo se aplican diferentes **patrones de diseño de software** con el objetivo de mejorar la organización, reutilización, flexibilidad y mantenibilidad del código.
 
-El proyecto se desarrolla progresivamente durante el semestre como aplicación práctica de conceptos de diseño de software y patrones de diseño.
+---
 
-\---
+## Objetivos
 
-**## Objetivo general**
+### Objetivo general
 
-Desarrollar un **\*\*Sistema de Control de Producción (MES)\*\*** que permita gestionar y supervisar procesos productivos, aplicando patrones de diseño de software para construir una solución organizada, mantenible y adaptable.
+Diseñar e implementar un Sistema de Control de Producción (MES) aplicando patrones de diseño de software que permitan construir una solución organizada, flexible y mantenible.
 
-\---
+### Objetivos específicos
 
-**## Objetivos específicos**
+- Modelar las principales entidades relacionadas con el proceso de producción.
+- Aplicar patrones de diseño para resolver problemas recurrentes de diseño de software.
+- Separar responsabilidades dentro de los diferentes componentes del sistema.
+- Facilitar la creación y configuración de órdenes de producción.
+- Implementar mecanismos para la creación de diferentes tipos de objetos.
+- Realizar pruebas automatizadas para verificar el funcionamiento de los componentes desarrollados.
+- Documentar el proceso de implementación de los patrones utilizados.
 
-\* Gestionar órdenes y actividades de producción, permitiendo realizar seguimiento a su estado y avance.
+---
 
-\* Implementar funcionalidades relacionadas con el control de calidad y la trazabilidad de productos y lotes.
+## Alcance funcional
 
-\* Representar y monitorear máquinas y equipos de producción, incluyendo la simulación de dispositivos CNC y robots.
+El sistema contempla diferentes funcionalidades relacionadas con la gestión de producción:
 
-\* Calcular y analizar el indicador **\*\*OEE\*\*** para evaluar la eficiencia de los equipos.
+- Creación de órdenes de producción.
+- Creación de órdenes estándar y urgentes.
+- Gestión de prioridades de las órdenes.
+- Manejo de la cola de órdenes pendientes.
+- Construcción de órdenes mediante el patrón Builder.
+- Clonación de órdenes mediante el patrón Prototype.
+- Creación de familias de equipos e inspecciones mediante Abstract Factory.
+- Registro centralizado de eventos mediante Singleton.
+- Asignación y control de equipos de producción.
+- Ejecución de inspecciones asociadas a los equipos.
+- Pruebas automatizadas mediante `pytest`.
 
-\* Identificar problemas de diseño durante el desarrollo y aplicar patrones de diseño cuando exista una necesidad que justifique su uso.
+---
 
-\---
+# Patrones de diseño implementados
 
-**## Alcance funcional**
+Durante el desarrollo del proyecto se implementaron los siguientes patrones de diseño:
 
-El proyecto se desarrolla alrededor de cuatro áreas principales:
+| Patrón | Propósito dentro del proyecto | Estado |
+|---|---|---|
+| Singleton | Gestionar una única instancia del Logger | Implementado |
+| Factory Method | Crear diferentes tipos de órdenes de producción | Implementado |
+| Abstract Factory | Crear familias de equipos e inspecciones relacionadas | Implementado |
+| Builder | Construir órdenes de producción paso a paso | Implementado |
+| Prototype | Crear nuevas órdenes mediante clonación de objetos existentes | Implementado |
 
-**### 1. Planificación y producción**
+La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-\* Gestión de órdenes de producción.
+---
 
-\* Programación de actividades.
+# Introducción a los patrones
 
-\* Seguimiento del estado de las órdenes.
-
-\* Control del avance de la producción.
-
-\* Gestión de diferentes tipos de órdenes mediante patrones de diseño.
-
-**### 2. Calidad y trazabilidad**
-
-\* Registro de inspecciones de calidad.
-
-\* Control de productos aprobados y rechazados.
-
-\* Gestión de lotes.
-
-\* Trazabilidad de materias primas y productos.
-
-\* Consulta del historial de producción.
-
-**### 3. Máquinas y equipos**
-
-\* Representación del estado de máquinas y equipos.
-
-\* Registro de tiempos de operación y paradas.
-
-\* Simulación de máquinas CNC y robots.
-
-\* Registro de información relacionada con la producción.
-
-La integración con hardware industrial real no forma parte del alcance inicial. Los dispositivos serán representados mediante abstracciones y simulaciones de software.
-
-**### 4. Análisis OEE**
-
-El sistema permitirá calcular y analizar el indicador **\*\*OEE (Overall Equipment Effectiveness)\*\***.
-
-El indicador considera:
-
-\* **\*\*Disponibilidad:\*\*** proporción del tiempo en que el equipo se encuentra operativo.
-
-\* **\*\*Rendimiento:\*\*** relación entre la producción obtenida y la producción esperada.
-
-\* **\*\*Calidad:\*\*** proporción de productos correctos frente al total producido.
-
-**\*\*OEE = Disponibilidad × Rendimiento × Calidad\*\***
-
-\---
-
-**## Introducción a los patrones de diseño**
-
-Antes de explicar cada patrón, se parte de la **contextualización del proyecto** y de los problemas que pueden aparecer durante su desarrollo. Los patrones de diseño se utilizan como soluciones a necesidades concretas, buscando mejorar la organización, el mantenimiento, la reutilización y la flexibilidad del sistema.
-
-Por esta razón, la documentación sigue una secuencia lógica que conecta la contextualización con cada implementación:
+Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 **Contextualización → Problema → Necesidad → Alternativas → Patrón → Diseño → Implementación → Prueba**
 
-\---
+Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-**## Singleton**
+---
 
-El patrón **\*\*Singleton\*\*** se implementó para construir un **\*\*Logger centralizado\*\*** del sistema.
+## Singleton
 
-Los diferentes componentes del MES pueden acceder a una única instancia mediante \`getInstance()\`, permitiendo centralizar el registro de eventos.
+El patrón **Singleton** garantiza que una clase tenga una única instancia durante la ejecución del sistema y proporciona un punto de acceso global a dicha instancia.
 
-La implementación utiliza **\*\*Lazy Initialization\*\***, por lo que la instancia del Logger se crea cuando es requerida por primera vez.
+En el proyecto se utiliza para implementar el componente `Logger`, encargado de centralizar el registro de eventos y mensajes del sistema.
 
-La implementación fue validada comprobando que dos referencias obtenidas mediante \`getInstance()\` corresponden a la misma instancia.
+La implementación se encuentra en:
 
-\---
+`src/infrastructure/logger.py`
 
-**## Factory Method**
+El acceso a la instancia se realiza mediante:
 
-El patrón **\*\*Factory Method\*\*** se implementó para separar la creación de las órdenes de producción de la lógica principal del sistema.
+```python
+logger1 = Logger.getInstance()
+logger2 = Logger.getInstance()
 
-Actualmente se manejan dos tipos de órdenes:
+print(logger1 is logger2)
+```
 
-\`\`\`text
+El resultado permite comprobar que ambas referencias corresponden a la misma instancia.
 
-StandardOrder → prioridad 1
+### Beneficios del Singleton
 
-UrgentOrder   → prioridad 10
+- Garantiza una única instancia del `Logger`.
+- Centraliza el registro de eventos y mensajes.
+- Evita la creación innecesaria de múltiples instancias.
+- Facilita el acceso al servicio de registro desde diferentes partes del sistema.
 
-\`\`\`
+---
 
-La estructura utiliza:
+## Factory Method
 
-\* \`OrderCreator\` como creador abstracto.
+El patrón **Factory Method** permite encapsular la creación de objetos y delegar en clases especializadas la decisión sobre qué tipo de objeto concreto debe ser creado.
 
-\* \`StandardOrderCreator\` como creador concreto.
+En el proyecto se utiliza para la creación de diferentes tipos de órdenes de producción.
 
-\* \`UrgentOrderCreator\` como creador concreto.
+La implementación se encuentra principalmente en:
 
-\* \`StandardOrder\` y \`UrgentOrder\` como productos concretos.
+`src/production/prod_factory.py`
 
-Cada tipo de orden implementa su propio comportamiento mediante \`get\_priority\_score()\`.
+Entre los componentes utilizados se encuentran:
 
-La prioridad es utilizada posteriormente por \`ProductionService\` para construir una cola de órdenes pendientes ordenada de acuerdo con el nivel de prioridad.
+- `OrderCreator`
+- `StandardOrderCreator`
+- `UrgentOrderCreator`
+- `StandardOrder`
+- `UrgentOrder`
 
-Esto permite que el sistema utilice polimorfismo en lugar de condicionales como \`if/elif\` o comprobaciones mediante \`isinstance()\` para determinar el comportamiento de cada tipo de orden.
+Ejemplo de uso:
 
+```python
+urgent_creator = UrgentOrderCreator()
+plantilla = urgent_creator.create_order(plantilla_data)
+```
 
-### Abstract Factory
+De esta manera, el código cliente no necesita encargarse directamente de instanciar las clases concretas de las órdenes.
 
-El patrón Abstract Factory permite crear familias de objetos relacionados sin especificar directamente sus clases concretas.
+### Beneficios del Factory Method
 
-En el proyecto se utiliza para crear familias de equipos de producción y sus respectivas inspecciones.
+- Permite crear diferentes tipos de órdenes sin acoplar el código cliente a las clases concretas.
+- Facilita la incorporación de nuevos tipos de órdenes.
+- Encapsula la lógica de creación de objetos.
+- Mejora la flexibilidad y mantenibilidad del sistema.
+
+---
+
+## Abstract Factory
+
+El patrón **Abstract Factory** permite crear familias de objetos relacionados sin especificar directamente sus clases concretas.
+
+En el proyecto se utiliza para crear familias de **equipos de producción e inspecciones relacionadas**.
 
 La implementación se encuentra en:
 
@@ -164,19 +162,37 @@ La fábrica abstracta `AbstractProductionCellFactory` define los métodos:
 - `create_equipment()`
 - `create_inspection()`
 
-Las fábricas concretas son:
+Las fábricas concretas implementadas son:
 
 - `CNCCellFactory`
 - `RobotCellFactory`
 
-Estas permiten crear respectivamente:
+Estas fábricas permiten crear las siguientes familias de objetos:
 
 - Máquina CNC + inspección dimensional.
 - Brazo robótico + inspección de ensamble.
 
-### Builder
+Ejemplo de uso:
 
-El patrón Builder permite construir objetos complejos paso a paso, separando el proceso de construcción de la representación final del objeto.
+```python
+equipment = EquipmentService(CNCCellFactory())
+```
+
+De esta manera, `EquipmentService` puede trabajar con diferentes familias de equipos sin depender directamente de las clases concretas.
+
+### Beneficios del Abstract Factory
+
+- Permite crear familias de objetos relacionados.
+- Reduce el acoplamiento entre el sistema y las clases concretas.
+- Facilita el cambio entre diferentes familias de equipos.
+- Mantiene la compatibilidad entre los objetos pertenecientes a una misma familia.
+- Facilita la incorporación de nuevas familias de productos.
+
+---
+
+## Builder
+
+El patrón **Builder** permite construir objetos complejos paso a paso, separando el proceso de construcción de la representación final del objeto.
 
 En el proyecto se utiliza para construir **órdenes de producción**, permitiendo configurar diferentes atributos de manera progresiva.
 
@@ -191,141 +207,275 @@ El componente principal es `OrderBuilder`, que permite establecer diferentes dat
 - `with_equipo_asignado()`
 - `build()`
 
-\---
+Ejemplo:
 
-**### Beneficios obtenidos**
+```python
+plantilla_data = (
+    OrderBuilder("OP-002", "Pieza metálica B", 50)
+    .with_lote("L-2026-09")
+    .with_fecha_entrega(datetime(2026, 9, 20))
+    .with_equipo_asignado("CNC-01")
+    .build()
+)
+```
 
-La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema:
+De esta manera, la orden se construye paso a paso sin necesidad de utilizar un constructor con una gran cantidad de parámetros.
+
+El patrón facilita la creación de diferentes configuraciones de órdenes de producción, mejora la legibilidad del código y permite mantener separada la lógica de construcción del objeto.
+
+---
+
+## Prototype
+
+El patrón **Prototype** permite crear nuevos objetos a partir de la clonación de una instancia existente, evitando tener que construir nuevamente el objeto desde cero.
+
+En el proyecto se utiliza para clonar órdenes de producción existentes y generar nuevas órdenes conservando la configuración de la orden original.
+
+La implementación utiliza el método:
+
+```python
+clone()
+```
+
+Ejemplo de uso:
+
+```python
+urgent_order_2 = plantilla.clone("OP-003", 75)
+urgent_order_3 = plantilla.clone("OP-004", 100)
+```
+
+A partir de una orden existente se pueden generar nuevas órdenes modificando los datos que sean necesarios, como el identificador y la cantidad.
+
+### Beneficios del Prototype
+
+- Permite crear nuevos objetos a partir de objetos existentes.
+- Evita repetir procesos de construcción complejos.
+- Facilita la creación de órdenes similares.
+- Permite conservar la configuración de una orden original.
+- Reduce la duplicación de lógica al crear objetos con características similares.
+
+---
+
+# Beneficios obtenidos
+
+La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
 
 ### Singleton
+
 - Garantiza una única instancia del `Logger` durante la ejecución del sistema.
 - Permite centralizar el registro de eventos y mensajes.
 - Evita la creación innecesaria de múltiples instancias del mismo componente.
 - Facilita el acceso al servicio de registro desde diferentes partes del sistema.
 
 ### Factory Method
+
 - Permite crear diferentes tipos de órdenes de producción sin acoplar el código cliente a las clases concretas.
 - Facilita la incorporación de nuevos tipos de órdenes.
 - Encapsula la lógica de creación de objetos.
 - Mejora la flexibilidad del sistema.
 
 ### Abstract Factory
+
 - Permite crear familias de objetos relacionados, como equipos e inspecciones.
 - Reduce el acoplamiento entre el sistema y las clases concretas.
 - Facilita el cambio entre diferentes familias de equipos.
 - Mantiene la compatibilidad entre los objetos que pertenecen a una misma familia.
 
 ### Builder
+
 - Permite construir las órdenes de producción paso a paso.
 - Mejora la legibilidad del código mediante métodos encadenados.
 - Evita constructores con una gran cantidad de parámetros.
 - Facilita la creación de órdenes con diferentes configuraciones.
 - Separa la lógica de construcción de la representación final del objeto.
 
-\---
+### Prototype
 
-**## Pruebas**
+- Permite crear nuevas órdenes a partir de órdenes existentes.
+- Facilita la reutilización de configuraciones.
+- Reduce la duplicación de código.
+- Permite generar objetos similares de manera sencilla.
 
-Se realizaron pruebas para verificar el funcionamiento de los patrones implementados:
+---
 
-### Singleton
-- Se verificó que `Logger.getInstance()` retorne siempre la misma instancia.
-- Se comprobó que dos referencias al `Logger` correspondan al mismo objeto.
+# Pruebas
 
-### Factory Method
-- Se verificó la creación de órdenes estándar y urgentes.
-- Se comprobó que las órdenes urgentes tengan mayor prioridad.
-- Se verificó el funcionamiento de la cola de órdenes pendientes.
+Se realizaron pruebas automatizadas para verificar el funcionamiento de los patrones implementados y de los diferentes componentes del sistema.
 
-### Abstract Factory
-- Se verificó la creación de equipos CNC junto con su inspección correspondiente.
-- Se verificó la creación de brazos robóticos junto con su inspección correspondiente.
-- Se comprobó que cada fábrica genere la familia de objetos correspondiente.
+## Singleton
 
-### Builder
-- Se verificó la construcción de órdenes de producción.
-- Se comprobó la configuración de atributos mediante métodos encadenados.
-- Se verificó que `build()` genere correctamente la orden configurada.
+Se verificó que:
+
+- `Logger.getInstance()` retorne siempre la misma instancia.
+- Dos referencias al `Logger` correspondan al mismo objeto.
+
+## Factory Method
+
+Se verificó:
+
+- La creación de órdenes estándar.
+- La creación de órdenes urgentes.
+- La asignación de prioridades.
+- El funcionamiento de la cola de órdenes pendientes.
+- La exclusión de órdenes que no se encuentran en estado `Pendiente`.
+
+## Abstract Factory
+
+Se verificó:
+
+- La creación de equipos CNC junto con su inspección correspondiente.
+- La creación de brazos robóticos junto con su inspección correspondiente.
+- La correcta generación de cada familia de objetos.
+- La integración de las fábricas con `EquipmentService`.
+
+## Builder
+
+Se verificó:
+
+- La construcción de órdenes de producción.
+- La configuración de atributos mediante métodos encadenados.
+- La creación de órdenes mediante `build()`.
+- La correcta configuración de los atributos opcionales.
+
+## Prototype
+
+Se verificó:
+
+- La clonación de órdenes existentes.
+- La creación de nuevas órdenes a partir de una orden original.
+- La modificación de los datos específicos de las órdenes clonadas.
+- La conservación de la información correspondiente al objeto original.
 
 Las pruebas automatizadas se ejecutan mediante:
 
 ```bash
 python -m pytest
+```
 
-\---
+---
 
-**## Tecnología**
+# Tecnologías utilizadas
 
-El desarrollo del sistema se realiza principalmente utilizando:
+El proyecto fue desarrollado utilizando las siguientes tecnologías:
 
-\* **\*\*Python 3.11\*\***
+- **Python**
+- **Pytest**
+- **Git**
+- **GitHub**
 
-\* **\*\*Visual Studio Code\*\***
+Python se utiliza como lenguaje principal para la implementación del sistema y de los patrones de diseño.
 
-\* **\*\*Git\*\***
+Pytest se utiliza para realizar las pruebas automatizadas.
 
-\* **\*\*GitHub\*\***
+Git y GitHub se utilizan para el control de versiones y la gestión del código fuente.
 
-\* **\*\*pytest\*\***
+---
 
-Las herramientas y tecnologías podrán evolucionar durante el desarrollo de acuerdo con las necesidades del proyecto y los requisitos de la asignatura.
+# Arquitectura del proyecto
 
-\---
+El sistema se encuentra organizado en diferentes módulos de acuerdo con las responsabilidades de cada componente.
 
-**## Arquitectura**
+### Producción
 
-La arquitectura definitiva del sistema será definida y refinada durante el desarrollo.
+Contiene los componentes relacionados con las órdenes de producción, fábricas y construcción de objetos.
 
-Como requisito del proyecto, se deberá analizar e implementar una arquitectura basada en **\*\*microservicios y/o arquitectura hexagonal\*\***, seleccionando la alternativa que resulte adecuada para el alcance académico del sistema.
+### Equipos
 
-La arquitectura no se considera todavía definitiva, ya que su diseño será desarrollado progresivamente junto con la evolución del sistema.
+Contiene las clases relacionadas con los equipos de producción, inspecciones y fábricas abstractas.
 
-\---
+### Infraestructura
 
-**## Estructura actual del proyecto**
+Contiene componentes generales utilizados por el sistema, como el `Logger`.
+
+### Pruebas
+
+Contiene las pruebas automatizadas de los diferentes componentes y patrones implementados.
+
+---
+
+# Estructura del proyecto
+
+La estructura general del proyecto es la siguiente:
 
 ```text
 Proyecto_Patrones_de_software/
-│
 ├── docs/
-├── img/
-│   └── imágenes generales del proyecto
-│ 
-│   ├── semana-01/
+│   ├── img/
+│   │   ├── codigo-abstract-factory.jpeg
+│   │   ├── codigo-equipment-inspection-base.jpeg
+│   │   ├── codigo-factory-creator.jpg
+│   │   ├── codigo-order-builder.jpeg
+│   │   ├── codigo-order-clone.jpeg
+│   │   ├── codigo-pending-queue.jpg
+│   │   ├── codigo-priority-score.jpg
+│   │   ├── codigo-singleton.jpeg
+│   │   ├── ejecucion-abstract-factory.jpeg
+│   │   ├── ejecucion-builder.jpeg
+│   │   ├── ejecucion-main.jpg
+│   │   ├── ejecucion-prototype.jpeg
+│   │   ├── prueba-pytest-abstract-factory.jpeg
+│   │   ├── prueba-pytest-builder.jpeg
+│   │   ├── prueba-pytest-factory.jpg
+│   │   ├── prueba-pytest-prototype.jpeg
+│   │   ├── prueba-singleton.jpeg
+│   │   ├── uml-abstract-factory.png
+│   │   ├── uml-builder.png
+│   │   ├── uml-factory.png
+│   │   ├── uml-prototype.png
+│   │   ├── uml-singleton.png
+│   │   ├── uso-equipment-service.jpeg
+│   │   ├── uso-factory-main.jpg
+│   │   ├── uso-order-builder.jpeg
+│   │   ├── uso-order-clone.jpeg
+│   │   └── uso-singleton.jpeg
+│   │
+│   ├── semana_01/
 │   │   ├── contextualizacion.md
+│   │   └── evidencia/
 │   │
-│   ├── semana-02/
+│   ├── semana_02/
 │   │   ├── contextualizacion2.md
+│   │   └── evidencia/
 │   │
-│   ├── semana-03/
+│   ├── semana_03/
 │   │   ├── singleton.md
+│   │   └── evidencia/
+│   │       ├── codigo-singleton.jpeg
+│   │       ├── uso-singleton.jpeg
+│   │       └── prueba-singleton.jpeg
 │   │
-│   ├── semana-04/
+│   ├── semana_04/
 │   │   ├── Factory-Method.md
+│   │   ├── Abstract-Factory.md
+│   │   └── evidencia/
 │   │
-│   └── semana-05/
+│   └── semana_05/
 │       ├── Builder.md
 │       ├── Prototype.md
+│       └── evidencia/
 │
 ├── src/
 │   ├── production/
-│   ├── prod_order.py
-│   ├── prod_factory.py
-│   ├── prod_service.py
-│   └── order_builder.py
+│   │   ├── prod_order.py
+│   │   ├── prod_factory.py
+│   │   ├── prod_service.py
+│   │   └── order_builder.py
 │   │
 │   ├── quality/
+│   │
 │   ├── equipment/
-│   ├── equi_service.py
-│   ├── equipment_base.py
-│   └── cell_factory.py
+│   │   ├── equi_service.py
+│   │   ├── equipment_base.py
+│   │   └── cell_factory.py
+│   │
 │   ├── oee/
+│   │
 │   ├── infrastructure/
 │   │   └── logger.py
+│   │
 │   └── main.py
 │
 ├── tests/
-│   ├── __pycache__/
 │   ├── test_cell_factory.py
 │   ├── test_EquipmentService.py
 │   ├── test_logger_and_order_rules.py
@@ -333,7 +483,6 @@ Proyecto_Patrones_de_software/
 │   ├── test_order_clone.py
 │   ├── test_production_order.py
 │   └── test_start_with_equipment.py
-│   
 │
 ├── videos/
 │   ├── semana-01-singleton.mp4
@@ -345,56 +494,148 @@ Proyecto_Patrones_de_software/
 └── README.md
 ```
 
-**## Documentación**
+---
 
-La documentación del desarrollo se organiza por semanas dentro de la carpeta \`docs/\`.
+# Documentación
 
-Cada etapa registra los avances, decisiones de diseño, implementaciones y pruebas realizadas durante el desarrollo del proyecto.
+La documentación del proyecto se encuentra organizada por semanas dentro de la carpeta `docs/`.
 
-Actualmente se cuenta con documentación relacionada con:
+### Semana 01
 
-\* Contextualización inicial del proyecto.
+Contiene la contextualización inicial del proyecto.
 
-\* Implementación del patrón Singleton.
+`docs/semana_01/contextualizacion.md`
 
-\* Implementación del patrón Factory Method.
+### Semana 02
 
-\* Implementación de los patrones Abstract factory y builder.
+Contiene la segunda contextualización del sistema.
 
-\* Pruebas de funcionamiento de los patrones implementados.
+`docs/semana_02/contextualizacion2.md`
 
-\---
+### Semana 03
 
-**## Videos de demostración**
+Contiene la documentación correspondiente al patrón Singleton.
 
-Los videos presentan evidencias del funcionamiento de las implementaciones realizadas durante el desarrollo del proyecto.
+`docs/semana_03/singleton.md`
 
-**### Patrón Singleton**
+### Semana 04
 
-El video muestra la implementación del Logger mediante el patrón Singleton, la validación de que se obtiene una única instancia y su utilización desde los componentes de producción y equipos del sistema MES.
+Contiene la documentación correspondiente a los patrones:
 
-**### Patrón Factory Method**
+- Factory Method
+- Abstract Factory
 
-El video muestra la creación de diferentes tipos de órdenes mediante \`StandardOrderCreator\` y \`UrgentOrderCreator\`, el registro de las órdenes en \`ProductionService\`, el manejo de prioridades y la ejecución del sistema.
+Archivos:
 
-**### Patrón Abstract Factory**
+- `docs/semana_04/Factory-Method.md`
+- `docs/semana_04/Abstract-Factory.md`
 
-El video muestra la explicación y demostración del patrón **Abstract Factory**, destacando su propósito, estructura y aplicación dentro del contexto del proyecto.
+### Semana 05
 
-**### Patrón Builder**
+Contiene la documentación correspondiente a los patrones:
 
-El video muestra la explicación y demostración del patrón **Builder**, destacando cómo permite construir objetos complejos de manera organizada y paso a paso.
+- Builder
+- Prototype
 
-\---
+Archivos:
 
-**## Control de versiones**
+- `docs/semana_05/Builder.md`
+- `docs/semana_05/Prototype.md`
 
-El proyecto utiliza **\*\*Git y GitHub\*\*** para gestionar el código fuente y documentar la evolución del sistema mediante ramas y commits.
+---
 
-La rama principal se utiliza como versión integrada del proyecto, mientras que las ramas de trabajo permiten desarrollar y validar cambios antes de su integración.
+# Evidencias
 
-\---
+Las evidencias gráficas del desarrollo y ejecución de los patrones se encuentran organizadas en:
 
-**\*\*Estado del proyecto:\*\*** En desarrollo
+```text
+docs/img/
+```
 
+y en las carpetas:
 
+```text
+docs/semana_03/evidencia/
+docs/semana_04/evidencia/
+docs/semana_05/evidencia/
+```
+
+Entre las evidencias se encuentran:
+
+- Código de los patrones.
+- Diagramas UML.
+- Ejecución del sistema.
+- Uso de los patrones.
+- Resultados de las pruebas automatizadas.
+
+---
+
+# Videos
+
+Los videos de demostración del proyecto se encuentran en la carpeta:
+
+```text
+videos/
+```
+
+Actualmente se cuenta con videos correspondientes a diferentes etapas de implementación y demostración de los patrones.
+
+---
+
+# Control de versiones
+
+El proyecto utiliza **Git** como sistema de control de versiones y **GitHub** como plataforma para almacenar y administrar el repositorio.
+
+Repositorio:
+
+`https://github.com/YesicaRueda/Proyecto_Patrones_Software.git`
+
+Las ramas principales utilizadas durante el desarrollo permiten trabajar de manera independiente y posteriormente integrar los cambios.
+
+---
+
+# Ejecución del proyecto
+
+Para ejecutar el proyecto se debe contar con Python instalado.
+
+Desde la carpeta raíz del proyecto se puede ejecutar:
+
+```bash
+python src/main.py
+```
+
+Para ejecutar las pruebas automatizadas:
+
+```bash
+python -m pytest
+```
+
+---
+
+# Estado del proyecto
+
+El proyecto cuenta con la implementación de los siguientes patrones de diseño:
+
+- **Singleton** — Implementado.
+- **Factory Method** — Implementado.
+- **Abstract Factory** — Implementado.
+- **Builder** — Implementado.
+- **Prototype** — Implementado.
+
+Estos patrones se encuentran integrados dentro del sistema de control de producción y cuentan con documentación y pruebas asociadas.
+
+---
+
+# Conclusión
+
+La implementación de los patrones de diseño permitió estructurar el Sistema de Control de Producción de una manera más organizada y flexible.
+
+Cada patrón responde a una necesidad específica del sistema:
+
+- **Singleton:** controla la instancia única del `Logger`.
+- **Factory Method:** permite crear diferentes tipos de órdenes.
+- **Abstract Factory:** permite crear familias relacionadas de equipos e inspecciones.
+- **Builder:** permite construir órdenes paso a paso.
+- **Prototype:** permite crear nuevas órdenes mediante clonación.
+
+El uso conjunto de estos patrones contribuye a reducir el acoplamiento, mejorar la reutilización del código y facilitar futuras modificaciones y ampliaciones del sistema.
