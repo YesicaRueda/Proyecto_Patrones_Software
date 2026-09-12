@@ -267,15 +267,9 @@ El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma 
 
 Además, se comprobó su utilización desde diferentes componentes del MES, registrando eventos relacionados con una orden de producción y una máquina CNC.
 
----
-## 13.6 Evidencia de video
-
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](https://www.youtube.com/watch?v=rjtVx3nIVDs)
 
 ---
-## 13.7 Diagrama UML
+## 13.6 Diagrama UML
 
 ![Diagrama UML de Singleton](../img/uml-singleton.png)
 
@@ -302,7 +296,7 @@ end note
 ---
 
 
-## 13.8 Integración con los componentes del MES
+## 13.7 Integración con los componentes del MES
 
 La implementación del Singleton se relacionó con los componentes desarrollados para representar el proceso productivo.
 
@@ -318,7 +312,7 @@ Esto permite demostrar que el patrón no se implementa de forma aislada, sino co
 
 ---
 
-## 13.9 Corrección posterior
+## 13.8 Corrección posterior
 
 Se identificó que la garantía de instancia única no estaba completamente asegurada: el control se realizaba en `__init__`, por lo que instanciar `Logger()` directamente (sin pasar por `getInstance()`) podía generar una segunda instancia.
 
@@ -602,13 +596,6 @@ Se implementaron pruebas que verifican:
 
 El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto.
 
----
-
-## 20.7 Evidencia de video
-
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](www.youtube.com)
 
 ---
 
