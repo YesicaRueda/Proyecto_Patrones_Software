@@ -361,7 +361,7 @@ Se definió `OrderCreator` como clase abstracta con el método `create_order()`,
 
 Cada uno es responsable de instanciar su respectivo tipo de orden.
 
-![Implementación de OrderCreator y sus subclases concretas](./docs/img/codigo-factory-creator.jpg)
+![Implementación de OrderCreator y sus subclases concretas](../img/codigo-factory-creator.jpg)
 
 ---
 
@@ -821,7 +821,7 @@ Construir cada orden de una tanda repitiendo toda la cadena de `OrderBuilder` es
 
 Se agregó el método `clone(new_order_id, new_quantity=None)` en `ProductionOrder`, heredado sin modificaciones por `StandardOrder` y `UrgentOrder`. Utiliza `copy.deepcopy()` para generar una copia completamente independiente de la orden original, y fuerza explícitamente el `status` de la copia a `"Pendiente"`, sin importar el estado en que se encuentre la orden original.
 
-![Método clone en ProductionOrder](../img/codigo-order-clone.jpeg)
+![Método clone en ProductionOrder](./docs/img/codigo-order-clone.jpeg)
 
 ---
 
