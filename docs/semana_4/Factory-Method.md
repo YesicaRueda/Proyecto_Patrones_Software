@@ -229,7 +229,7 @@ Por esta razón, se requiere un único objeto `Logger` que pueda ser utilizado d
 
 Se implementó la clase `Logger` utilizando una instancia única almacenada en `_instance` y un método `getInstance()` encargado de crearla únicamente cuando sea necesaria y devolverla posteriormente.
 
-![Implementación del patrón Singleton](./evidencia/codigo-singleton.jpeg)
+![Implementación del patrón Singleton](../img/codigo-singleton.jpeg)
 
 La implementación corresponde a una inicialización **Lazy**, ya que la instancia se crea solamente cuando se solicita por primera vez mediante `getInstance()`.
 
@@ -253,7 +253,7 @@ La implementación permite evidenciar:
 
 Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-![Uso del Singleton](./evidencia/uso-singleton.jpeg)
+![Uso del Singleton](../img/uso-singleton.jpeg)
 
 La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método.
 
@@ -265,7 +265,7 @@ Esto permite comprobar que ambas referencias corresponden al mismo objeto.
 
 Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-![Prueba de ejecución](./evidencia/prueba-singleton.jpeg)
+![Prueba de ejecución](../img/prueba-singleton.jpeg)
 
 El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
@@ -324,7 +324,7 @@ Se definió `OrderCreator` como clase abstracta con el método `create_order()`,
 
 Cada uno es responsable de instanciar su respectivo tipo de orden.
 
-![Implementación de OrderCreator y sus subclases concretas](./evidencia/codigo-factory-creator.jpg)
+![Implementación de OrderCreator y sus subclases concretas](../img/codigo-factory-creator.jpg)
 
 ---
 
@@ -341,7 +341,7 @@ StandardOrder → 1
 UrgentOrder   → 10
 ```
 
-![Método get\_priority\_score en ProductionOrder, StandardOrder y UrgentOrder](./evidencia/codigo-priority-score.jpg)
+![Método get\_priority\_score en ProductionOrder, StandardOrder y UrgentOrder](../img/codigo-priority-score.jpg)
 
 De esta manera, cada tipo de orden tiene un comportamiento específico que posteriormente puede ser utilizado por el sistema.
 
@@ -385,7 +385,7 @@ Pendiente
 
 Posteriormente las ordena según `get_priority_score()`, de forma descendente.
 
-![Método get\_pending\_queue en ProductionService](./evidencia/codigo-pending-queue.jpg)
+![Método get\_pending\_queue en ProductionService](../img/codigo-pending-queue.jpg)
 
 La ordenación se resuelve completamente mediante polimorfismo, sin utilizar `if`/`elif` ni `isinstance` para distinguir el tipo de orden.
 
@@ -416,7 +416,7 @@ Las pruebas verifican:
 * Que `get_pending_queue()` prioriza correctamente las órdenes urgentes.
 * Que se excluyen las órdenes que ya no están en estado `"Pendiente"`.
 
-![Resultado de la ejecución de pytest (3 pruebas superadas)](./evidencia/prueba-pytest-factory.jpg)
+![Resultado de la ejecución de pytest (3 pruebas superadas)](../img/prueba-pytest-factory.jpg)
 
 El resultado obtenido fue de **3 pruebas superadas**.
 

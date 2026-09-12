@@ -293,35 +293,19 @@ Proyecto_Patrones_de_software/
 │ 
 │   ├── semana-01/
 │   │   ├── contextualizacion.md
-│   │   └── evidencia/
 │   │
 │   ├── semana-02/
 │   │   ├── contextualizacion2.md
-│   │   └── evidencia/
 │   │
 │   ├── semana-03/
 │   │   ├── singleton.md
-│   │   └── evidencia/
-│   │       ├── codigo-singleton.jpeg
-│   │       ├── prueba-singleton.jpeg
-│   │       └── uso-singleton.jpeg
 │   │
 │   ├── semana-04/
 │   │   ├── Factory-Method.md
-│   │   └── evidencia/
-│   │       ├── codigo-factory-creator.jpg
-│   │       ├── codigo-pending-queue.jpg
-│   │       ├── codigo-priority-score.jpg
-│   │       ├── codigo-singleton.jpeg
-│   │       ├── ejecucion-main.jpg
-│   │       ├── prueba-pytest-factory.jpg
-│   │       ├── prueba-singleton.jpeg
-│   │       └── uso-factory-main.jpg
 │   │
 │   └── semana-05/
 │       ├── Builder.md
 │       ├── Prototype.md
-│       └── evidencia/
 │
 ├── src/
 │   ├── production/
