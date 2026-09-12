@@ -361,7 +361,7 @@ Se definió `OrderCreator` como clase abstracta con el método `create_order()`,
 
 Cada uno es responsable de instanciar su respectivo tipo de orden.
 
-![Implementación de OrderCreator y sus subclases concretas](./img/codigo-factory-creator.jpg)
+![Implementación de OrderCreator y sus subclases concretas](./docs/img/codigo-factory-creator.jpg)
 
 ---
 
