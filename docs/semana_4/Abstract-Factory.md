@@ -256,7 +256,7 @@ La implementación permite evidenciar:
 
 Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-![Uso del Singleton](img/uso-singleton.jpeg)
+![Uso del Singleton](evidencia/uso-singleton.jpeg)
 
 La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método.
 
@@ -268,7 +268,7 @@ Esto permite comprobar que ambas referencias corresponden al mismo objeto.
 
 Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-![Prueba de ejecución](img/prueba-singleton.jpeg)
+![Prueba de ejecución](evidencia/prueba-singleton.jpeg)
 
 El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
@@ -277,7 +277,7 @@ Además, se comprobó su utilización desde diferentes componentes del MES, regi
 
 ## 13.6 Diagrama UML
 
-![Diagrama UML de Singleton](img/uml-singleton.png)
+![Diagrama UML de Singleton](evidencia/uml-singleton.png)
 
 ---
 
@@ -341,7 +341,7 @@ Se definió `OrderCreator` como clase abstracta con el método `create_order()`,
 
 Cada uno es responsable de instanciar su respectivo tipo de orden.
 
-![Implementación de OrderCreator y sus subclases concretas](img/codigo-factory-creator.jpg)
+![Implementación de OrderCreator y sus subclases concretas](evidencia/codigo-factory-creator.jpg)
 
 ---
 
@@ -358,7 +358,7 @@ StandardOrder → 1
 UrgentOrder   → 10
 ```
 
-![Método get\_priority\_score en ProductionOrder, StandardOrder y UrgentOrder](img/codigo-priority-score.jpg)
+![Método get\_priority\_score en ProductionOrder, StandardOrder y UrgentOrder](evidencia/codigo-priority-score.jpg)
 
 De esta manera, cada tipo de orden tiene un comportamiento específico que posteriormente puede ser utilizado por el sistema.
 
@@ -384,7 +384,7 @@ Esto permite aplicar el principio de abierto/cerrado y mantener separada la lóg
 
 Desde `main.py` se instancian `StandardOrderCreator` y `UrgentOrderCreator`, y se utiliza `create_order()` para generar las órdenes de producción que luego se registran en `ProductionService`.
 
-![Uso de los creadores concretos desde main.py](img/uso-factory-main.jpg)
+![Uso de los creadores concretos desde main.py](evidencia/uso-factory-main.jpg)
 
 La creación de las órdenes queda de esta manera separada de la lógica principal del servicio de producción.
 
@@ -402,7 +402,7 @@ Pendiente
 
 Posteriormente las ordena según `get_priority_score()`, de forma descendente.
 
-![Método get\_pending\_queue en ProductionService](img/codigo-pending-queue.jpg)
+![Método get\_pending\_queue en ProductionService](evidencia/codigo-pending-queue.jpg)
 
 La ordenación se resuelve completamente mediante polimorfismo, sin utilizar `if`/`elif` ni `isinstance` para distinguir el tipo de orden.
 
@@ -433,14 +433,14 @@ Las pruebas verifican:
 * Que `get_pending_queue()` prioriza correctamente las órdenes urgentes.
 * Que se excluyen las órdenes que ya no están en estado `"Pendiente"`.
 
-![Resultado de la ejecución de pytest (3 pruebas superadas)](img/prueba-pytest-factory.jpg)
+![Resultado de la ejecución de pytest (3 pruebas superadas)](evidencia/prueba-pytest-factory.jpg)
 
 El resultado obtenido fue de **3 pruebas superadas**.
 
 ---
 ## 19.3 Diagrama UML
 
-![Diagrama UML de Factory Method](img/uml-factory.png)
+![Diagrama UML de Factory Method](evidencia/uml-factory.png)
 
 ---
 
@@ -468,7 +468,7 @@ Antes de esta implementación, `EquipmentService` no representaba ningún equipo
 
 Se definieron dos interfaces base: `Equipment` (con `start()`, `stop()` y estado) e `Inspection` (con `inspect()`).
 
-![Interfaces Equipment e Inspection](img/codigo-equipment-inspection-base.jpeg)
+![Interfaces Equipment e Inspection](evidencia/codigo-equipment-inspection-base.jpeg)
 
 ### 20.3.2 Productos concretos y fábricas concretas
 
@@ -482,7 +482,7 @@ Cada familia se agrupa mediante una fábrica concreta que hereda de `AbstractPro
 * `CNCCellFactory` → crea `CNCMachine` + `CNCInspection`.
 * `RobotCellFactory` → crea `RobotArm` + `RobotInspection`.
 
-![Productos concretos y fábricas concretas de Abstract Factory](img/codigo-abstract-factory.jpeg)
+![Productos concretos y fábricas concretas de Abstract Factory](evidencia/codigo-abstract-factory.jpeg)
 
 ---
 
@@ -502,7 +502,7 @@ Agregar una nueva línea de producción en el futuro implicaría únicamente cre
 
 `EquipmentService` recibe la fábrica en su constructor y delega en ella la creación del equipo y la inspección. También se actualizó para registrar sus eventos a través del `Logger` centralizado, en lugar de mensajes de consola independientes.
 
-![Uso de EquipmentService con la fábrica concreta desde main.py](img/uso-equipment-service.jpeg)
+![Uso de EquipmentService con la fábrica concreta desde main.py](evidencia/uso-equipment-service.jpeg)
 
 ---
 
@@ -510,7 +510,7 @@ Agregar una nueva línea de producción en el futuro implicaría únicamente cre
 
 Se ejecutó `main.py` utilizando `CNCCellFactory`, verificando que el equipo y la inspección creados correspondan a la misma familia y que los eventos se registren mediante el Logger.
 
-![Ejecución de main.py con Abstract Factory](img/ejecucion-abstract-factory.jpeg)
+![Ejecución de main.py con Abstract Factory](evidencia/ejecucion-abstract-factory.jpeg)
 
 ### 20.6.1 Pruebas automatizadas
 
@@ -521,7 +521,7 @@ Se implementaron pruebas que verifican:
 * Que `EquipmentService` refleja correctamente la familia de la fábrica recibida.
 * Que `start_machine()`/`stop_machine()` cambian correctamente el estado del equipo.
 
-![Resultado de la ejecución de pytest para Abstract Factory](img/prueba-pytest-abstract-factory.jpeg)
+![Resultado de la ejecución de pytest para Abstract Factory](evidencia/prueba-pytest-abstract-factory.jpeg)
 
 El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto.
 
@@ -529,7 +529,7 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ## 20.7 Diagrama UML
 
-![Diagrama UML de Abstract Factory](img/uml-abstract-factory.png)
+![Diagrama UML de Abstract Factory](evidencia/uml-abstract-factory.png)
 
 ---
 # 20.9 Correcciones y cambios respecto a la semana anterior
