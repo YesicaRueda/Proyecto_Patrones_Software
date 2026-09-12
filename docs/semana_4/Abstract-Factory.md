@@ -274,22 +274,15 @@ El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma 
 
 Además, se comprobó su utilización desde diferentes componentes del MES, registrando eventos relacionados con una orden de producción y una máquina CNC.
 
----
-## 13.6 Evidencia de video
 
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](https://www.youtube.com/watch?v=rjtVx3nIVDs)
-
----
-## 13.7 Diagrama UML
+## 13.6 Diagrama UML
 
 ![Diagrama UML de Singleton](img/uml-singleton.png)
 
 ---
 
 
-## 13.8 Integración con los componentes del MES
+## 13.7 Integración con los componentes del MES
 
 La implementación del Singleton se relacionó con los componentes desarrollados para representar el proceso productivo.
 
@@ -445,15 +438,6 @@ Las pruebas verifican:
 El resultado obtenido fue de **3 pruebas superadas**.
 
 ---
-
-
-## 19.2 Evidencia de video
-
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
-
----
 ## 19.3 Diagrama UML
 
 ![Diagrama UML de Factory Method](img/uml-factory.png)
@@ -543,15 +527,7 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ---
 
-## 20.7 Evidencia de video
-
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
-
-[Ver video de la prueba](www.youtube.com)
-
----
-
-## 20.8 Diagrama UML
+## 20.7 Diagrama UML
 
 ![Diagrama UML de Abstract Factory](img/uml-abstract-factory.png)
 
