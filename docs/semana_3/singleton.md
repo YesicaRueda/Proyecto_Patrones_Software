@@ -232,7 +232,7 @@ Esta necesidad permite aplicar el patrón de diseño **Singleton**.
 
 Se implementó la clase `Logger` utilizando una instancia única almacenada en `_instance` y un método `getInstance()` encargado de crearla únicamente cuando sea necesaria y devolverla posteriormente.
 
-![Implementación del patrón Singleton](evidencia/codigo-singleton.jpeg)
+![Implementación del patrón Singleton](./evidencia/codigo-singleton.jpeg)
 
 La implementación corresponde a una inicialización **Lazy**, ya que la instancia se crea solamente cuando se solicita por primera vez mediante `getInstance()`.
 
@@ -258,7 +258,7 @@ La implementación permite evidenciar las características principales del patr�
 
 Desde el programa principal se solicita la instancia del Logger mediante `getInstance()`.
 
-![Uso del Singleton](evidencia/uso-singleton.jpeg)
+![Uso del Singleton](./evidencia/uso-singleton.jpeg)
 
 La variable `logger1` y la variable `logger2` obtienen la instancia mediante el mismo método.
 
@@ -270,7 +270,7 @@ Esto permite comprobar que ambas referencias corresponden al mismo objeto.
 
 Se realizó una prueba solicitando dos veces la instancia del Logger y verificando si ambas referencias corresponden al mismo objeto.
 
-![Prueba de ejecución](evidencia/prueba-singleton.jpeg)
+![Prueba de ejecución](./evidencia/prueba-singleton.jpeg)
 
 El resultado `True` demuestra que `logger1` y `logger2` corresponden a la misma instancia.
 
