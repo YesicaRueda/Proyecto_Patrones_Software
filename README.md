@@ -4,8 +4,8 @@
 
 **Integrantes:**
 
-- Yesica Dayana Rueda Saldarriaga
-- Sergio Andrés Mendoza Osorio
+* Yesica Dayana Rueda Saldarriaga
+* Sergio Andrés Mendoza Osorio
 
 ---
 
@@ -27,13 +27,15 @@ Diseñar e implementar un Sistema de Control de Producción (MES) aplicando patr
 
 ### Objetivos específicos
 
-- Modelar las principales entidades relacionadas con el proceso de producción.
-- Aplicar patrones de diseño para resolver problemas recurrentes de diseño de software.
-- Separar responsabilidades dentro de los diferentes componentes del sistema.
-- Facilitar la creación y configuración de órdenes de producción.
-- Implementar mecanismos para la creación de diferentes tipos de objetos.
-- Realizar pruebas automatizadas para verificar el funcionamiento de los componentes desarrollados.
-- Documentar el proceso de implementación de los patrones utilizados.
+* Modelar las principales entidades relacionadas con el proceso de producción.
+* Aplicar patrones de diseño para resolver problemas recurrentes de diseño de software.
+* Separar responsabilidades dentro de los diferentes componentes del sistema.
+* Facilitar la creación y configuración de órdenes de producción.
+* Implementar mecanismos para la creación de diferentes tipos de objetos.
+* Integrar componentes externos sin afectar las interfaces existentes del sistema.
+* Realizar pruebas automatizadas para verificar el funcionamiento de los componentes desarrollados.
+* Analizar la pertinencia de los patrones antes de incorporarlos al proyecto.
+* Documentar el proceso de implementación y evaluación de los patrones utilizados.
 
 ---
 
@@ -41,33 +43,42 @@ Diseñar e implementar un Sistema de Control de Producción (MES) aplicando patr
 
 El sistema contempla diferentes funcionalidades relacionadas con la gestión de producción:
 
-- Creación de órdenes de producción.
-- Creación de órdenes estándar y urgentes.
-- Gestión de prioridades de las órdenes.
-- Manejo de la cola de órdenes pendientes.
-- Construcción de órdenes mediante el patrón Builder.
-- Clonación de órdenes mediante el patrón Prototype.
-- Creación de familias de equipos e inspecciones mediante Abstract Factory.
-- Registro centralizado de eventos mediante Singleton.
-- Asignación y control de equipos de producción.
-- Ejecución de inspecciones asociadas a los equipos.
-- Pruebas automatizadas mediante `pytest`.
+* Creación de órdenes de producción.
+* Creación de órdenes estándar y urgentes.
+* Gestión de prioridades de las órdenes.
+* Manejo de la cola de órdenes pendientes.
+* Construcción de órdenes mediante el patrón Builder.
+* Clonación de órdenes mediante el patrón Prototype.
+* Creación de familias de equipos e inspecciones mediante Abstract Factory.
+* Registro centralizado de eventos mediante Singleton.
+* Integración del módulo estándar `logging` de Python mediante Adapter.
+* Registro de eventos con niveles de severidad.
+* Persistencia de eventos en archivo.
+* Asignación y control de equipos de producción.
+* Ejecución de inspecciones asociadas a los equipos.
+* Pruebas automatizadas mediante `pytest`.
 
 ---
 
-# Patrones de diseño implementados
+# Patrones de diseño implementados y evaluados
 
-Durante el desarrollo del proyecto se implementaron los siguientes patrones de diseño:
+Durante el desarrollo del proyecto se han implementado y evaluado los siguientes patrones de diseño:
 
-| Patrón | Propósito dentro del proyecto | Estado |
-|---|---|---|
-| Singleton | Gestionar una única instancia del Logger | Implementado |
-| Factory Method | Crear diferentes tipos de órdenes de producción | Implementado |
-| Abstract Factory | Crear familias de equipos e inspecciones relacionadas | Implementado |
-| Builder | Construir órdenes de producción paso a paso | Implementado |
-| Prototype | Crear nuevas órdenes mediante clonación de objetos existentes | Implementado |
+| Patrón           | Propósito dentro del proyecto                                                                   | Estado                 |
+| ---------------- | ----------------------------------------------------------------------------------------------- | ---------------------- |
+| Singleton        | Gestionar una única instancia del Logger                                                        | Implementado           |
+| Factory Method   | Crear diferentes tipos de órdenes de producción                                                 | Implementado           |
+| Abstract Factory | Crear familias de equipos e inspecciones relacionadas                                           | Implementado           |
+| Builder          | Construir órdenes de producción paso a paso                                                     | Implementado           |
+| Prototype        | Crear nuevas órdenes mediante clonación de objetos existentes                                   | Implementado           |
+| Adapter          | Integrar `logging` de Python manteniendo la interfaz existente del Logger                       | Implementado           |
+| Bridge           | Separar abstracción e implementación cuando existen dos dimensiones independientes de variación | Evaluado — no aplicado |
+| Composite        | Pendiente de análisis                                                                           | Pendiente              |
+| Decorator        | Pendiente de análisis                                                                           | Pendiente              |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
+
+Además, el análisis de Bridge permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -78,6 +89,8 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 **Contextualización → Problema → Necesidad → Alternativas → Patrón → Diseño → Implementación → Prueba**
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
+
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge.
 
 ---
 
@@ -104,10 +117,11 @@ El resultado permite comprobar que ambas referencias corresponden a la misma ins
 
 ### Beneficios del Singleton
 
-- Garantiza una única instancia del `Logger`.
-- Centraliza el registro de eventos y mensajes.
-- Evita la creación innecesaria de múltiples instancias.
-- Facilita el acceso al servicio de registro desde diferentes partes del sistema.
+* Garantiza una única instancia del `Logger`.
+* Centraliza el registro de eventos y mensajes.
+* Evita la creación innecesaria de múltiples instancias.
+* Facilita el acceso al servicio de registro desde diferentes partes del sistema.
+* Permite integrar posteriormente otros mecanismos de registro sin modificar los componentes que utilizan el Logger.
 
 ---
 
@@ -123,11 +137,11 @@ La implementación se encuentra principalmente en:
 
 Entre los componentes utilizados se encuentran:
 
-- `OrderCreator`
-- `StandardOrderCreator`
-- `UrgentOrderCreator`
-- `StandardOrder`
-- `UrgentOrder`
+* `OrderCreator`
+* `StandardOrderCreator`
+* `UrgentOrderCreator`
+* `StandardOrder`
+* `UrgentOrder`
 
 Ejemplo de uso:
 
@@ -138,12 +152,15 @@ plantilla = urgent_creator.create_order(plantilla_data)
 
 De esta manera, el código cliente no necesita encargarse directamente de instanciar las clases concretas de las órdenes.
 
+Además, cada tipo de orden implementa un comportamiento diferenciado mediante `get_priority_score()`, permitiendo que `ProductionService` organice la cola de órdenes pendientes mediante polimorfismo.
+
 ### Beneficios del Factory Method
 
-- Permite crear diferentes tipos de órdenes sin acoplar el código cliente a las clases concretas.
-- Facilita la incorporación de nuevos tipos de órdenes.
-- Encapsula la lógica de creación de objetos.
-- Mejora la flexibilidad y mantenibilidad del sistema.
+* Permite crear diferentes tipos de órdenes sin acoplar el código cliente a las clases concretas.
+* Facilita la incorporación de nuevos tipos de órdenes.
+* Encapsula la lógica de creación de objetos.
+* Mejora la flexibilidad y mantenibilidad del sistema.
+* Permite utilizar polimorfismo para gestionar las prioridades.
 
 ---
 
@@ -159,18 +176,18 @@ La implementación se encuentra en:
 
 La fábrica abstracta `AbstractProductionCellFactory` define los métodos:
 
-- `create_equipment()`
-- `create_inspection()`
+* `create_equipment()`
+* `create_inspection()`
 
 Las fábricas concretas implementadas son:
 
-- `CNCCellFactory`
-- `RobotCellFactory`
+* `CNCCellFactory`
+* `RobotCellFactory`
 
 Estas fábricas permiten crear las siguientes familias de objetos:
 
-- Máquina CNC + inspección dimensional.
-- Brazo robótico + inspección de ensamble.
+* Máquina CNC + inspección CNC.
+* Brazo robótico + inspección robótica.
 
 Ejemplo de uso:
 
@@ -182,11 +199,11 @@ De esta manera, `EquipmentService` puede trabajar con diferentes familias de equ
 
 ### Beneficios del Abstract Factory
 
-- Permite crear familias de objetos relacionados.
-- Reduce el acoplamiento entre el sistema y las clases concretas.
-- Facilita el cambio entre diferentes familias de equipos.
-- Mantiene la compatibilidad entre los objetos pertenecientes a una misma familia.
-- Facilita la incorporación de nuevas familias de productos.
+* Permite crear familias de objetos relacionados.
+* Reduce el acoplamiento entre el sistema y las clases concretas.
+* Facilita el cambio entre diferentes familias de equipos.
+* Mantiene la compatibilidad entre los objetos pertenecientes a una misma familia.
+* Facilita la incorporación de nuevas familias de productos.
 
 ---
 
@@ -202,10 +219,12 @@ La implementación se encuentra en:
 
 El componente principal es `OrderBuilder`, que permite establecer diferentes datos de la orden mediante métodos encadenados, como:
 
-- `with_lote()`
-- `with_fecha_entrega()`
-- `with_equipo_asignado()`
-- `build()`
+* `with_lote()`
+* `with_fecha_ingreso()`
+* `with_fecha_entrega()`
+* `with_descripcion()`
+* `with_equipo_asignado()`
+* `build()`
 
 Ejemplo:
 
@@ -221,7 +240,15 @@ plantilla_data = (
 
 De esta manera, la orden se construye paso a paso sin necesidad de utilizar un constructor con una gran cantidad de parámetros.
 
-El patrón facilita la creación de diferentes configuraciones de órdenes de producción, mejora la legibilidad del código y permite mantener separada la lógica de construcción del objeto.
+El Builder se integra con Factory Method: el Builder prepara los datos y los creadores concretos se encargan de construir el tipo de orden correspondiente.
+
+### Beneficios del Builder
+
+* Permite construir las órdenes de producción paso a paso.
+* Mejora la legibilidad mediante métodos encadenados.
+* Evita constructores con una gran cantidad de parámetros.
+* Facilita la creación de órdenes con diferentes configuraciones.
+* Mantiene separada la construcción de datos de la creación del tipo concreto de orden.
 
 ---
 
@@ -229,7 +256,7 @@ El patrón facilita la creación de diferentes configuraciones de órdenes de pr
 
 El patrón **Prototype** permite crear nuevos objetos a partir de la clonación de una instancia existente, evitando tener que construir nuevamente el objeto desde cero.
 
-En el proyecto se utiliza para clonar órdenes de producción existentes y generar nuevas órdenes conservando la configuración de la orden original.
+En el proyecto se utiliza para clonar órdenes de producción pertenecientes a un mismo lote.
 
 La implementación utiliza el método:
 
@@ -237,22 +264,108 @@ La implementación utiliza el método:
 clone()
 ```
 
-Ejemplo de uso:
+Ejemplo:
 
 ```python
 urgent_order_2 = plantilla.clone("OP-003", 75)
 urgent_order_3 = plantilla.clone("OP-004", 100)
 ```
 
-A partir de una orden existente se pueden generar nuevas órdenes modificando los datos que sean necesarios, como el identificador y la cantidad.
+A partir de una orden existente se pueden generar nuevas órdenes modificando datos específicos, como el identificador y la cantidad, mientras se conserva información como el lote, fecha de entrega y equipo asignado.
+
+La clonación utiliza `copy.deepcopy()` para garantizar que la nueva orden sea independiente de la original.
+
+Además, cada copia inicia nuevamente con estado `"Pendiente"`.
 
 ### Beneficios del Prototype
 
-- Permite crear nuevos objetos a partir de objetos existentes.
-- Evita repetir procesos de construcción complejos.
-- Facilita la creación de órdenes similares.
-- Permite conservar la configuración de una orden original.
-- Reduce la duplicación de lógica al crear objetos con características similares.
+* Permite crear nuevos objetos a partir de objetos existentes.
+* Evita repetir procesos de construcción complejos.
+* Facilita la creación de órdenes similares.
+* Permite conservar la configuración de una orden original.
+* Reduce la duplicación de lógica.
+* Facilita la representación de diferentes tandas pertenecientes al mismo lote.
+
+---
+
+## Adapter
+
+El patrón **Adapter** permite conectar componentes que utilizan interfaces diferentes sin modificar el código cliente que ya depende de una interfaz existente.
+
+En el proyecto se utiliza para integrar el módulo estándar `logging` de Python con el `Logger` centralizado del MES.
+
+Anteriormente, el `Logger` únicamente registraba mensajes mediante consola. Esto limitaba el sistema porque no existían niveles de severidad ni persistencia de los eventos en archivos.
+
+Para solucionar esta necesidad se implementó:
+
+`StandardLoggingAdapter`
+
+El Adapter traduce las operaciones del Logger del MES hacia la interfaz proporcionada por `logging`.
+
+El resto del sistema puede continuar utilizando:
+
+```python
+Logger.getInstance().log(mensaje)
+```
+
+sin necesidad de modificar los componentes existentes.
+
+El Adapter se encarga internamente de utilizar las operaciones correspondientes de `logging`, incluyendo:
+
+* `info()`
+* `warning()`
+* `error()`
+
+También permite configurar:
+
+* `StreamHandler` para mostrar eventos en consola.
+* `FileHandler` para almacenar eventos en archivo.
+* Formato de fecha.
+* Nivel de severidad.
+* Mensaje registrado.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Target:** interfaz utilizada por el `Logger` del MES.
+* **Adapter:** `StandardLoggingAdapter`.
+* **Adaptee:** módulo estándar `logging` de Python.
+* **Cliente:** componentes del MES que continúan utilizando `Logger.getInstance().log()`.
+
+### Beneficios del Adapter
+
+* Integra `logging` sin modificar el código existente.
+* Mantiene la interfaz pública del `Logger`.
+* Agrega niveles de severidad.
+* Permite persistir eventos en archivos.
+* Reduce el impacto de integrar una herramienta externa.
+* Mantiene compatibilidad con los componentes previamente desarrollados.
+* Mejora la capacidad de seguimiento de los eventos generados por el MES.
+
+---
+
+## Bridge — Evaluado y no aplicado
+
+El patrón **Bridge** busca separar una abstracción de su implementación cuando existen **dos dimensiones independientes que pueden variar por separado**.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES.
+
+Sin embargo, al revisar la estructura actual del proyecto no se identificó un problema real que requiriera separar dos dimensiones independientes mediante este patrón.
+
+Parte de las variaciones existentes ya son resueltas adecuadamente por los patrones implementados anteriormente, especialmente Abstract Factory y Adapter.
+
+Implementar Bridge sin una necesidad concreta habría agregado clases, abstracciones y complejidad innecesaria al proyecto.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización.
+
+Bridge podrá evaluarse nuevamente en etapas posteriores si aparecen dos dimensiones del dominio que necesiten evolucionar de forma independiente.
 
 ---
 
@@ -262,39 +375,38 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 
 ### Singleton
 
-- Garantiza una única instancia del `Logger` durante la ejecución del sistema.
-- Permite centralizar el registro de eventos y mensajes.
-- Evita la creación innecesaria de múltiples instancias del mismo componente.
-- Facilita el acceso al servicio de registro desde diferentes partes del sistema.
+* Garantiza una única instancia del `Logger`.
+* Centraliza el registro de eventos.
 
 ### Factory Method
 
-- Permite crear diferentes tipos de órdenes de producción sin acoplar el código cliente a las clases concretas.
-- Facilita la incorporación de nuevos tipos de órdenes.
-- Encapsula la lógica de creación de objetos.
-- Mejora la flexibilidad del sistema.
+* Separa la creación de los diferentes tipos de órdenes.
+* Facilita agregar nuevos tipos de órdenes.
 
 ### Abstract Factory
 
-- Permite crear familias de objetos relacionados, como equipos e inspecciones.
-- Reduce el acoplamiento entre el sistema y las clases concretas.
-- Facilita el cambio entre diferentes familias de equipos.
-- Mantiene la compatibilidad entre los objetos que pertenecen a una misma familia.
+* Permite crear familias compatibles de equipos e inspecciones.
+* Evita mezclar componentes pertenecientes a familias distintas.
 
 ### Builder
 
-- Permite construir las órdenes de producción paso a paso.
-- Mejora la legibilidad del código mediante métodos encadenados.
-- Evita constructores con una gran cantidad de parámetros.
-- Facilita la creación de órdenes con diferentes configuraciones.
-- Separa la lógica de construcción de la representación final del objeto.
+* Simplifica la construcción de órdenes con información opcional.
+* Mejora la legibilidad del código.
 
 ### Prototype
 
-- Permite crear nuevas órdenes a partir de órdenes existentes.
-- Facilita la reutilización de configuraciones.
-- Reduce la duplicación de código.
-- Permite generar objetos similares de manera sencilla.
+* Permite reutilizar órdenes previamente configuradas.
+* Facilita la generación de tandas pertenecientes al mismo lote.
+
+### Adapter
+
+* Integra el módulo `logging` sin modificar la interfaz existente.
+* Incorpora niveles de severidad y persistencia de eventos.
+* Evita cambios invasivos sobre los componentes existentes.
+
+### Bridge
+
+Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
 
 ---
 
@@ -302,51 +414,66 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 
 Se realizaron pruebas automatizadas para verificar el funcionamiento de los patrones implementados y de los diferentes componentes del sistema.
 
-## Singleton
+### Singleton
 
 Se verificó que:
 
-- `Logger.getInstance()` retorne siempre la misma instancia.
-- Dos referencias al `Logger` correspondan al mismo objeto.
+* `Logger.getInstance()` retorne siempre la misma instancia.
+* Dos referencias al `Logger` correspondan al mismo objeto.
 
-## Factory Method
-
-Se verificó:
-
-- La creación de órdenes estándar.
-- La creación de órdenes urgentes.
-- La asignación de prioridades.
-- El funcionamiento de la cola de órdenes pendientes.
-- La exclusión de órdenes que no se encuentran en estado `Pendiente`.
-
-## Abstract Factory
+### Factory Method
 
 Se verificó:
 
-- La creación de equipos CNC junto con su inspección correspondiente.
-- La creación de brazos robóticos junto con su inspección correspondiente.
-- La correcta generación de cada familia de objetos.
-- La integración de las fábricas con `EquipmentService`.
+* La creación de órdenes estándar.
+* La creación de órdenes urgentes.
+* La asignación de prioridades.
+* El funcionamiento de la cola de órdenes pendientes.
+* La exclusión de órdenes que no se encuentran en estado `Pendiente`.
 
-## Builder
-
-Se verificó:
-
-- La construcción de órdenes de producción.
-- La configuración de atributos mediante métodos encadenados.
-- La creación de órdenes mediante `build()`.
-- La correcta configuración de los atributos opcionales.
-
-## Prototype
+### Abstract Factory
 
 Se verificó:
 
-- La clonación de órdenes existentes.
-- La creación de nuevas órdenes a partir de una orden original.
-- La modificación de los datos específicos de las órdenes clonadas.
-- La conservación de la información correspondiente al objeto original.
+* La creación de equipos CNC junto con su inspección correspondiente.
+* La creación de brazos robóticos junto con su inspección correspondiente.
+* La correcta generación de cada familia de objetos.
+* La integración de las fábricas con `EquipmentService`.
 
-Las pruebas automatizadas se ejecutan mediante:
+### Builder
+
+Se verificó:
+
+* La construcción de órdenes de producción.
+* La configuración de atributos mediante métodos encadenados.
+* La creación de datos mediante `build()`.
+* La correcta configuración de los atributos opcionales.
+
+### Prototype
+
+Se verificó:
+
+* La clonación de órdenes existentes.
+* La independencia entre la orden original y la copia.
+* La modificación del identificador y cantidad.
+* La conservación del lote, fecha de entrega y equipo asignado.
+* El establecimiento del estado `"Pendiente"` en las copias.
+
+### Adapter
+
+Se verificó:
+
+* La integración entre `Logger` y `StandardLoggingAdapter`.
+* El registro de mensajes mediante `logging`.
+* El funcionamiento del registro en consola.
+* La persistencia de eventos en archivo.
+* El aislamiento correcto entre loggers asociados a diferentes archivos.
+
+Actualmente, el proyecto cuenta con:
+
+**21 pruebas automatizadas superadas.**
+
+Las pruebas se ejecutan mediante:
 
 ```bash
 python -m pytest
@@ -356,18 +483,24 @@ python -m pytest
 
 # Tecnologías utilizadas
 
-El proyecto fue desarrollado utilizando las siguientes tecnologías:
+El proyecto fue desarrollado utilizando:
 
-- **Python**
-- **Pytest**
-- **Git**
-- **GitHub**
+* **Python**
+* **Pytest**
+* **logging**
+* **Git**
+* **GitHub**
+* **PlantUML**
 
 Python se utiliza como lenguaje principal para la implementación del sistema y de los patrones de diseño.
 
 Pytest se utiliza para realizar las pruebas automatizadas.
 
+El módulo `logging` de Python se integra mediante el patrón Adapter para mejorar el registro de eventos.
+
 Git y GitHub se utilizan para el control de versiones y la gestión del código fuente.
+
+PlantUML se utiliza para representar gráficamente la estructura de los patrones implementados.
 
 ---
 
@@ -377,82 +510,78 @@ El sistema se encuentra organizado en diferentes módulos de acuerdo con las res
 
 ### Producción
 
-Contiene los componentes relacionados con las órdenes de producción, fábricas y construcción de objetos.
+Contiene los componentes relacionados con:
+
+* Órdenes de producción.
+* Factory Method.
+* Builder.
+* Prototype.
+* Gestión de prioridades.
 
 ### Equipos
 
-Contiene las clases relacionadas con los equipos de producción, inspecciones y fábricas abstractas.
+Contiene:
+
+* Equipos de producción.
+* Inspecciones.
+* Abstract Factory.
+* Servicios relacionados con los equipos.
 
 ### Infraestructura
 
-Contiene componentes generales utilizados por el sistema, como el `Logger`.
+Contiene componentes generales utilizados por el sistema, principalmente:
+
+* `Logger`
+* `StandardLoggingAdapter`
+
+En esta capa se encuentran actualmente integrados los patrones Singleton y Adapter.
 
 ### Pruebas
 
-Contiene las pruebas automatizadas de los diferentes componentes y patrones implementados.
+Contiene las pruebas automatizadas correspondientes a los diferentes componentes y patrones implementados.
 
 ---
 
-# Estructura del proyecto
-
-La estructura general del proyecto es la siguiente:
+# Estructura general del proyecto
 
 ```text
 Proyecto_Patrones_de_software/
+│
 ├── docs/
 │   ├── img/
-│   │   ├── codigo-abstract-factory.jpeg
-│   │   ├── codigo-equipment-inspection-base.jpeg
+│   │   ├── codigo-singleton.jpeg
 │   │   ├── codigo-factory-creator.jpg
+│   │   ├── codigo-priority-score.jpg
+│   │   ├── codigo-pending-queue.jpg
+│   │   ├── codigo-equipment-inspection-base.jpeg
+│   │   ├── codigo-abstract-factory.jpeg
 │   │   ├── codigo-order-builder.jpeg
 │   │   ├── codigo-order-clone.jpeg
-│   │   ├── codigo-pending-queue.jpg
-│   │   ├── codigo-priority-score.jpg
-│   │   ├── codigo-singleton.jpeg
+│   │   ├── codigo-logging-adapter.png
+│   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-abstract-factory.jpeg
 │   │   ├── ejecucion-builder.jpeg
-│   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
+│   │   ├── ejecucion-adapter.png
+│   │   ├── prueba-singleton.jpeg
+│   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-abstract-factory.jpeg
 │   │   ├── prueba-pytest-builder.jpeg
-│   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-prototype.jpeg
-│   │   ├── prueba-singleton.jpeg
+│   │   ├── prueba-pytest-adapter.png
+│   │   ├── uml-singleton.png
+│   │   ├── uml-factory.png
 │   │   ├── uml-abstract-factory.png
 │   │   ├── uml-builder.png
-│   │   ├── uml-factory.png
 │   │   ├── uml-prototype.png
-│   │   ├── uml-singleton.png
-│   │   ├── uso-equipment-service.jpeg
-│   │   ├── uso-factory-main.jpg
-│   │   ├── uso-order-builder.jpeg
-│   │   ├── uso-order-clone.jpeg
-│   │   └── uso-singleton.jpeg
+│   │   └── uml-adapter.png
 │   │
 │   ├── semana_01/
-│   │   ├── contextualizacion.md
-│   │   └── evidencia/
-│   │
 │   ├── semana_02/
-│   │   ├── contextualizacion2.md
-│   │   └── evidencia/
-│   │
 │   ├── semana_03/
-│   │   ├── singleton.md
-│   │   └── evidencia/
-│   │       ├── codigo-singleton.jpeg
-│   │       ├── uso-singleton.jpeg
-│   │       └── prueba-singleton.jpeg
-│   │
 │   ├── semana_04/
-│   │   ├── Factory-Method.md
-│   │   ├── Abstract-Factory.md
-│   │   └── evidencia/
-│   │
-│   └── semana_05/
-│       ├── Builder.md
-│       ├── Prototype.md
-│       └── evidencia/
+│   ├── semana_05/
+│   └── semana_07/
 │
 ├── src/
 │   ├── production/
@@ -476,18 +605,8 @@ Proyecto_Patrones_de_software/
 │   └── main.py
 │
 ├── tests/
-│   ├── test_cell_factory.py
-│   ├── test_EquipmentService.py
-│   ├── test_logger_and_order_rules.py
-│   ├── test_order_builder.py
-│   ├── test_order_clone.py
-│   ├── test_production_order.py
-│   └── test_start_with_equipment.py
 │
 ├── videos/
-│   ├── semana-01-singleton.mp4
-│   ├── semana-04-factory-method.mp4
-│   └── semana-05-builder.mp4
 │
 ├── pytest.ini
 ├── .gitignore
@@ -502,83 +621,94 @@ La documentación del proyecto se encuentra organizada por semanas dentro de la 
 
 ### Semana 01
 
-Contiene la contextualización inicial del proyecto.
+Contextualización inicial del proyecto.
 
-`docs/semana_01/contextualizacion.md`
+```text
+docs/semana_01/
+```
 
 ### Semana 02
 
-Contiene la segunda contextualización del sistema.
+Profundización de la contextualización y problemática del sistema.
 
-`docs/semana_02/contextualizacion2.md`
+```text
+docs/semana_02/
+```
 
 ### Semana 03
 
-Contiene la documentación correspondiente al patrón Singleton.
+Implementación y documentación de:
 
-`docs/semana_03/singleton.md`
+* Singleton
+
+```text
+docs/semana_03/
+```
 
 ### Semana 04
 
-Contiene la documentación correspondiente a los patrones:
+Implementación y documentación de:
 
-- Factory Method
-- Abstract Factory
+* Factory Method
+* Abstract Factory
 
-Archivos:
-
-- `docs/semana_04/Factory-Method.md`
-- `docs/semana_04/Abstract-Factory.md`
+```text
+docs/semana_04/
+```
 
 ### Semana 05
 
-Contiene la documentación correspondiente a los patrones:
+Implementación y documentación de:
 
-- Builder
-- Prototype
+* Builder
+* Prototype
 
-Archivos:
+```text
+docs/semana_05/
+```
 
-- `docs/semana_05/Builder.md`
-- `docs/semana_05/Prototype.md`
+### Semana 07
+
+Durante esta etapa se continuó con el análisis de los patrones estructurales.
+
+Se trabajó en:
+
+* Implementación del patrón **Adapter**.
+* Integración del módulo estándar `logging` de Python.
+* Incorporación de niveles de severidad y persistencia de eventos.
+* Integración del Adapter con el Singleton `Logger`.
+* Pruebas automatizadas del Adapter.
+* Evaluación del patrón **Bridge**.
+* Justificación de la decisión de no implementar Bridge en el estado actual del proyecto.
+
+```text
+docs/semana_07/
+```
 
 ---
 
 # Evidencias
 
-Las evidencias gráficas del desarrollo y ejecución de los patrones se encuentran organizadas en:
+Las evidencias gráficas del desarrollo y ejecución de los patrones se encuentran organizadas principalmente en:
 
 ```text
 docs/img/
 ```
 
-y en las carpetas:
-
-```text
-docs/semana_03/evidencia/
-docs/semana_04/evidencia/
-docs/semana_05/evidencia/
-```
-
 Entre las evidencias se encuentran:
 
-- Código de los patrones.
-- Diagramas UML.
-- Ejecución del sistema.
-- Uso de los patrones.
-- Resultados de las pruebas automatizadas.
+* Código de los patrones.
+* Diagramas UML.
+* Ejecución del sistema.
+* Uso de los patrones.
+* Resultados de las pruebas automatizadas.
 
----
+Para Adapter se incorporaron evidencias correspondientes a:
 
-# Videos
-
-Los videos de demostración del proyecto se encuentran en la carpeta:
-
-```text
-videos/
-```
-
-Actualmente se cuenta con videos correspondientes a diferentes etapas de implementación y demostración de los patrones.
+* Implementación de `StandardLoggingAdapter`.
+* Ejecución del sistema utilizando el Adapter.
+* Resultado de las pruebas automatizadas.
+* Diagrama UML.
 
 ---
 
@@ -588,9 +718,11 @@ El proyecto utiliza **Git** como sistema de control de versiones y **GitHub** co
 
 Repositorio:
 
-`https://github.com/YesicaRueda/Proyecto_Patrones_Software.git`
+```text
+https://github.com/YesicaRueda/Proyecto_Patrones_Software.git
+```
 
-Las ramas principales utilizadas durante el desarrollo permiten trabajar de manera independiente y posteriormente integrar los cambios.
+Las ramas utilizadas durante el desarrollo permiten trabajar de manera independiente y posteriormente integrar los cambios correspondientes al proyecto.
 
 ---
 
@@ -598,7 +730,7 @@ Las ramas principales utilizadas durante el desarrollo permiten trabajar de mane
 
 Para ejecutar el proyecto se debe contar con Python instalado.
 
-Desde la carpeta raíz del proyecto se puede ejecutar:
+Desde la carpeta raíz:
 
 ```bash
 python src/main.py
@@ -610,32 +742,47 @@ Para ejecutar las pruebas automatizadas:
 python -m pytest
 ```
 
+Actualmente la ejecución completa de las pruebas debe mostrar:
+
+```text
+21 passed
+```
+
 ---
 
 # Estado del proyecto
 
-El proyecto cuenta con la implementación de los siguientes patrones de diseño:
+Actualmente el Sistema de Control de Producción cuenta con los siguientes patrones:
 
-- **Singleton** — Implementado.
-- **Factory Method** — Implementado.
-- **Abstract Factory** — Implementado.
-- **Builder** — Implementado.
-- **Prototype** — Implementado.
+* **Singleton** — Implementado.
+* **Factory Method** — Implementado.
+* **Abstract Factory** — Implementado.
+* **Builder** — Implementado.
+* **Prototype** — Implementado.
+* **Adapter** — Implementado.
+* **Bridge** — Evaluado, no aplicado.
+* **Composite** — Pendiente de análisis.
+* **Decorator** — Pendiente de análisis.
 
-Estos patrones se encuentran integrados dentro del sistema de control de producción y cuentan con documentación y pruebas asociadas.
+Los seis patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+
+La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
 ---
 
 # Conclusión
 
-La implementación de los patrones de diseño permitió estructurar el Sistema de Control de Producción de una manera más organizada y flexible.
+La implementación progresiva de los patrones de diseño ha permitido estructurar el Sistema de Control de Producción de una manera más organizada, flexible y mantenible.
 
-Cada patrón responde a una necesidad específica del sistema:
+Cada patrón incorporado responde a una necesidad específica:
 
-- **Singleton:** controla la instancia única del `Logger`.
-- **Factory Method:** permite crear diferentes tipos de órdenes.
-- **Abstract Factory:** permite crear familias relacionadas de equipos e inspecciones.
-- **Builder:** permite construir órdenes paso a paso.
-- **Prototype:** permite crear nuevas órdenes mediante clonación.
+* **Singleton:** controla la instancia única del `Logger`.
+* **Factory Method:** permite crear diferentes tipos de órdenes.
+* **Abstract Factory:** permite crear familias relacionadas de equipos e inspecciones.
+* **Builder:** permite construir los datos de las órdenes paso a paso.
+* **Prototype:** permite generar nuevas órdenes mediante clonación.
+* **Adapter:** integra `logging` de Python manteniendo la interfaz existente del `Logger`.
 
-El uso conjunto de estos patrones contribuye a reducir el acoplamiento, mejorar la reutilización del código y facilitar futuras modificaciones y ampliaciones del sistema.
+Adicionalmente, el análisis de **Bridge** permitió concluir que actualmente no existe una necesidad real que justifique su implementación. Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype y Adapter implementados y **21 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable para continuar con el análisis de **Composite** y **Decorator** en las siguientes etapas.

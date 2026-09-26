@@ -274,9 +274,9 @@ Además, se comprobó su utilización desde diferentes componentes del MES, regi
 ---
 ## 13.6 Evidencia de video
 
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
+Los videos correspondientes a las evidencias de las implementaciones realizadas durante el proyecto se encuentran almacenados dentro del repositorio, en la siguiente ruta:
 
-[Ver video de la prueba](https://www.youtube.com/watch?v=rjtVx3nIVDs)
+docs/videos/
 
 ---
 ## 13.7 Diagrama UML
@@ -466,9 +466,9 @@ El resultado obtenido fue de **3 pruebas superadas**.
 
 ## 19.2 Evidencia de video
 
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
+Los videos correspondientes a las evidencias de las implementaciones realizadas durante el proyecto se encuentran almacenados dentro del repositorio, en la siguiente ruta:
 
-[Ver video de la prueba](https://www.youtube.com/watch?v=SWhTslEtTYQ)
+docs/videos/
 
 ---
 ## 19.3 Diagrama UML
@@ -610,10 +610,9 @@ El resultado obtenido fue de **14 pruebas superadas** en total sobre el proyecto
 
 ## 20.7 Evidencia de video
 
-*(El archivo de video supera el límite de tamaño admitido por GitHub para incluirse directamente en el repositorio. Se subio a un servicio externo como Google Drive o YouTube en modo no listado aquí.)*
+Los videos correspondientes a las evidencias de las implementaciones realizadas durante el proyecto se encuentran almacenados dentro del repositorio, en la siguiente ruta:
 
-[Ver video de la prueba](www.youtube.com)
-
+docs/videos/
 ---
 
 ## 20.8 Diagrama UML
