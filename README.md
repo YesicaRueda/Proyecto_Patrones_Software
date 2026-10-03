@@ -52,6 +52,8 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Creación de familias de equipos e inspecciones mediante Abstract Factory.
 * Registro centralizado de eventos mediante Singleton.
 * Integración del módulo estándar `logging` de Python mediante Adapter.
+* Agrupación de órdenes en lotes y sublotes mediante Composite.
+* Extensión de las inspecciones con registro y medición de tiempo mediante Decorator.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -73,8 +75,8 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Prototype        | Crear nuevas órdenes mediante clonación de objetos existentes                                   | Implementado           |
 | Adapter          | Integrar `logging` de Python manteniendo la interfaz existente del Logger                       | Implementado           |
 | Bridge           | Separar abstracción e implementación cuando existen dos dimensiones independientes de variación | Evaluado — no aplicado |
-| Composite        | Pendiente de análisis                                                                           | Pendiente              |
-| Decorator        | Pendiente de análisis                                                                           | Pendiente              |
+| Composite        | Tratar de la misma forma una orden individual y un grupo de órdenes (lote o sublote)            | Implementado           |
+| Decorator        | Agregar registro y medición de tiempo a las inspecciones sin modificarlas                       | Implementado           |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
@@ -369,6 +371,109 @@ Bridge podrá evaluarse nuevamente en etapas posteriores si aparecen dos dimensi
 
 ---
 
+## Composite
+
+El patrón **Composite** permite componer objetos en estructuras de árbol y tratar de la misma forma a los objetos individuales y a los grupos de objetos.
+
+En el proyecto se utiliza para representar **lotes de órdenes de producción**. Anteriormente, el lote era únicamente un texto (`lote`) guardado en cada orden, por lo que iniciar las órdenes de un mismo lote exigía operar orden por orden.
+
+La implementación se encuentra en:
+
+`src/production/order_group.py`
+
+El componente principal es `OrderGroup`, que hereda de `ProductionOrder` y puede contener órdenes individuales u otros grupos. Sus operaciones se aplican sobre los hijos:
+
+* `quantity`: suma de las cantidades de sus hijos.
+* `status`: se calcula a partir del estado de sus hijos.
+* `start()` y `complete()`: se propagan a los hijos que corresponda.
+* `get_priority_score()`: máxima prioridad de sus hijos.
+* `clone()`: clona recursivamente el grupo y renombra sus hijos.
+* `add()` y `remove()`: administran los hijos, evitando duplicados y ciclos.
+
+Ejemplo:
+
+```python
+lote = OrderGroup("LOTE-01", lote="L-2026-09")
+lote.add(plantilla.clone("OP-010", 20))
+lote.add(plantilla.clone("OP-011", 30))
+
+subgrupo = OrderGroup("LOTE-01-B", lote="L-2026-09")
+subgrupo.add(StandardOrder("OP-012", "Pieza metálica C", 15))
+lote.add(subgrupo)
+
+production.add_order(lote)
+production.start_order_with_equipment("LOTE-01", equipment)
+```
+
+Con una sola llamada se inician todas las órdenes del lote, incluidas las del subgrupo. `ProductionService` no necesitó modificarse, porque trata al grupo como una `ProductionOrder` más.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Component:** `ProductionOrder`.
+* **Leaf:** `StandardOrder` y `UrgentOrder`.
+* **Composite:** `OrderGroup`.
+* **Cliente:** `ProductionService` y `main.py`.
+
+### Beneficios del Composite
+
+* Permite representar lotes y sublotes como objetos del dominio.
+* Permite iniciar o completar un lote con una sola operación.
+* Calcula automáticamente la cantidad total y la prioridad del lote.
+* Mantiene una única interfaz para órdenes individuales y grupos.
+* No requiere modificar `ProductionService` ni las clases de órdenes existentes.
+* Se integra con Prototype para clonar lotes completos.
+
+---
+
+## Decorator
+
+El patrón **Decorator** permite agregar responsabilidades a un objeto de forma dinámica, envolviéndolo en otro objeto que implementa la misma interfaz y delega en él.
+
+En el proyecto se utiliza para extender las **inspecciones de los equipos** con registro de eventos y medición de tiempo, sin modificar las inspecciones concretas ni `EquipmentService`.
+
+La implementación se encuentra en:
+
+`src/equipment/inspection_decorators.py`
+
+Los componentes principales son:
+
+* `InspectionDecorator`: decorador base que envuelve una `Inspection` y delega en ella.
+* `LoggedInspection`: registra en el `Logger` el inicio y el resultado de la inspección, usando nivel `WARNING` cuando es rechazada.
+* `TimedInspection`: mide la duración de la inspección y la deja disponible en `last_duration`.
+
+Ejemplo:
+
+```python
+timed = TimedInspection(equipment.inspection)
+equipment.inspection = LoggedInspection(timed)
+
+resultado = equipment.run_inspection(plantilla)
+```
+
+`EquipmentService` sigue llamando a `inspection.inspect(order)` sin saber si la inspección está decorada. Los decoradores se pueden combinar en cualquier orden según se necesite.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Component:** `Inspection`.
+* **ConcreteComponent:** `CNCInspection` y `RobotInspection`.
+* **Decorator:** `InspectionDecorator`.
+* **ConcreteDecorator:** `LoggedInspection` y `TimedInspection`.
+* **Cliente:** `EquipmentService`.
+
+### Beneficios del Decorator
+
+* Agrega comportamiento sin modificar las inspecciones existentes.
+* Evita crear una subclase por cada combinación de capacidades.
+* Permite combinar registro y medición de tiempo según se necesite.
+* Mantiene la interfaz `Inspection`, por lo que `EquipmentService` no cambia.
+* Aprovecha el `Logger` (Singleton + Adapter) para registrar los rechazos con nivel `WARNING`.
+
+---
+
 # Beneficios obtenidos
 
 La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
@@ -403,6 +508,18 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Integra el módulo `logging` sin modificar la interfaz existente.
 * Incorpora niveles de severidad y persistencia de eventos.
 * Evita cambios invasivos sobre los componentes existentes.
+
+### Composite
+
+* Permite tratar un lote de órdenes como una sola orden.
+* Facilita iniciar, completar y consultar lotes y sublotes con una sola operación.
+* Calcula automáticamente la cantidad total y la prioridad del grupo.
+
+### Decorator
+
+* Agrega registro y medición de tiempo a las inspecciones sin modificarlas.
+* Evita crear una subclase por cada combinación de capacidades.
+* Mantiene intacta la interfaz que utiliza `EquipmentService`.
 
 ### Bridge
 
@@ -469,9 +586,34 @@ Se verificó:
 * La persistencia de eventos en archivo.
 * El aislamiento correcto entre loggers asociados a diferentes archivos.
 
+### Composite
+
+Se verificó:
+
+* El cálculo de la cantidad total del grupo a partir de sus hijos.
+* El cálculo de la prioridad máxima y el estado de grupos vacíos.
+* La propagación de `start()` y `complete()` a los hijos, sin reiniciar órdenes ya completadas.
+* El estado del grupo cuando sus hijos se encuentran en estados distintos.
+* El funcionamiento de grupos anidados.
+* El rechazo de ciclos y de identificadores duplicados.
+* La eliminación de hijos.
+* La clonación de grupos con hijos independientes y renombrados.
+* El tratamiento del grupo como una orden más dentro de `ProductionService`.
+
+### Decorator
+
+Se verificó:
+
+* Que una inspección decorada mantiene la interfaz `Inspection`.
+* El registro del inicio y la aprobación de la inspección con nivel `INFO`.
+* El registro del rechazo con nivel `WARNING`.
+* La medición de la duración mediante un reloj inyectado.
+* La combinación de varios decoradores conservando el resultado.
+* El funcionamiento de `EquipmentService` con una inspección decorada.
+
 Actualmente, el proyecto cuenta con:
 
-**21 pruebas automatizadas superadas.**
+**40 pruebas automatizadas superadas.**
 
 Las pruebas se ejecutan mediante:
 
@@ -516,6 +658,7 @@ Contiene los componentes relacionados con:
 * Factory Method.
 * Builder.
 * Prototype.
+* Composite.
 * Gestión de prioridades.
 
 ### Equipos
@@ -525,6 +668,7 @@ Contiene:
 * Equipos de producción.
 * Inspecciones.
 * Abstract Factory.
+* Decorator aplicado a las inspecciones.
 * Servicios relacionados con los equipos.
 
 ### Infraestructura
@@ -546,74 +690,107 @@ Contiene las pruebas automatizadas correspondientes a los diferentes componentes
 
 ```text
 Proyecto_Patrones_de_software/
-│
 ├── docs/
 │   ├── img/
-│   │   ├── codigo-singleton.jpeg
-│   │   ├── codigo-factory-creator.jpg
-│   │   ├── codigo-priority-score.jpg
-│   │   ├── codigo-pending-queue.jpg
-│   │   ├── codigo-equipment-inspection-base.jpeg
 │   │   ├── codigo-abstract-factory.jpeg
+│   │   ├── codigo-composite.png
+│   │   ├── codigo-decorator.png
+│   │   ├── codigo-equipment-inspection-base.jpeg
+│   │   ├── codigo-factory-creator.jpg
+│   │   ├── codigo-logger-integrado.png
+│   │   ├── codigo-logging-adapter.png
 │   │   ├── codigo-order-builder.jpeg
 │   │   ├── codigo-order-clone.jpeg
-│   │   ├── codigo-logging-adapter.png
-│   │   ├── ejecucion-main.jpg
+│   │   ├── codigo-pending-queue.jpg
+│   │   ├── codigo-priority-score.jpg
+│   │   ├── codigo-singleton.jpeg
+│   │   ├── uso-equipment-service.jpeg
+│   │   ├── uso-factory-main.jpg
+│   │   ├── uso-order-builder.jpeg
+│   │   ├── uso-order-clone.jpeg
+│   │   ├── uso-singleton.jpeg
 │   │   ├── ejecucion-abstract-factory.jpeg
-│   │   ├── ejecucion-builder.jpeg
-│   │   ├── ejecucion-prototype.jpeg
 │   │   ├── ejecucion-adapter.png
-│   │   ├── prueba-singleton.jpeg
-│   │   ├── prueba-pytest-factory.jpg
+│   │   ├── ejecucion-builder.jpeg
+│   │   ├── ejecucion-composite.png
+│   │   ├── ejecucion-decorator.png
+│   │   ├── ejecucion-main.jpg
+│   │   ├── ejecucion-prototype.jpeg
 │   │   ├── prueba-pytest-abstract-factory.jpeg
-│   │   ├── prueba-pytest-builder.jpeg
-│   │   ├── prueba-pytest-prototype.jpeg
 │   │   ├── prueba-pytest-adapter.png
-│   │   ├── uml-singleton.png
-│   │   ├── uml-factory.png
+│   │   ├── prueba-pytest-builder.jpeg
+│   │   ├── prueba-pytest-composite.png
+│   │   ├── prueba-pytest-decorator.png
+│   │   ├── prueba-pytest-factory.jpg
+│   │   ├── prueba-pytest-prototype.jpeg
+│   │   ├── prueba-singleton.jpeg
 │   │   ├── uml-abstract-factory.png
+│   │   ├── uml-adapter.png
 │   │   ├── uml-builder.png
+│   │   ├── uml-composite.png
+│   │   ├── uml-decorator.png
+│   │   ├── uml-factory.png
 │   │   ├── uml-prototype.png
-│   │   └── uml-adapter.png
-│   │
-│   ├── semana_01/
-│   ├── semana_02/
-│   ├── semana_03/
-│   ├── semana_04/
-│   ├── semana_05/
-│   └── semana_07/
-│
+│   │   └── uml-singleton.png
+│   ├── semana_1/
+│   │   └── contextualizacion.md
+│   ├── semana_2/
+│   │   └── contextualizacion2.md
+│   ├── semana_3/
+│   │   └── singleton.md
+│   ├── semana_4/
+│   │   ├── Abstract-Factory.md
+│   │   └── Factory-Method.md
+│   ├── semana_5/
+│   │   ├── Builder.md
+│   │   └── Prototype.md
+│   ├── semana_7/
+│   │   └── Adapter.md
+│   └── semana_8/
+│       ├── composite.md
+│       └── decoretor.md
 ├── src/
 │   ├── production/
 │   │   ├── prod_order.py
+│   │   ├── order_group.py
 │   │   ├── prod_factory.py
 │   │   ├── prod_service.py
 │   │   └── order_builder.py
-│   │
-│   ├── quality/
-│   │
 │   ├── equipment/
-│   │   ├── equi_service.py
 │   │   ├── equipment_base.py
-│   │   └── cell_factory.py
-│   │
-│   ├── oee/
-│   │
+│   │   ├── cell_factory.py
+│   │   ├── equipment_service.py
+│   │   └── inspection_decorators.py
 │   ├── infrastructure/
-│   │   └── logger.py
-│   │
+│   │   ├── logger.py
+│   │   └── logging_adapter.py
 │   └── main.py
-│
 ├── tests/
-│
+│   ├── test_cell_factory.py
+│   ├── test_EquipmentService.py
+│   ├── test_inspection_decorators.py
+│   ├── test_logger_and_order_rules.py
+│   ├── test_logging_adapter.py
+│   ├── test_order_builder.py
+│   ├── test_order_clone.py
+│   ├── test_order_group.py
+│   ├── test_production_order.py
+│   └── test_start_with_equipment.py
 ├── videos/
-│
+│   ├── Adapter.mp4
+│   ├── factory-method.mp4
+│   ├── semana-05-builder.mp4
+│   └── singleton.mp4
+│   └── composite.mp4
+│   └── decoretor.mp4
+├── mes.log
 ├── pytest.ini
 ├── .gitignore
 └── README.md
 ```
 
 ---
+
 
 # Documentación
 
@@ -686,6 +863,23 @@ docs/semana_07/
 ```
 
 ---
+### Semana 08
+
+Durante esta etapa se completó el análisis de los patrones estructurales.
+
+Se trabajó en:
+
+* Implementación del patrón **Composite** para agrupar órdenes de producción en lotes y sublotes (`OrderGroup`).
+* Implementación del patrón **Decorator** para extender las inspecciones con registro y medición de tiempo (`LoggedInspection` y `TimedInspection`).
+* Integración de ambos patrones en `main.py`.
+* Pruebas automatizadas de Composite y Decorator.
+* Documentación de la forma de implementación de cada patrón: `composite.md` y `decoretor.md`.
+
+```text
+docs/semana_8/
+```
+
+---
 
 # Evidencias
 
@@ -709,6 +903,8 @@ Para Adapter se incorporaron evidencias correspondientes a:
 * Ejecución del sistema utilizando el Adapter.
 * Resultado de las pruebas automatizadas.
 * Diagrama UML.
+
+Para Composite y Decorator se incorporan evidencias equivalentes (`codigo-`, `ejecucion-`, `prueba-pytest-` y `uml-` seguidas de `composite` o `decorator`), referenciadas desde los documentos de `docs/semana_8/`.
 
 ---
 
@@ -745,7 +941,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-21 passed
+40 passed
 ```
 
 ---
@@ -761,10 +957,10 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Prototype** — Implementado.
 * **Adapter** — Implementado.
 * **Bridge** — Evaluado, no aplicado.
-* **Composite** — Pendiente de análisis.
-* **Decorator** — Pendiente de análisis.
+* **Composite** — Implementado.
+* **Decorator** — Implementado.
 
-Los seis patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los ocho patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
@@ -782,7 +978,11 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Builder:** permite construir los datos de las órdenes paso a paso.
 * **Prototype:** permite generar nuevas órdenes mediante clonación.
 * **Adapter:** integra `logging` de Python manteniendo la interfaz existente del `Logger`.
+* **Composite:** permite tratar un lote de órdenes como una sola orden.
+* **Decorator:** permite agregar registro y medición de tiempo a las inspecciones sin modificarlas.
 
 Adicionalmente, el análisis de **Bridge** permitió concluir que actualmente no existe una necesidad real que justifique su implementación. Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype y Adapter implementados y **21 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable para continuar con el análisis de **Composite** y **Decorator** en las siguientes etapas.
+Composite y Decorator se incorporaron después de verificar que existía una necesidad concreta: el lote de órdenes era solo un texto sin estructura propia, y las inspecciones no podían ampliarse sin modificarlas. Ambos se añadieron sin cambiar `ProductionService`, `EquipmentService` ni las clases existentes. Se evaluaron además otras aplicaciones (Decorator sobre las órdenes o el `Logger`, Composite sobre los equipos) que se descartaron por no resolver un problema actual.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite y Decorator implementados y **40 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable.

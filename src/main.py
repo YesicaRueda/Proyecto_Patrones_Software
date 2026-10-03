@@ -8,6 +8,12 @@ from src.production.prod_factory import (
 )
 from datetime import datetime
 from src.production.order_builder import OrderBuilder
+from src.production.order_group import OrderGroup
+from src.production.prod_order import StandardOrder
+from src.equipment.inspection_decorators import (
+    LoggedInspection,
+    TimedInspection
+)
 
 
 def seccion(titulo):
@@ -61,3 +67,34 @@ production.start_order_with_equipment("OP-002", equipment)
 print(f"Estado OP-002: {production.get_order('OP-002').status}")
 print(f"Estado OP-003: {production.get_order('OP-003').status}")
 print(f"Estado OP-004: {production.get_order('OP-004').status}")
+
+seccion("COMPOSITE - LOTE DE ÓRDENES")
+lote = OrderGroup("LOTE-01", lote="L-2026-09")
+lote.add(plantilla.clone("OP-010", 20))
+lote.add(plantilla.clone("OP-011", 30))
+
+subgrupo = OrderGroup("LOTE-01-B", lote="L-2026-09")
+subgrupo.add(StandardOrder("OP-012", "Pieza metálica C", 15))
+lote.add(subgrupo)
+
+production.add_order(lote)
+
+print(f"Órdenes individuales en el lote: {lote.count_orders()}")
+print(f"Cantidad total del lote: {lote.quantity}")
+print(f"Prioridad del lote (máxima de sus hijos): {lote.get_priority_score()}")
+print(f"Estado del lote: {lote.status}")
+
+production.start_order_with_equipment("LOTE-01", equipment)
+
+print(f"Estado del lote tras iniciarlo: {lote.status}")
+for hijo in lote.children:
+    print(f"  {hijo.order_id:<10} estado={hijo.status}")
+print(f"  OP-012 (dentro del subgrupo): {subgrupo.children[0].status}")
+
+seccion("DECORATOR - INSPECCIÓN CON REGISTRO Y MEDICIÓN DE TIEMPO")
+timed = TimedInspection(equipment.inspection)
+equipment.inspection = LoggedInspection(timed)
+
+resultado = equipment.run_inspection(plantilla)
+print(f"Resultado de la inspección: {resultado}")
+print(f"Duración medida: {timed.last_duration:.6f} s")

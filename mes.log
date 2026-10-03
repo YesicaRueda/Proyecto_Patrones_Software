@@ -91,3 +91,134 @@
 2026-09-26 13:10:44,794 [INFO] CNCMachine en operación
 2026-09-26 13:10:44,794 [INFO] Orden OP-201 registrada
 2026-09-26 13:10:44,794 [INFO] Orden de producción OP-201 iniciada
+2026-09-26 16:08:52,821 [INFO] CNCMachine en operación
+2026-09-26 16:08:52,821 [INFO] Orden OP-002 registrada
+2026-09-26 16:08:52,821 [INFO] Orden OP-003 registrada
+2026-09-26 16:08:52,821 [INFO] Orden OP-004 registrada
+2026-09-26 16:08:52,822 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:04:37,426 [INFO] CNCMachine en operación
+2026-10-03 11:04:37,426 [INFO] Orden OP-002 registrada
+2026-10-03 11:04:37,426 [INFO] Orden OP-003 registrada
+2026-10-03 11:04:37,426 [INFO] Orden OP-004 registrada
+2026-10-03 11:04:37,427 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:05:51,006 [INFO] CNCMachine en operación
+2026-10-03 11:05:51,006 [INFO] Orden G-1 registrada
+2026-10-03 11:05:51,006 [INFO] Orden OP-9 registrada
+2026-10-03 11:05:51,007 [INFO] Orden de producción G-1 iniciada
+2026-10-03 11:05:51,007 [INFO] Orden de producción G-1 completada
+2026-10-03 11:07:28,967 [INFO] CNCMachine en operación
+2026-10-03 11:07:28,968 [INFO] CNCMachine detenida
+2026-10-03 11:07:28,976 [INFO] Inspección de CNCMachine: True
+2026-10-03 11:07:28,979 [INFO] Orden 1 registrada
+2026-10-03 11:07:28,980 [INFO] Orden 1 registrada
+2026-10-03 11:07:28,980 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:07:28,981 [INFO] Orden 1 registrada
+2026-10-03 11:07:28,981 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:07:28,981 [INFO] Orden de producción 1 completada
+2026-10-03 11:07:28,983 [INFO] Orden 1 registrada
+2026-10-03 11:07:29,012 [INFO] CNCMachine en operación
+2026-10-03 11:07:29,013 [INFO] Orden G-1 registrada
+2026-10-03 11:07:29,013 [INFO] Orden OP-9 registrada
+2026-10-03 11:07:29,013 [INFO] Orden de producción G-1 iniciada
+2026-10-03 11:07:29,013 [INFO] Orden de producción G-1 completada
+2026-10-03 11:07:29,015 [INFO] Orden 1 registrada
+2026-10-03 11:07:29,016 [INFO] Orden 2 registrada
+2026-10-03 11:07:29,016 [INFO] Orden 3 registrada
+2026-10-03 11:07:29,017 [INFO] Orden 1 registrada
+2026-10-03 11:07:29,017 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:07:29,018 [INFO] Orden OP-200 registrada
+2026-10-03 11:07:29,019 [INFO] CNCMachine en operación
+2026-10-03 11:07:29,020 [INFO] Orden OP-201 registrada
+2026-10-03 11:07:29,020 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:12:07,632 [INFO] CNCMachine en operación
+2026-10-03 11:12:07,633 [INFO] Orden OP-002 registrada
+2026-10-03 11:12:07,633 [INFO] Orden OP-003 registrada
+2026-10-03 11:12:07,633 [INFO] Orden OP-004 registrada
+2026-10-03 11:12:07,633 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:12:59,413 [INFO] CNCMachine en operación
+2026-10-03 11:12:59,413 [INFO] CNCMachine detenida
+2026-10-03 11:12:59,421 [INFO] Inspección de CNCMachine: True
+2026-10-03 11:12:59,424 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,426 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,426 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:12:59,427 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,427 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:12:59,427 [INFO] Orden de producción 1 completada
+2026-10-03 11:12:59,428 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,455 [INFO] CNCMachine en operación
+2026-10-03 11:12:59,455 [INFO] Orden G-1 registrada
+2026-10-03 11:12:59,455 [INFO] Orden OP-9 registrada
+2026-10-03 11:12:59,455 [INFO] Orden de producción G-1 iniciada
+2026-10-03 11:12:59,455 [INFO] Orden de producción G-1 completada
+2026-10-03 11:12:59,458 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,458 [INFO] Orden 2 registrada
+2026-10-03 11:12:59,458 [INFO] Orden 3 registrada
+2026-10-03 11:12:59,459 [INFO] Orden 1 registrada
+2026-10-03 11:12:59,459 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:12:59,460 [INFO] Orden OP-200 registrada
+2026-10-03 11:12:59,462 [INFO] CNCMachine en operación
+2026-10-03 11:12:59,462 [INFO] Orden OP-201 registrada
+2026-10-03 11:12:59,462 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:15:20,839 [INFO] CNCMachine en operación
+2026-10-03 11:15:20,839 [INFO] Orden OP-002 registrada
+2026-10-03 11:15:20,839 [INFO] Orden OP-003 registrada
+2026-10-03 11:15:20,839 [INFO] Orden OP-004 registrada
+2026-10-03 11:15:20,840 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:16:39,159 [INFO] CNCMachine en operación
+2026-10-03 11:16:39,159 [INFO] CNCMachine detenida
+2026-10-03 11:16:39,171 [INFO] Inspección de CNCMachine: True
+2026-10-03 11:16:39,176 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,178 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,178 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:16:39,180 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,180 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:16:39,180 [INFO] Orden de producción 1 completada
+2026-10-03 11:16:39,182 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,231 [INFO] CNCMachine en operación
+2026-10-03 11:16:39,231 [INFO] Orden G-1 registrada
+2026-10-03 11:16:39,231 [INFO] Orden OP-9 registrada
+2026-10-03 11:16:39,231 [INFO] Orden de producción G-1 iniciada
+2026-10-03 11:16:39,231 [INFO] Orden de producción G-1 completada
+2026-10-03 11:16:39,234 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,234 [INFO] Orden 2 registrada
+2026-10-03 11:16:39,234 [INFO] Orden 3 registrada
+2026-10-03 11:16:39,236 [INFO] Orden 1 registrada
+2026-10-03 11:16:39,236 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:16:39,238 [INFO] Orden OP-200 registrada
+2026-10-03 11:16:39,240 [INFO] CNCMachine en operación
+2026-10-03 11:16:39,240 [INFO] Orden OP-201 registrada
+2026-10-03 11:16:39,240 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:18:40,384 [INFO] CNCMachine en operación
+2026-10-03 11:18:40,384 [INFO] Orden OP-002 registrada
+2026-10-03 11:18:40,384 [INFO] Orden OP-003 registrada
+2026-10-03 11:18:40,385 [INFO] Orden OP-004 registrada
+2026-10-03 11:18:40,385 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:18:40,386 [INFO] Orden LOTE-01 registrada
+2026-10-03 11:18:40,386 [INFO] Orden de producción LOTE-01 iniciada
+2026-10-03 11:18:40,386 [INFO] Inspección iniciada para la orden OP-002
+2026-10-03 11:18:40,386 [INFO] Inspección aprobada para la orden OP-002
+2026-10-03 11:18:40,386 [INFO] Inspección de CNCMachine: True
+2026-10-03 11:22:25,634 [INFO] CNCMachine en operación
+2026-10-03 11:22:25,634 [INFO] CNCMachine detenida
+2026-10-03 11:22:25,647 [INFO] Inspección de CNCMachine: True
+2026-10-03 11:22:25,652 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,654 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,655 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:22:25,656 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,656 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:22:25,657 [INFO] Orden de producción 1 completada
+2026-10-03 11:22:25,658 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,702 [INFO] CNCMachine en operación
+2026-10-03 11:22:25,702 [INFO] Orden G-1 registrada
+2026-10-03 11:22:25,702 [INFO] Orden OP-9 registrada
+2026-10-03 11:22:25,702 [INFO] Orden de producción G-1 iniciada
+2026-10-03 11:22:25,702 [INFO] Orden de producción G-1 completada
+2026-10-03 11:22:25,706 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,706 [INFO] Orden 2 registrada
+2026-10-03 11:22:25,706 [INFO] Orden 3 registrada
+2026-10-03 11:22:25,709 [INFO] Orden 1 registrada
+2026-10-03 11:22:25,710 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:22:25,712 [INFO] Orden OP-200 registrada
+2026-10-03 11:22:25,714 [INFO] CNCMachine en operación
+2026-10-03 11:22:25,714 [INFO] Orden OP-201 registrada
+2026-10-03 11:22:25,714 [INFO] Orden de producción OP-201 iniciada
