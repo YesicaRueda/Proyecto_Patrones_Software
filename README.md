@@ -54,6 +54,7 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Integración del módulo estándar `logging` de Python mediante Adapter.
 * Agrupación de órdenes en lotes y sublotes mediante Composite.
 * Extensión de las inspecciones con registro y medición de tiempo mediante Decorator.
+* Operación simplificada del MES (registro, producción, inspección y consulta de estado) mediante Facade.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -77,6 +78,7 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Bridge           | Separar abstracción e implementación cuando existen dos dimensiones independientes de variación | Evaluado — no aplicado |
 | Composite        | Tratar de la misma forma una orden individual y un grupo de órdenes (lote o sublote)            | Implementado           |
 | Decorator        | Agregar registro y medición de tiempo a las inspecciones sin modificarlas                       | Implementado           |
+| Facade           | Ofrecer una interfaz única y simple para operar los subsistemas del MES                         | Implementado           |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
@@ -474,6 +476,60 @@ Los participantes principales del patrón son:
 
 ---
 
+## Facade
+
+El patrón **Facade** proporciona una interfaz unificada y simplificada a un conjunto de subsistemas, de modo que el cliente no tenga que conocerlos ni encadenar sus llamadas en el orden correcto.
+
+En el proyecto se utiliza para **operar el MES desde un único punto de entrada**. Anteriormente, para registrar una orden, producirla e inspeccionarla, el cliente debía conocer `ProductionService`, `EquipmentService`, la fábrica de equipos, `OrderBuilder` y los creadores de órdenes, y repetir el orden de los pasos (equipo operando antes de iniciar, inspección antes de completar).
+
+La implementación se encuentra en:
+
+`src/facade/mes_facade.py`
+
+El componente principal es `MESFacade`, que coordina los subsistemas existentes sin modificarlos:
+
+* `register_order()`: construye (Builder), crea (Factory Method) y registra una orden.
+* `register_batch()`: registra un lote como un `OrderGroup` (Composite).
+* `start_cell()` y `stop_cell()`: controlan el equipo.
+* `run_order()`: inicia el equipo si hace falta e inicia la orden.
+* `finish_order()`: inspecciona la orden y la completa solo si la inspección es aprobada.
+* `process_order()`: ejecuta el flujo completo.
+* `get_status_report()`: resume el equipo, las órdenes por estado y la cola pendiente.
+
+Ejemplo:
+
+```python
+mes = MESFacade(RobotCellFactory())
+mes.register_order("F-001", "Ensamble A", 10, urgent=True, lote="L-2026-10")
+mes.register_batch(
+    "F-LOTE", "L-2026-10",
+    [("F-002", "Ensamble B", 20), ("F-003", "Ensamble C", 30)]
+)
+
+mes.process_order("F-001")
+mes.process_order("F-LOTE")
+```
+
+La fachada no oculta los subsistemas: `mes.production` y `mes.equipment` siguen siendo accesibles para operaciones más específicas.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Facade:** `MESFacade`.
+* **Subsistemas:** `ProductionService`, `EquipmentService`, las fábricas de equipos, `OrderBuilder` con los creadores de órdenes, `OrderGroup` y `Logger`.
+* **Cliente:** `main.py`.
+
+### Beneficios del Facade
+
+* Reduce el acoplamiento entre el cliente y los subsistemas.
+* Define en un solo lugar el orden del flujo de producción.
+* Reduce el código del cliente: un caso que requería cerca de diez líneas se resuelve con dos llamadas.
+* Integra Builder, Factory Method, Composite, Abstract Factory y Decorator sin modificarlos.
+* No impide el acceso directo a los subsistemas.
+
+---
+
 # Beneficios obtenidos
 
 La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
@@ -520,6 +576,12 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Agrega registro y medición de tiempo a las inspecciones sin modificarlas.
 * Evita crear una subclase por cada combinación de capacidades.
 * Mantiene intacta la interfaz que utiliza `EquipmentService`.
+
+### Facade
+
+* Permite operar el MES desde un único punto de entrada.
+* Define en un solo lugar el orden del flujo (equipo, orden, inspección, finalización).
+* Reduce el acoplamiento entre el cliente y los subsistemas.
 
 ### Bridge
 
@@ -611,9 +673,23 @@ Se verificó:
 * La combinación de varios decoradores conservando el resultado.
 * El funcionamiento de `EquipmentService` con una inspección decorada.
 
+### Facade
+
+Se verificó:
+
+* La creación de órdenes estándar y urgentes con los datos opcionales del Builder.
+* El rechazo de identificadores duplicados.
+* El registro de lotes como un único grupo, el rechazo de lotes vacíos y que no se registre nada si un elemento es inválido.
+* El inicio automático del equipo al ejecutar una orden.
+* La finalización de la orden solo cuando la inspección es aprobada.
+* Que una inspección rechazada deja la orden en producción.
+* El flujo completo sobre órdenes individuales y lotes.
+* El reporte de estado del equipo, las órdenes y la cola pendiente.
+* El funcionamiento con otra familia de equipos y con una inspección decorada.
+
 Actualmente, el proyecto cuenta con:
 
-**40 pruebas automatizadas superadas.**
+**58 pruebas automatizadas superadas.**
 
 Las pruebas se ejecutan mediante:
 
@@ -671,6 +747,13 @@ Contiene:
 * Decorator aplicado a las inspecciones.
 * Servicios relacionados con los equipos.
 
+### Fachada
+
+Contiene:
+
+* `MESFacade`, que coordina producción, equipos, creación de órdenes y registro de eventos.
+* El patrón Facade.
+
 ### Infraestructura
 
 Contiene componentes generales utilizados por el sistema, principalmente:
@@ -696,6 +779,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── codigo-composite.png
 │   │   ├── codigo-decorator.png
 │   │   ├── codigo-equipment-inspection-base.jpeg
+│   │   ├── codigo-facade.png
 │   │   ├── codigo-factory-creator.jpg
 │   │   ├── codigo-logger-integrado.png
 │   │   ├── codigo-logging-adapter.png
@@ -714,6 +798,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-builder.jpeg
 │   │   ├── ejecucion-composite.png
 │   │   ├── ejecucion-decorator.png
+│   │   ├── ejecucion-facade.png
 │   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
 │   │   ├── prueba-pytest-abstract-factory.jpeg
@@ -721,6 +806,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-builder.jpeg
 │   │   ├── prueba-pytest-composite.png
 │   │   ├── prueba-pytest-decorator.png
+│   │   ├── prueba-pytest-facade.png
 │   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-prototype.jpeg
 │   │   ├── prueba-singleton.jpeg
@@ -729,6 +815,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-builder.png
 │   │   ├── uml-composite.png
 │   │   ├── uml-decorator.png
+│   │   ├── uml-facade.png
 │   │   ├── uml-factory.png
 │   │   ├── uml-prototype.png
 │   │   └── uml-singleton.png
@@ -746,10 +833,14 @@ Proyecto_Patrones_de_software/
 │   │   └── Prototype.md
 │   ├── semana_7/
 │   │   └── Adapter.md
-│   └── semana_8/
-│       ├── composite.md
-│       └── decoretor.md
+│   ├── semana_8/
+│   │   ├── composite.md
+│   │   └── decoretor.md
+│   └── semana_9/
+│       └── facade.md
 ├── src/
+│   ├── facade/
+│   │   └── mes_facade.py
 │   ├── production/
 │   │   ├── prod_order.py
 │   │   ├── order_group.py
@@ -771,6 +862,7 @@ Proyecto_Patrones_de_software/
 │   ├── test_inspection_decorators.py
 │   ├── test_logger_and_order_rules.py
 │   ├── test_logging_adapter.py
+│   ├── test_mes_facade.py
 │   ├── test_order_builder.py
 │   ├── test_order_clone.py
 │   ├── test_order_group.py
@@ -781,8 +873,7 @@ Proyecto_Patrones_de_software/
 │   ├── factory-method.mp4
 │   ├── semana-05-builder.mp4
 │   └── singleton.mp4
-│   └── composite.mp4
-│   └── decoretor.mp4
+│   └── facade.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -790,7 +881,6 @@ Proyecto_Patrones_de_software/
 ```
 
 ---
-
 
 # Documentación
 
@@ -801,7 +891,7 @@ La documentación del proyecto se encuentra organizada por semanas dentro de la 
 Contextualización inicial del proyecto.
 
 ```text
-docs/semana_01/
+docs/semana_1/
 ```
 
 ### Semana 02
@@ -809,7 +899,7 @@ docs/semana_01/
 Profundización de la contextualización y problemática del sistema.
 
 ```text
-docs/semana_02/
+docs/semana_2/
 ```
 
 ### Semana 03
@@ -819,7 +909,7 @@ Implementación y documentación de:
 * Singleton
 
 ```text
-docs/semana_03/
+docs/semana_3/
 ```
 
 ### Semana 04
@@ -830,7 +920,7 @@ Implementación y documentación de:
 * Abstract Factory
 
 ```text
-docs/semana_04/
+docs/semana_4/
 ```
 
 ### Semana 05
@@ -841,7 +931,7 @@ Implementación y documentación de:
 * Prototype
 
 ```text
-docs/semana_05/
+docs/semana_5/
 ```
 
 ### Semana 07
@@ -859,10 +949,9 @@ Se trabajó en:
 * Justificación de la decisión de no implementar Bridge en el estado actual del proyecto.
 
 ```text
-docs/semana_07/
+docs/semana_7/
 ```
 
----
 ### Semana 08
 
 Durante esta etapa se completó el análisis de los patrones estructurales.
@@ -877,6 +966,22 @@ Se trabajó en:
 
 ```text
 docs/semana_8/
+```
+
+### Semana 09
+
+Durante esta etapa se incorporó un patrón que simplifica el uso de los subsistemas ya construidos.
+
+Se trabajó en:
+
+* Implementación del patrón **Facade** (`MESFacade`) como punto de entrada único para registrar, producir, inspeccionar y consultar el estado del MES.
+* Integración de la fachada con Builder, Factory Method, Composite, Abstract Factory y Decorator, sin modificarlos.
+* Integración del patrón en `main.py`.
+* Pruebas automatizadas de Facade.
+* Documentación de la forma de implementación: `facade.md`.
+
+```text
+docs/semana_9/
 ```
 
 ---
@@ -906,6 +1011,8 @@ Para Adapter se incorporaron evidencias correspondientes a:
 
 Para Composite y Decorator se incorporan evidencias equivalentes (`codigo-`, `ejecucion-`, `prueba-pytest-` y `uml-` seguidas de `composite` o `decorator`), referenciadas desde los documentos de `docs/semana_8/`.
 
+Para Facade se incorporan las evidencias `codigo-facade`, `ejecucion-facade`, `prueba-pytest-facade` y `uml-facade`, referenciadas desde `docs/semana_9/facade.md`.
+
 ---
 
 # Control de versiones
@@ -929,7 +1036,7 @@ Para ejecutar el proyecto se debe contar con Python instalado.
 Desde la carpeta raíz:
 
 ```bash
-python src/main.py
+python -m src.main
 ```
 
 Para ejecutar las pruebas automatizadas:
@@ -941,7 +1048,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-40 passed
+58 passed
 ```
 
 ---
@@ -959,8 +1066,9 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Bridge** — Evaluado, no aplicado.
 * **Composite** — Implementado.
 * **Decorator** — Implementado.
+* **Facade** — Implementado.
 
-Los ocho patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los nueve patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
@@ -980,9 +1088,12 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Adapter:** integra `logging` de Python manteniendo la interfaz existente del `Logger`.
 * **Composite:** permite tratar un lote de órdenes como una sola orden.
 * **Decorator:** permite agregar registro y medición de tiempo a las inspecciones sin modificarlas.
+* **Facade:** permite operar el MES desde un único punto de entrada, definiendo en un solo lugar el orden del flujo de producción.
 
 Adicionalmente, el análisis de **Bridge** permitió concluir que actualmente no existe una necesidad real que justifique su implementación. Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
 Composite y Decorator se incorporaron después de verificar que existía una necesidad concreta: el lote de órdenes era solo un texto sin estructura propia, y las inspecciones no podían ampliarse sin modificarlas. Ambos se añadieron sin cambiar `ProductionService`, `EquipmentService` ni las clases existentes. Se evaluaron además otras aplicaciones (Decorator sobre las órdenes o el `Logger`, Composite sobre los equipos) que se descartaron por no resolver un problema actual.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite y Decorator implementados y **40 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable.
+Facade se incorporó al final, cuando ya existían varios subsistemas que el cliente debía conocer y encadenar en el orden correcto. Se añadió como una capa de coordinación, sin modificar los subsistemas, y manteniendo el acceso directo a ellos.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator y Facade implementados y **58 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable.

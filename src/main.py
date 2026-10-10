@@ -1,7 +1,7 @@
 from src.infrastructure.logger import Logger
 from src.production.prod_service import ProductionService
 from src.equipment.equipment_service import EquipmentService
-from src.equipment.cell_factory import CNCCellFactory
+from src.equipment.cell_factory import CNCCellFactory, RobotCellFactory
 from src.production.prod_factory import (
     StandardOrderCreator,
     UrgentOrderCreator
@@ -9,6 +9,7 @@ from src.production.prod_factory import (
 from datetime import datetime
 from src.production.order_builder import OrderBuilder
 from src.production.order_group import OrderGroup
+from src.facade.mes_facade import MESFacade
 from src.production.prod_order import StandardOrder
 from src.equipment.inspection_decorators import (
     LoggedInspection,
@@ -98,3 +99,25 @@ equipment.inspection = LoggedInspection(timed)
 resultado = equipment.run_inspection(plantilla)
 print(f"Resultado de la inspección: {resultado}")
 print(f"Duración medida: {timed.last_duration:.6f} s")
+
+seccion("FACADE - OPERACIÓN SIMPLIFICADA DEL MES")
+mes = MESFacade(RobotCellFactory())
+
+mes.register_order("F-001", "Ensamble A", 10, urgent=True, lote="L-2026-10")
+mes.register_batch(
+    "F-LOTE", "L-2026-10",
+    [("F-002", "Ensamble B", 20), ("F-003", "Ensamble C", 30)]
+)
+
+
+def mostrar_reporte(titulo, reporte):
+    print(f"{titulo}: equipo={reporte['equipo']} ({reporte['estado_equipo']}), "
+          f"órdenes={reporte['ordenes']}")
+
+
+mostrar_reporte("Antes", mes.get_status_report())
+
+print(f"Orden F-001 procesada: {mes.process_order('F-001')}")
+print(f"Lote F-LOTE procesado: {mes.process_order('F-LOTE')}")
+
+mostrar_reporte("Después", mes.get_status_report())
