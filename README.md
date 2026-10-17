@@ -55,6 +55,7 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Agrupación de órdenes en lotes y sublotes mediante Composite.
 * Extensión de las inspecciones con registro y medición de tiempo mediante Decorator.
 * Operación simplificada del MES (registro, producción, inspección y consulta de estado) mediante Facade.
+* Control de acceso por rol y auditoría de las operaciones de producción mediante Proxy.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -79,10 +80,12 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Composite        | Tratar de la misma forma una orden individual y un grupo de órdenes (lote o sublote)            | Implementado           |
 | Decorator        | Agregar registro y medición de tiempo a las inspecciones sin modificarlas                       | Implementado           |
 | Facade           | Ofrecer una interfaz única y simple para operar los subsistemas del MES                         | Implementado           |
+| Flyweight        | Compartir estado repetido entre muchos objetos para ahorrar memoria                             | Evaluado — no aplicado |
+| Proxy            | Controlar el acceso a las operaciones de producción y auditar quién las ejecuta                 | Implementado           |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-Además, el análisis de Bridge permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
+Además, el análisis de Bridge y de Flyweight permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -94,7 +97,7 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge.
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge y con Flyweight.
 
 ---
 
@@ -530,6 +533,84 @@ Los participantes principales del patrón son:
 
 ---
 
+## Proxy
+
+El patrón **Proxy** proporciona un sustituto de un objeto que controla el acceso a él: tiene su misma interfaz y decide si delega cada llamada en el objeto real, y qué hacer antes o después.
+
+En el proyecto se utiliza la variante **Protection Proxy** para **controlar quién puede ejecutar cada operación de producción y dejar constancia de quién la ejecutó**. Anteriormente, cualquier cliente con una referencia a `ProductionService` podía registrar, iniciar y completar órdenes, y el `Logger` no indicaba quién realizaba cada operación.
+
+La implementación se encuentra en:
+
+`src/production/prod_service_proxy.py`
+
+El componente principal es `ProductionServiceProxy`, que expone la misma interfaz pública que `ProductionService` y valida el rol del usuario antes de delegar:
+
+| Operación | `consulta` | `operador` | `supervisor` |
+| --------- | :--------: | :--------: | :----------: |
+| Lectura (`get_order`, `get_pending_queue`, `orders`) | Sí | Sí | Sí |
+| `start_order`, `start_order_with_equipment`, `complete_order` | No | Sí | Sí |
+| `add_order` | No | No | Sí |
+
+* Una operación no permitida lanza `PermissionError`, se registra como `WARNING` y no llega al servicio real.
+* Las operaciones permitidas que modifican la producción se registran con el usuario y el rol (en el `Logger` y en el historial `audit`).
+* `orders` devuelve una vista de solo lectura.
+
+Ejemplo:
+
+```python
+servicio_real = ProductionService()
+supervisor = ProductionServiceProxy(servicio_real, "ana", "supervisor")
+operador = ProductionServiceProxy(servicio_real, "luis", "operador")
+
+supervisor.add_order(StandardOrder("P-001", "Pieza P", 5))
+operador.start_order("P-001")
+operador.add_order(StandardOrder("P-002", "Pieza Q", 5))   # PermissionError
+```
+
+`ProductionService` y `MESFacade` no necesitaron modificarse: la fachada ya recibía el servicio por inyección, por lo que acepta el proxy en su lugar.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Subject:** la interfaz pública de `ProductionService`.
+* **RealSubject:** `ProductionService`.
+* **Proxy:** `ProductionServiceProxy`.
+* **Cliente:** `MESFacade` y `main.py`.
+
+### Beneficios del Proxy
+
+* Restringe las operaciones de producción según el rol, sin modificar `ProductionService`.
+* Deja constancia de quién ejecutó o intentó ejecutar cada operación.
+* Es transparente para el cliente: se puede intercambiar con el servicio real.
+* Se integra con Facade, Singleton + Adapter y Composite sin cambios.
+
+---
+
+## Flyweight — Evaluado y no aplicado
+
+El patrón **Flyweight** permite manejar una gran cantidad de objetos finos compartiendo la parte de su estado que se repite, de modo que cada objeto guarde solo lo que lo diferencia. Se justifica cuando hay **muchos objetos** y **mucho estado repetido** que consume una cantidad de memoria relevante.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES.
+
+Al revisar el proyecto, el único dato repetido en cantidad es el nombre del producto de las órdenes, que es un texto corto. Las inspecciones y los equipos existen en una instancia por servicio, el `Logger` ya es una única instancia (Singleton) y el estado de cada orden es propio de ella.
+
+Para decidir con datos se midió el ahorro posible mediante `scripts/medicion_flyweight.py`: con 10.000 órdenes y 5 productos, compartir el nombre del producto reduce un 26 % la memoria de las órdenes, pero en términos absolutos son unos 714 KiB (unos 71 bytes por orden). Ese mismo ahorro se obtiene con `sys.intern`, una línea de la biblioteca estándar, sin agregar clases.
+
+Implementar Flyweight habría requerido crear un catálogo de productos (`ProductSpec`) y una fábrica de flyweights que el dominio todavía no necesita, para ahorrar una cantidad de memoria que no representa un problema.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación y de la medición se encuentra en `docs/semana_10/flyweight.md`.
+
+Flyweight podrá evaluarse nuevamente si aparece un catálogo de productos con datos pesados y repetidos entre muchas órdenes, o un volumen de objetos tal que la memoria sea una restricción medible.
+
+---
+
 # Beneficios obtenidos
 
 La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
@@ -583,9 +664,19 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Define en un solo lugar el orden del flujo (equipo, orden, inspección, finalización).
 * Reduce el acoplamiento entre el cliente y los subsistemas.
 
+### Proxy
+
+* Restringe las operaciones de producción según el rol del usuario.
+* Registra quién ejecuta o intenta ejecutar cada operación.
+* Se incorpora sin modificar `ProductionService`.
+
 ### Bridge
 
 Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
+
+### Flyweight
+
+Su evaluación se respaldó con una medición de memoria: el ahorro posible es pequeño en términos absolutos y se obtiene sin el patrón (`sys.intern`), por lo que no se justificó agregar clases ni un catálogo.
 
 ---
 
@@ -687,9 +778,24 @@ Se verificó:
 * El reporte de estado del equipo, las órdenes y la cola pendiente.
 * El funcionamiento con otra familia de equipos y con una inspección decorada.
 
+### Proxy
+
+Se verificó:
+
+* El rechazo de roles desconocidos.
+* Que el supervisor ejecuta el flujo completo sobre el servicio real.
+* Que el operador no puede registrar órdenes, pero sí iniciarlas y completarlas.
+* Que el rol de consulta solo puede leer y no modifica el estado de las órdenes.
+* Que la vista `orders` es de solo lectura.
+* El registro de los intentos denegados (nivel `WARNING`) y de las escrituras permitidas en la auditoría.
+* Que las lecturas permitidas no se auditan.
+* Que los errores del servicio real no se ocultan.
+* Que `ProductionService` sigue funcionando sin el proxy.
+* El funcionamiento de `MESFacade` con proxies de supervisor, operador y consulta.
+
 Actualmente, el proyecto cuenta con:
 
-**58 pruebas automatizadas superadas.**
+**72 pruebas automatizadas superadas.**
 
 Las pruebas se ejecutan mediante:
 
@@ -735,6 +841,7 @@ Contiene los componentes relacionados con:
 * Builder.
 * Prototype.
 * Composite.
+* Proxy de control de acceso (`ProductionServiceProxy`).
 * Gestión de prioridades.
 
 ### Equipos
@@ -787,6 +894,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── codigo-order-clone.jpeg
 │   │   ├── codigo-pending-queue.jpg
 │   │   ├── codigo-priority-score.jpg
+│   │   ├── codigo-proxy.png
 │   │   ├── codigo-singleton.jpeg
 │   │   ├── uso-equipment-service.jpeg
 │   │   ├── uso-factory-main.jpg
@@ -799,8 +907,10 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-composite.png
 │   │   ├── ejecucion-decorator.png
 │   │   ├── ejecucion-facade.png
+│   │   ├── ejecucion-flyweight.png
 │   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
+│   │   ├── ejecucion-proxy.png
 │   │   ├── prueba-pytest-abstract-factory.jpeg
 │   │   ├── prueba-pytest-adapter.png
 │   │   ├── prueba-pytest-builder.jpeg
@@ -809,6 +919,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-facade.png
 │   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-prototype.jpeg
+│   │   ├── prueba-pytest-proxy.png
 │   │   ├── prueba-singleton.jpeg
 │   │   ├── uml-abstract-factory.png
 │   │   ├── uml-adapter.png
@@ -818,6 +929,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-facade.png
 │   │   ├── uml-factory.png
 │   │   ├── uml-prototype.png
+│   │   ├── uml-proxy.png
 │   │   └── uml-singleton.png
 │   ├── semana_1/
 │   │   └── contextualizacion.md
@@ -836,8 +948,11 @@ Proyecto_Patrones_de_software/
 │   ├── semana_8/
 │   │   ├── composite.md
 │   │   └── decoretor.md
-│   └── semana_9/
-│       └── facade.md
+│   ├── semana_9/
+│   │   └── facade.md
+│   └── semana_10/
+│       ├── flyweight.md
+│       └── proxy.md
 ├── src/
 │   ├── facade/
 │   │   └── mes_facade.py
@@ -846,6 +961,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── order_group.py
 │   │   ├── prod_factory.py
 │   │   ├── prod_service.py
+│   │   ├── prod_service_proxy.py
 │   │   └── order_builder.py
 │   ├── equipment/
 │   │   ├── equipment_base.py
@@ -856,6 +972,8 @@ Proyecto_Patrones_de_software/
 │   │   ├── logger.py
 │   │   └── logging_adapter.py
 │   └── main.py
+├── scripts/
+│   └── medicion_flyweight.py
 ├── tests/
 │   ├── test_cell_factory.py
 │   ├── test_EquipmentService.py
@@ -866,14 +984,16 @@ Proyecto_Patrones_de_software/
 │   ├── test_order_builder.py
 │   ├── test_order_clone.py
 │   ├── test_order_group.py
+│   ├── test_prod_service_proxy.py
 │   ├── test_production_order.py
 │   └── test_start_with_equipment.py
 ├── videos/
 │   ├── Adapter.mp4
+│   ├── facade.mp4
 │   ├── factory-method.mp4
 │   ├── semana-05-builder.mp4
 │   └── singleton.mp4
-│   └── facade.mp4
+│   └── proxy.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -984,6 +1104,22 @@ Se trabajó en:
 docs/semana_9/
 ```
 
+### Semana 10
+
+Durante esta etapa se evaluaron los patrones **Flyweight** y **Proxy**.
+
+Se trabajó en:
+
+* Implementación del patrón **Proxy** (`ProductionServiceProxy`) para controlar el acceso por rol a las operaciones de producción y auditar quién las ejecuta.
+* Evaluación del patrón **Flyweight**, respaldada con una medición de memoria (`scripts/medicion_flyweight.py`), y su justificación como no aplicado.
+* Integración de Proxy en `main.py` y verificación de su uso con `MESFacade`.
+* Pruebas automatizadas de Proxy.
+* Documentación: `proxy.md` y `flyweight.md`.
+
+```text
+docs/semana_10/
+```
+
 ---
 
 # Evidencias
@@ -1012,6 +1148,8 @@ Para Adapter se incorporaron evidencias correspondientes a:
 Para Composite y Decorator se incorporan evidencias equivalentes (`codigo-`, `ejecucion-`, `prueba-pytest-` y `uml-` seguidas de `composite` o `decorator`), referenciadas desde los documentos de `docs/semana_8/`.
 
 Para Facade se incorporan las evidencias `codigo-facade`, `ejecucion-facade`, `prueba-pytest-facade` y `uml-facade`, referenciadas desde `docs/semana_9/facade.md`.
+
+Para Proxy se incorporan las evidencias `codigo-proxy`, `ejecucion-proxy`, `prueba-pytest-proxy` y `uml-proxy`, y para Flyweight la evidencia `ejecucion-flyweight` (resultado de la medición), referenciadas desde `docs/semana_10/`.
 
 ---
 
@@ -1048,7 +1186,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-58 passed
+72 passed
 ```
 
 ---
@@ -1067,10 +1205,14 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Composite** — Implementado.
 * **Decorator** — Implementado.
 * **Facade** — Implementado.
+* **Flyweight** — Evaluado y no aplicado.
+* **Proxy** — Implementado.
 
-Los nueve patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los diez patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
+
+La evaluación de Flyweight, respaldada con una medición de memoria, permitió determinar que el único dato repetido en cantidad (el nombre del producto) ahorra muy poco y que `sys.intern` logra el mismo resultado sin agregar clases.
 
 ---
 
@@ -1089,11 +1231,14 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Composite:** permite tratar un lote de órdenes como una sola orden.
 * **Decorator:** permite agregar registro y medición de tiempo a las inspecciones sin modificarlas.
 * **Facade:** permite operar el MES desde un único punto de entrada, definiendo en un solo lugar el orden del flujo de producción.
+* **Proxy:** permite controlar el acceso a las operaciones de producción por rol y auditar quién las ejecuta, sin modificar `ProductionService`.
 
-Adicionalmente, el análisis de **Bridge** permitió concluir que actualmente no existe una necesidad real que justifique su implementación. Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
+Adicionalmente, el análisis de **Bridge** y de **Flyweight** permitió concluir que actualmente no existe una necesidad real que justifique su implementación (en el caso de Flyweight, con una medición de memoria como respaldo). Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
 Composite y Decorator se incorporaron después de verificar que existía una necesidad concreta: el lote de órdenes era solo un texto sin estructura propia, y las inspecciones no podían ampliarse sin modificarlas. Ambos se añadieron sin cambiar `ProductionService`, `EquipmentService` ni las clases existentes. Se evaluaron además otras aplicaciones (Decorator sobre las órdenes o el `Logger`, Composite sobre los equipos) que se descartaron por no resolver un problema actual.
 
 Facade se incorporó al final, cuando ya existían varios subsistemas que el cliente debía conocer y encadenar en el orden correcto. Se añadió como una capa de coordinación, sin modificar los subsistemas, y manteniendo el acceso directo a ellos.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator y Facade implementados y **58 pruebas automatizadas superadas**, el proyecto mantiene una base organizada y escalable.
+Proxy se incorporó para cubrir una necesidad habitual de un MES, la trazabilidad y la separación de permisos por perfil, sin modificar `ProductionService`. Flyweight, en cambio, se evaluó y no se aplicó: una medición de memoria mostró que el único dato repetido (el nombre del producto) ahorra unos 71 bytes por orden y que `sys.intern` logra lo mismo sin agregar clases, por lo que implementarlo habría sido sobrediseño. Con ello se mantiene el criterio que ya se había aplicado con Bridge.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade y Proxy implementados y **72 pruebas automatizadas superadas**, y con Bridge y Flyweight evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.

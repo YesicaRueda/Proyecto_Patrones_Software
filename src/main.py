@@ -1,5 +1,6 @@
 from src.infrastructure.logger import Logger
 from src.production.prod_service import ProductionService
+from src.production.prod_service_proxy import ProductionServiceProxy
 from src.equipment.equipment_service import EquipmentService
 from src.equipment.cell_factory import CNCCellFactory, RobotCellFactory
 from src.production.prod_factory import (
@@ -121,3 +122,40 @@ print(f"Orden F-001 procesada: {mes.process_order('F-001')}")
 print(f"Lote F-LOTE procesado: {mes.process_order('F-LOTE')}")
 
 mostrar_reporte("Después", mes.get_status_report())
+
+seccion("PROXY - CONTROL DE ACCESO Y AUDITORÍA")
+servicio_real = ProductionService()
+supervisor = ProductionServiceProxy(servicio_real, "ana", "supervisor")
+operador = ProductionServiceProxy(servicio_real, "luis", "operador")
+consulta = ProductionServiceProxy(servicio_real, "visita", "consulta")
+
+supervisor.add_order(StandardOrder("P-001", "Pieza P", 5))
+
+for proxy in (operador, consulta):
+    try:
+        proxy.add_order(StandardOrder("P-002", "Pieza Q", 5))
+    except PermissionError as error:
+        print(f"Denegado: {error}")
+
+operador.start_order("P-001")
+operador.complete_order("P-001")
+print(f"Estado de P-001 tras operarla el operador: "
+      f"{servicio_real.get_order('P-001').status}")
+
+try:
+    consulta.start_order("P-001")
+except PermissionError as error:
+    print(f"Denegado: {error}")
+
+print("Auditoría del operador:",
+      [(r["operacion"], r["permitido"]) for r in operador.audit])
+print("Auditoría de consulta:",
+      [(r["operacion"], r["permitido"]) for r in consulta.audit])
+
+mes_consulta = MESFacade(production_service=consulta)
+try:
+    mes_consulta.register_order("P-009", "Pieza X", 1)
+except PermissionError as error:
+    print(f"Fachada con rol de consulta: {error}")
+print(f"Órdenes visibles para consulta: "
+      f"{mes_consulta.get_status_report()['total_ordenes']}")
