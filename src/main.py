@@ -16,6 +16,13 @@ from src.equipment.inspection_decorators import (
     LoggedInspection,
     TimedInspection
 )
+from src.commands.invoker import CommandInvoker
+from src.commands.mes_commands import (
+    ProcessOrderCommand,
+    RegisterOrderCommand,
+    RunOrderCommand,
+    StartCellCommand,
+)
 
 
 def seccion(titulo):
@@ -159,3 +166,32 @@ except PermissionError as error:
     print(f"Fachada con rol de consulta: {error}")
 print(f"Órdenes visibles para consulta: "
       f"{mes_consulta.get_status_report()['total_ordenes']}")
+
+seccion("COMMAND - EJECUCIÓN DE OPERACIONES")
+mes_cmd = MESFacade(CNCCellFactory())
+invoker = CommandInvoker()
+
+print("Turno planificado (cola diferida; todavía no se ejecuta nada):")
+invoker.enqueue(RegisterOrderCommand(mes_cmd, "C-001", "Pieza A", 10, urgent=True))
+invoker.enqueue(RunOrderCommand(mes_cmd, "C-999"))  # orden inexistente
+invoker.enqueue(ProcessOrderCommand(mes_cmd, "C-001"))
+print(f"  Pendientes: {[c.description for c in invoker.pending]}")
+print(f"  Órdenes registradas antes de ejecutar: "
+      f"{mes_cmd.get_status_report()['total_ordenes']}")
+
+print("Ejecutando la cola:")
+for entrada in invoker.run_pending():
+    resultado = entrada["resultado"]
+    detalle = entrada["error"] or getattr(resultado, "order_id", resultado)
+    print(f"  {entrada['comando']:<24} {entrada['estado']:<10} {detalle}")
+
+print("Undo seguro sobre el equipo:")
+mes_cmd.stop_cell()
+invoker.execute(StartCellCommand(mes_cmd))
+print(f"  Tras 'Iniciar equipo': {mes_cmd.equipment.equipment.status}")
+invoker.undo_last()
+print(f"  Tras deshacer:         {mes_cmd.equipment.equipment.status}")
+
+print(f"Historial completo: {len(invoker.history)} entradas")
+for h in invoker.history:
+    print(f"  - {h['comando']}: {h['estado']}")

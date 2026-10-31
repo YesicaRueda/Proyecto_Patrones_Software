@@ -56,6 +56,7 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Extensión de las inspecciones con registro y medición de tiempo mediante Decorator.
 * Operación simplificada del MES (registro, producción, inspección y consulta de estado) mediante Facade.
 * Control de acceso por rol y auditoría de las operaciones de producción mediante Proxy.
+* Ejecución diferida, historial y reversión segura de las operaciones del MES mediante Command.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -82,10 +83,12 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Facade           | Ofrecer una interfaz única y simple para operar los subsistemas del MES                         | Implementado           |
 | Flyweight        | Compartir estado repetido entre muchos objetos para ahorrar memoria                             | Evaluado — no aplicado |
 | Proxy            | Controlar el acceso a las operaciones de producción y auditar quién las ejecuta                 | Implementado           |
+| Chain of Responsibility | Encadenar validaciones independientes de una solicitud                                   | Evaluado — no aplicado |
+| Command          | Encapsular las operaciones del MES para ejecutarlas de forma diferida, registrarlas y deshacerlas con seguridad | Implementado |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-Además, el análisis de Bridge y de Flyweight permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
+Además, el análisis de Bridge, Flyweight y Chain of Responsibility permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -97,7 +100,7 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge y con Flyweight.
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight y Chain of Responsibility.
 
 ---
 
@@ -611,6 +614,95 @@ Flyweight podrá evaluarse nuevamente si aparece un catálogo de productos con d
 
 ---
 
+## Chain of Responsibility — Evaluado y no aplicado
+
+El patrón **Chain of Responsibility** pasa una solicitud por una cadena de manejadores independientes, cada uno con su propia regla, que la procesan, la rechazan o la pasan al siguiente. Se justifica cuando existen **muchas reglas independientes** que **cambian de orden o de composición** según el contexto.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES para centralizar las validaciones que hoy están en `ProductionService`, `MESFacade` y `ProductionServiceProxy`.
+
+Al revisar el proyecto se encontró que las validaciones son pocas (orden duplicada, orden inexistente, estado esperado, equipo operando, lote vacío, inspección aprobada, permisos), se ejecutan siempre en el mismo orden, dependen unas de otras (no se puede comprobar el estado de una orden que no existe) y están junto a la operación que protegen. No hay reglas configurables, ni validaciones distintas por tipo de orden o de equipo. Los permisos ya los resuelve el Proxy, y la inspección es una ejecución con resultado (ya extendida con Decorator), no una precondición.
+
+La única duplicación real es el par "la orden existe + estado esperado" en `start_order`, `complete_order` y `finish_order`, que se resuelve con un método privado, no con una jerarquía de manejadores.
+
+Implementar la cadena habría requerido una clase base, de 4 a 6 manejadores con una sola comparación cada uno, un objeto de contexto y la modificación de `ProductionService` y `MESFacade`, con riesgo de cambiar mensajes y excepciones que hoy verifican las pruebas.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_11/chain_of_responsibility.md`.
+
+Chain of Responsibility podrá evaluarse nuevamente si aparecen reglas de negocio configurables (materiales, capacidad, mantenimiento, fechas de entrega), validaciones que se combinen o reordenen según el tipo de orden o de equipo, o aprobaciones escalonadas entre roles.
+
+---
+
+## Command
+
+El patrón **Command** encapsula una solicitud como un objeto, lo que permite parametrizar clientes con distintas solicitudes, ponerlas en cola, registrarlas y, cuando corresponde, deshacerlas.
+
+En el proyecto se utiliza para **encapsular las operaciones del MES**. Anteriormente, cada operación se ejecutaba mediante una llamada directa a `MESFacade` en el mismo instante en que se escribía: no se podía planificar una secuencia para ejecutarla después, no quedaba un historial consultable de lo solicitado, de su resultado y de lo que falló, y cada punto de uso debía manejar los errores para que las demás operaciones continuaran.
+
+La implementación se encuentra en:
+
+* `src/commands/command.py`
+* `src/commands/mes_commands.py`
+* `src/commands/invoker.py`
+
+Los componentes principales son:
+
+* `Command`: interfaz común con `execute()`, `undo()` y `description`.
+* `RegisterOrderCommand` y `RegisterBatchCommand`: registran órdenes y lotes.
+* `RunOrderCommand`, `FinishOrderCommand` y `ProcessOrderCommand`: inician, finalizan y procesan órdenes.
+* `StartCellCommand` y `StopCellCommand`: controlan el equipo y son los únicos reversibles.
+* `CommandInvoker`: ejecuta (`execute`), encola (`enqueue`, `run_pending`), conserva el historial (`history`) y deshace (`undo_last`).
+
+Ejemplo:
+
+```python
+mes = MESFacade(CNCCellFactory())
+invoker = CommandInvoker()
+
+invoker.enqueue(RegisterOrderCommand(mes, "C-001", "Pieza A", 10, urgent=True))
+invoker.enqueue(RunOrderCommand(mes, "C-999"))          # orden inexistente
+invoker.enqueue(ProcessOrderCommand(mes, "C-001"))
+
+invoker.run_pending()      # ejecuta en orden; el fallo no detiene a los demás
+
+invoker.execute(StartCellCommand(mes))
+invoker.undo_last()        # detiene el equipo, solo porque es seguro
+```
+
+Los comandos no implementan las operaciones: las piden a `MESFacade`, por lo que no duplican reglas de negocio y respetan al Proxy si la fachada se construye con un `ProductionServiceProxy` (un comando con rol `consulta` falla con `PermissionError`). `ProductionService`, `ProductionServiceProxy` y `MESFacade` no necesitaron modificarse.
+
+Solo `StartCellCommand` y `StopCellCommand` admiten `undo`, porque `ProductionOrder` no tiene transiciones inversas y revertir una orden completada contradeciría la inspección que la aprobó. El `undo` del equipo se rechaza si el equipo ya operaba antes del comando o si hay órdenes en producción, y el comando rechazado se conserva en la pila.
+
+![Diagrama UML de Command](docs/img/uml-command.png)
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Command:** `Command`.
+* **ConcreteCommand:** `RegisterOrderCommand`, `RegisterBatchCommand`, `RunOrderCommand`, `FinishOrderCommand`, `ProcessOrderCommand`, `StartCellCommand` y `StopCellCommand`.
+* **Receiver:** `MESFacade`.
+* **Invoker:** `CommandInvoker`.
+* **Cliente:** `main.py`.
+
+### Beneficios del Command
+
+* Permite preparar operaciones y ejecutarlas de forma diferida, en orden.
+* Mantiene un historial consultable de operaciones ejecutadas, fallidas y deshechas.
+* Aísla los fallos: un comando fallido no detiene a los siguientes de la cola.
+* Permite reutilizar solicitudes y deshacer únicamente donde la reversión es segura.
+* No duplica la lógica de `MESFacade` ni de `ProductionService`.
+* Respeta los permisos del Proxy y registra sus eventos con el `Logger`.
+
+Documentación detallada: `docs/semana_11/command.md`.
+
+---
+
 # Beneficios obtenidos
 
 La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
@@ -670,9 +762,20 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Registra quién ejecuta o intenta ejecutar cada operación.
 * Se incorpora sin modificar `ProductionService`.
 
+### Command
+
+* Permite ejecutar operaciones del MES de forma diferida y en orden.
+* Conserva un historial consultable, también de los fallos.
+* Permite deshacer de forma segura las operaciones del equipo.
+* Se incorpora sin modificar `MESFacade`, `ProductionService` ni el Proxy.
+
 ### Bridge
 
 Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
+
+### Chain of Responsibility
+
+Su evaluación mostró que las validaciones del MES son pocas, fijas y dependientes entre sí, y que cada una ya está junto a la operación que protege. Una cadena de manejadores habría reemplazado unas veinte líneas legibles por una jerarquía de clases sin un problema real que resolver.
 
 ### Flyweight
 
@@ -793,9 +896,21 @@ Se verificó:
 * Que `ProductionService` sigue funcionando sin el proxy.
 * El funcionamiento de `MESFacade` con proxies de supervisor, operador y consulta.
 
+### Command
+
+Se verificó:
+
+* Que `Command` es abstracta y que solo los comandos de equipo son reversibles.
+* El efecto de cada comando concreto a través de `MESFacade`.
+* El historial de ejecuciones exitosas, fallidas y deshechas, y el registro en el `Logger`.
+* La cola diferida: orden de ejecución, que nada se ejecuta antes de `run_pending()` y que un fallo no detiene a los demás.
+* La reutilización de un comando.
+* El `undo` seguro del equipo y su rechazo cuando el equipo ya operaba o hay órdenes en producción.
+* El funcionamiento con proxies de rol `consulta` y `supervisor`.
+
 Actualmente, el proyecto cuenta con:
 
-**72 pruebas automatizadas superadas.**
+**96 pruebas automatizadas superadas** (72 anteriores + 24 de Command).
 
 Las pruebas se ejecutan mediante:
 
@@ -870,6 +985,14 @@ Contiene componentes generales utilizados por el sistema, principalmente:
 
 En esta capa se encuentran actualmente integrados los patrones Singleton y Adapter.
 
+### Comandos
+
+Contiene:
+
+* `Command` y los comandos concretos de las operaciones del MES.
+* `CommandInvoker`, con la cola, el historial y el `undo` seguro.
+* El patrón Command.
+
 ### Pruebas
 
 Contiene las pruebas automatizadas correspondientes a los diferentes componentes y patrones implementados.
@@ -883,6 +1006,7 @@ Proyecto_Patrones_de_software/
 ├── docs/
 │   ├── img/
 │   │   ├── codigo-abstract-factory.jpeg
+│   │   ├── codigo-command.png
 │   │   ├── codigo-composite.png
 │   │   ├── codigo-decorator.png
 │   │   ├── codigo-equipment-inspection-base.jpeg
@@ -904,6 +1028,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-abstract-factory.jpeg
 │   │   ├── ejecucion-adapter.png
 │   │   ├── ejecucion-builder.jpeg
+│   │   ├── ejecucion-command.png
 │   │   ├── ejecucion-composite.png
 │   │   ├── ejecucion-decorator.png
 │   │   ├── ejecucion-facade.png
@@ -914,6 +1039,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-abstract-factory.jpeg
 │   │   ├── prueba-pytest-adapter.png
 │   │   ├── prueba-pytest-builder.jpeg
+│   │   ├── prueba-pytest-command.png
 │   │   ├── prueba-pytest-composite.png
 │   │   ├── prueba-pytest-decorator.png
 │   │   ├── prueba-pytest-facade.png
@@ -924,6 +1050,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-abstract-factory.png
 │   │   ├── uml-adapter.png
 │   │   ├── uml-builder.png
+│   │   ├── uml-command.png
 │   │   ├── uml-composite.png
 │   │   ├── uml-decorator.png
 │   │   ├── uml-facade.png
@@ -950,10 +1077,18 @@ Proyecto_Patrones_de_software/
 │   │   └── decoretor.md
 │   ├── semana_9/
 │   │   └── facade.md
-│   └── semana_10/
-│       ├── flyweight.md
-│       └── proxy.md
+│   ├── semana_10/
+│   │   ├── flyweight.md
+│   │   └── proxy.md
+│   └── semana_12/
+│       ├── chain_of_responsibility.md
+│       ├── command.md
+│       └── uml-command.puml
 ├── src/
+│   ├── commands/
+│   │   ├── command.py
+│   │   ├── mes_commands.py
+│   │   └── invoker.py
 │   ├── facade/
 │   │   └── mes_facade.py
 │   ├── production/
@@ -976,6 +1111,7 @@ Proyecto_Patrones_de_software/
 │   └── medicion_flyweight.py
 ├── tests/
 │   ├── test_cell_factory.py
+│   ├── test_commands.py
 │   ├── test_EquipmentService.py
 │   ├── test_inspection_decorators.py
 │   ├── test_logger_and_order_rules.py
@@ -994,6 +1130,7 @@ Proyecto_Patrones_de_software/
 │   ├── semana-05-builder.mp4
 │   └── singleton.mp4
 │   └── proxy.mp4
+│   └── command.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -1120,6 +1257,22 @@ Se trabajó en:
 docs/semana_10/
 ```
 
+### Semana 12
+
+Durante esta etapa se evaluaron los patrones **Chain of Responsibility** y **Command**.
+
+Se trabajó en:
+
+* Implementación del patrón **Command** (`CommandInvoker` y los comandos de las operaciones del MES) para ejecutar operaciones de forma diferida, mantener un historial consultable y deshacer con seguridad las operaciones del equipo.
+* Evaluación del patrón **Chain of Responsibility** y su justificación como no aplicado.
+* Integración de Command en `main.py` y verificación de su uso con `MESFacade` y con el Proxy.
+* Pruebas automatizadas de Command.
+* Documentación: `command.md` y `chain_of_responsibility.md`.
+
+```text
+docs/semana_11/
+```
+
 ---
 
 # Evidencias
@@ -1150,6 +1303,8 @@ Para Composite y Decorator se incorporan evidencias equivalentes (`codigo-`, `ej
 Para Facade se incorporan las evidencias `codigo-facade`, `ejecucion-facade`, `prueba-pytest-facade` y `uml-facade`, referenciadas desde `docs/semana_9/facade.md`.
 
 Para Proxy se incorporan las evidencias `codigo-proxy`, `ejecucion-proxy`, `prueba-pytest-proxy` y `uml-proxy`, y para Flyweight la evidencia `ejecucion-flyweight` (resultado de la medición), referenciadas desde `docs/semana_10/`.
+
+Para Command se incorporan las evidencias `codigo-command`, `ejecucion-command`, `prueba-pytest-command` y `uml-command`, referenciadas desde `docs/semana_11/command.md`. Chain of Responsibility, al no implementarse, no tiene evidencias de código ni de ejecución: su evaluación está en `docs/semana_11/chain_of_responsibility.md`.
 
 ---
 
@@ -1186,7 +1341,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-72 passed
+96 passed
 ```
 
 ---
@@ -1207,12 +1362,16 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Facade** — Implementado.
 * **Flyweight** — Evaluado y no aplicado.
 * **Proxy** — Implementado.
+* **Chain of Responsibility** — Evaluado y no aplicado.
+* **Command** — Implementado.
 
-Los diez patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los once patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
 La evaluación de Flyweight, respaldada con una medición de memoria, permitió determinar que el único dato repetido en cantidad (el nombre del producto) ahorra muy poco y que `sys.intern` logra el mismo resultado sin agregar clases.
+
+La evaluación de Chain of Responsibility permitió determinar que las validaciones del MES son pocas, fijas y dependientes entre sí, y que cada una ya está resuelta junto a la operación que protege (servicio, fachada y Proxy).
 
 ---
 
@@ -1232,6 +1391,7 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Decorator:** permite agregar registro y medición de tiempo a las inspecciones sin modificarlas.
 * **Facade:** permite operar el MES desde un único punto de entrada, definiendo en un solo lugar el orden del flujo de producción.
 * **Proxy:** permite controlar el acceso a las operaciones de producción por rol y auditar quién las ejecuta, sin modificar `ProductionService`.
+* **Command:** permite ejecutar las operaciones del MES de forma diferida, registrarlas en un historial y deshacer con seguridad las del equipo.
 
 Adicionalmente, el análisis de **Bridge** y de **Flyweight** permitió concluir que actualmente no existe una necesidad real que justifique su implementación (en el caso de Flyweight, con una medición de memoria como respaldo). Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
@@ -1241,4 +1401,6 @@ Facade se incorporó al final, cuando ya existían varios subsistemas que el cli
 
 Proxy se incorporó para cubrir una necesidad habitual de un MES, la trazabilidad y la separación de permisos por perfil, sin modificar `ProductionService`. Flyweight, en cambio, se evaluó y no se aplicó: una medición de memoria mostró que el único dato repetido (el nombre del producto) ahorra unos 71 bytes por orden y que `sys.intern` logra lo mismo sin agregar clases, por lo que implementarlo habría sido sobrediseño. Con ello se mantiene el criterio que ya se había aplicado con Bridge.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade y Proxy implementados y **72 pruebas automatizadas superadas**, y con Bridge y Flyweight evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
+Command se incorporó para cubrir una necesidad que las llamadas directas no resolvían: preparar secuencias de operaciones, ejecutarlas de forma diferida, conservar un historial de lo solicitado y de lo que falló, y deshacer lo que es seguro deshacer. Usa `MESFacade` como Receiver, por lo que no duplica reglas de negocio y respeta al Proxy. Su `undo` se limitó al equipo porque `ProductionOrder` no tiene transiciones inversas seguras. Chain of Responsibility, en cambio, se evaluó y no se aplicó: las validaciones del MES son pocas, fijas y dependientes entre sí, y una cadena de manejadores habría sido sobrediseño. Con ello se mantiene el criterio que ya se había aplicado con Bridge y Flyweight.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy y Command implementados y **96 pruebas automatizadas superadas**, y con Bridge, Flyweight y Chain of Responsibility evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
