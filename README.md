@@ -57,6 +57,7 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Operación simplificada del MES (registro, producción, inspección y consulta de estado) mediante Facade.
 * Control de acceso por rol y auditoría de las operaciones de producción mediante Proxy.
 * Ejecución diferida, historial y reversión segura de las operaciones del MES mediante Command.
+* Recorrido de las órdenes de un lote (en profundidad o por niveles, con filtro de estado) y conteo de órdenes individuales por estado mediante Iterator.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -85,10 +86,13 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Proxy            | Controlar el acceso a las operaciones de producción y auditar quién las ejecuta                 | Implementado           |
 | Chain of Responsibility | Encadenar validaciones independientes de una solicitud                                   | Evaluado — no aplicado |
 | Command          | Encapsular las operaciones del MES para ejecutarlas de forma diferida, registrarlas y deshacerlas con seguridad | Implementado |
+| Iterator         | Recorrer las órdenes de un lote (árbol de `OrderGroup`) sin conocer su estructura interna       | Implementado           |
+| Mediator         | Centralizar la comunicación entre componentes que se llaman entre sí de forma desordenada       | Evaluado — no aplicado |
+| Memento          | Capturar y restaurar el estado interno de un objeto sin violar su encapsulamiento               | Evaluado — no aplicado |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-Además, el análisis de Bridge, Flyweight y Chain of Responsibility permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
+Además, el análisis de Bridge, Flyweight, Chain of Responsibility, Mediator y Memento permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -100,7 +104,7 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight y Chain of Responsibility.
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight, Chain of Responsibility, Mediator y Memento.
 
 ---
 
@@ -632,7 +636,7 @@ Por esta razón, el patrón fue:
 
 ### Justificación
 
-La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_11/chain_of_responsibility.md`.
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_12/chain_of_responsibility.md`.
 
 Chain of Responsibility podrá evaluarse nuevamente si aparecen reglas de negocio configurables (materiales, capacidad, mantenimiento, fechas de entrega), validaciones que se combinen o reordenen según el tipo de orden o de equipo, o aprobaciones escalonadas entre roles.
 
@@ -699,7 +703,109 @@ Los participantes principales del patrón son:
 * No duplica la lógica de `MESFacade` ni de `ProductionService`.
 * Respeta los permisos del Proxy y registra sus eventos con el `Logger`.
 
-Documentación detallada: `docs/semana_11/command.md`.
+Documentación detallada: `docs/semana_12/command.md`.
+
+---
+
+## Iterator
+
+El patrón **Iterator** proporciona una forma de acceder secuencialmente a los elementos de una colección sin exponer su representación interna.
+
+En el proyecto se utiliza para **recorrer las órdenes de un lote**. Con Composite, un lote es un árbol: un `OrderGroup` contiene órdenes u otros grupos. Anteriormente, para visitar las órdenes individuales el cliente debía escribir la recursión a mano (en `main.py` el subgrupo se imprimía aparte), esa recursión estaba repetida dentro de `OrderGroup` (`count_orders()`, `start()`, `complete()`, `clone()`), y `MESFacade.get_status_report()` contaba un lote como una sola orden.
+
+La implementación se encuentra en:
+
+`src/production/order_iterators.py`
+
+Los componentes principales son:
+
+* `OrderIterator`: interfaz común con `has_next()` y `__next__()`; también se puede usar en un `for`.
+* `DepthFirstIterator`: recorrido en profundidad (termina un subgrupo antes de seguir).
+* `BreadthFirstIterator`: recorrido por niveles (primero los hijos directos, luego los nietos).
+* `create_iterator()`: elige el recorrido (`"depth"` o `"breadth"`), si devuelve solo órdenes individuales (`leaves_only`) y un filtro opcional por estado (`status`).
+* `leaf_status_counts()`: cuenta las órdenes individuales por estado abriendo los lotes.
+
+Ejemplo:
+
+```python
+from src.production.order_iterators import create_iterator, leaf_status_counts
+
+print([o.order_id for o in create_iterator(lote_it)])                    # en profundidad
+print([o.order_id for o in create_iterator(lote_it, "breadth")])         # por niveles
+print([o.order_id for o in create_iterator(lote_it, status="En producción")])
+print(leaf_status_counts([lote_it]))                                      # {'Pendiente': 2, 'En producción': 2}
+```
+
+Cada iterador guarda su propio estado, por lo que se pueden tener varios recorridos simultáneos sobre el mismo lote, y recorrer no modifica el árbol. `OrderGroup`, `ProductionService` y `MESFacade` no necesitaron modificarse.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Iterator:** `OrderIterator`.
+* **ConcreteIterator:** `DepthFirstIterator` y `BreadthFirstIterator`, sobre una base común.
+* **Aggregate:** `OrderGroup`, que expone `children`.
+* **Cliente:** `main.py` y `leaf_status_counts()`.
+
+### Beneficios del Iterator
+
+* El cliente recorre un lote sin conocer su estructura ni escribir recursión.
+* Permite elegir el orden del recorrido y filtrar por estado.
+* Permite contar las órdenes individuales por estado, también dentro de lotes y sublotes.
+* Se pueden agregar nuevos recorridos sin tocar `OrderGroup`.
+* No modifica ninguna clase existente.
+
+Documentación detallada: `docs/semana_13/iterator.md`.
+
+---
+
+## Mediator — Evaluado y no aplicado
+
+El patrón **Mediator** centraliza en un objeto la comunicación entre varios componentes que se conocen y se llaman entre sí de forma desordenada, para que dejen de referenciarse directamente. Se justifica cuando hay **varios colegas** con comunicación **muchos a muchos** (o bidireccional) que genera dependencias cruzadas.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES.
+
+Al revisar las relaciones entre los componentes se encontró que las llamadas siguen una sola dirección (cliente → fachada → servicios). `ProductionService` solo conoce al equipo a través de un parámetro en `start_order_with_equipment()`, `EquipmentService` no conoce ni notifica a producción, las inspecciones no llaman a nadie y el `Logger` es un servicio compartido, no un colega. La coordinación del flujo ya la resuelve `MESFacade`, que se parece a un mediador pero no lo es: los componentes no se comunican a través de ella, solo la usa el cliente.
+
+Implementar Mediator habría requerido una interfaz y un mediador concreto, la modificación de `ProductionService` y `EquipmentService` (las clases más probadas) y comunicaciones artificiales entre componentes que hoy no las necesitan.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_13/mediator.md`.
+
+Mediator podrá evaluarse nuevamente si aparecen varias líneas o equipos que compitan por las mismas órdenes, reacciones entre módulos (una falla de equipo que pause y reasigne órdenes, una inspección rechazada que avise a calidad y planificación) o un módulo de calidad u OEE que dependa a la vez del estado de equipos y órdenes. Si lo único necesario fuera avisar a varios interesados, convendría evaluar Observer antes.
+
+---
+
+## Memento — Evaluado y no aplicado
+
+El patrón **Memento** captura el estado interno de un objeto sin violar su encapsulamiento, para poder restaurarlo después. Se justifica cuando un objeto tiene **estado interno relevante**, restaurarlo es una **operación válida del dominio** y copiarlo desde fuera rompería su encapsulamiento.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES, principalmente para ampliar el `undo` de Command a las operaciones sobre órdenes.
+
+Al revisar el proyecto se encontró que:
+
+* Restaurar el estado de una orden contradice el dominio: una orden `Completada` que volviera a `En producción` se saltaría la inspección que la aprobó, y un MES real lo manejaría con una operación explícita de reapertura o retrabajo, no con un rollback silencioso.
+* Se opone a la trazabilidad: el `Logger`, el `audit` del Proxy y el historial de `CommandInvoker` solo crecen y no se pueden restaurar, por lo que retroceder el estado los dejaría inconsistentes.
+* El estado a capturar es mínimo: el único estado mutable de una orden es `status`, con dos transiciones.
+* Las necesidades vecinas ya están cubiertas: `StartCellCommand` y `StopCellCommand` ya recuerdan si el equipo operaba antes de ejecutarse, y `clone()` (Prototype) ya genera copias independientes.
+* `OrderGroup` no guarda estado propio: calcula `quantity` y `status` a partir de sus hijos.
+
+Implementar Memento habría requerido un `Memento` y un `Caretaker` por objeto restaurable, y la primera transición hacia atrás del dominio sin una necesidad que la pida.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_13/memento.md`.
+
+Memento podrá evaluarse nuevamente si se editan órdenes con varios campos modificables (cantidad, fecha de entrega, equipo asignado) y se necesita deshacer y rehacer cambios antes de confirmarlos, si se agrega planificación con simulación ("qué pasaría si"), si se quiere guardar y restaurar la simulación completa, o si el negocio define un flujo de reapertura o retrabajo con su propia trazabilidad.
 
 ---
 
@@ -769,6 +875,13 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Permite deshacer de forma segura las operaciones del equipo.
 * Se incorpora sin modificar `MESFacade`, `ProductionService` ni el Proxy.
 
+### Iterator
+
+* Permite recorrer las órdenes de un lote sin conocer su estructura ni escribir recursión en el cliente.
+* Ofrece recorridos intercambiables (en profundidad y por niveles) con filtro por estado.
+* Permite contar las órdenes individuales por estado, incluso dentro de lotes y sublotes.
+* Se incorpora sin modificar `OrderGroup`, `ProductionService` ni `MESFacade`.
+
 ### Bridge
 
 Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
@@ -780,6 +893,14 @@ Su evaluación mostró que las validaciones del MES son pocas, fijas y dependien
 ### Flyweight
 
 Su evaluación se respaldó con una medición de memoria: el ahorro posible es pequeño en términos absolutos y se obtiene sin el patrón (`sys.intern`), por lo que no se justificó agregar clases ni un catálogo.
+
+### Mediator
+
+Su evaluación mostró que los componentes del MES se conectan en un solo sentido y que `MESFacade` ya coordina el flujo, por lo que no existe una red de comunicación entre componentes que centralizar.
+
+### Memento
+
+Su evaluación mostró que restaurar el estado de las órdenes contradice la inspección y la trazabilidad, y que el único caso reversible (el equipo) ya lo cubre Command, por lo que el patrón habría creado una capacidad que el dominio rechaza.
 
 ---
 
@@ -908,9 +1029,24 @@ Se verificó:
 * El `undo` seguro del equipo y su rechazo cuando el equipo ya operaba o hay órdenes en producción.
 * El funcionamiento con proxies de rol `consulta` y `supervisor`.
 
+### Iterator
+
+Se verificó:
+
+* Que los recorridos en profundidad y por niveles son `OrderIterator`.
+* El orden de las órdenes individuales en cada recorrido, con y sin grupos incluidos.
+* Que una orden individual se devuelve a sí misma y un grupo vacío no devuelve nada.
+* El funcionamiento con grupos anidados en varios niveles.
+* El filtro por estado.
+* El protocolo `has_next()` / `StopIteration`, también al pedir de más.
+* Que dos iteradores sobre el mismo lote son independientes.
+* Que recorrer no modifica la cantidad, el estado ni los hijos del grupo.
+* El conteo de órdenes individuales por estado sobre lotes y órdenes sueltas.
+* El rechazo de una estrategia de recorrido desconocida.
+
 Actualmente, el proyecto cuenta con:
 
-**96 pruebas automatizadas superadas** (72 anteriores + 24 de Command).
+**110 pruebas automatizadas superadas** (96 anteriores + 14 de Iterator).
 
 Las pruebas se ejecutan mediante:
 
@@ -956,6 +1092,7 @@ Contiene los componentes relacionados con:
 * Builder.
 * Prototype.
 * Composite.
+* Iterator (recorridos del árbol de órdenes).
 * Proxy de control de acceso (`ProductionServiceProxy`).
 * Gestión de prioridades.
 
@@ -1012,6 +1149,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── codigo-equipment-inspection-base.jpeg
 │   │   ├── codigo-facade.png
 │   │   ├── codigo-factory-creator.jpg
+│   │   ├── codigo-iterator.png
 │   │   ├── codigo-logger-integrado.png
 │   │   ├── codigo-logging-adapter.png
 │   │   ├── codigo-order-builder.jpeg
@@ -1033,6 +1171,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-decorator.png
 │   │   ├── ejecucion-facade.png
 │   │   ├── ejecucion-flyweight.png
+│   │   ├── ejecucion-iterator.png
 │   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
 │   │   ├── ejecucion-proxy.png
@@ -1044,6 +1183,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-decorator.png
 │   │   ├── prueba-pytest-facade.png
 │   │   ├── prueba-pytest-factory.jpg
+│   │   ├── prueba-pytest-iterator.png
 │   │   ├── prueba-pytest-prototype.jpeg
 │   │   ├── prueba-pytest-proxy.png
 │   │   ├── prueba-singleton.jpeg
@@ -1055,6 +1195,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-decorator.png
 │   │   ├── uml-facade.png
 │   │   ├── uml-factory.png
+│   │   ├── uml-iterator.png
 │   │   ├── uml-prototype.png
 │   │   ├── uml-proxy.png
 │   │   └── uml-singleton.png
@@ -1080,10 +1221,14 @@ Proyecto_Patrones_de_software/
 │   ├── semana_10/
 │   │   ├── flyweight.md
 │   │   └── proxy.md
-│   └── semana_12/
-│       ├── chain_of_responsibility.md
-│       ├── command.md
-│       └── uml-command.puml
+│   ├── semana_12/
+│   │   ├── chain_of_responsibility.md
+│   │   ├── command.md
+│   │   └── uml-command.puml
+│   └── semana_13/
+│       ├── iterator.md
+│       ├── mediator.md
+│       └── memento.md
 ├── src/
 │   ├── commands/
 │   │   ├── command.py
@@ -1094,6 +1239,7 @@ Proyecto_Patrones_de_software/
 │   ├── production/
 │   │   ├── prod_order.py
 │   │   ├── order_group.py
+│   │   ├── order_iterators.py
 │   │   ├── prod_factory.py
 │   │   ├── prod_service.py
 │   │   ├── prod_service_proxy.py
@@ -1120,6 +1266,7 @@ Proyecto_Patrones_de_software/
 │   ├── test_order_builder.py
 │   ├── test_order_clone.py
 │   ├── test_order_group.py
+│   ├── test_order_iterators.py
 │   ├── test_prod_service_proxy.py
 │   ├── test_production_order.py
 │   └── test_start_with_equipment.py
@@ -1131,6 +1278,7 @@ Proyecto_Patrones_de_software/
 │   └── singleton.mp4
 │   └── proxy.mp4
 │   └── command.mp4
+│   └── iterator.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -1270,7 +1418,24 @@ Se trabajó en:
 * Documentación: `command.md` y `chain_of_responsibility.md`.
 
 ```text
-docs/semana_11/
+docs/semana_12/
+```
+
+### Semana 13
+
+Durante esta etapa se evaluaron los patrones de comportamiento **Iterator**, **Mediator** y **Memento**.
+
+Se trabajó en:
+
+* Implementación del patrón **Iterator** (`DepthFirstIterator`, `BreadthFirstIterator`, `create_iterator()` y `leaf_status_counts()`) para recorrer las órdenes de un lote sin escribir recursión en el cliente, con filtro por estado y conteo de órdenes individuales.
+* Evaluación del patrón **Mediator** y su justificación como no aplicado: los componentes se conectan en un solo sentido y `MESFacade` ya coordina el flujo.
+* Evaluación del patrón **Memento** y su justificación como no aplicado: restaurar el estado de una orden contradice la inspección y la trazabilidad, y `Command` ya cubre el único caso reversible (el equipo).
+* Integración de Iterator en `main.py`.
+* Pruebas automatizadas de Iterator.
+* Documentación: `iterator.md`, `mediator.md` y `memento.md`.
+
+```text
+docs/semana_13/
 ```
 
 ---
@@ -1304,7 +1469,9 @@ Para Facade se incorporan las evidencias `codigo-facade`, `ejecucion-facade`, `p
 
 Para Proxy se incorporan las evidencias `codigo-proxy`, `ejecucion-proxy`, `prueba-pytest-proxy` y `uml-proxy`, y para Flyweight la evidencia `ejecucion-flyweight` (resultado de la medición), referenciadas desde `docs/semana_10/`.
 
-Para Command se incorporan las evidencias `codigo-command`, `ejecucion-command`, `prueba-pytest-command` y `uml-command`, referenciadas desde `docs/semana_11/command.md`. Chain of Responsibility, al no implementarse, no tiene evidencias de código ni de ejecución: su evaluación está en `docs/semana_11/chain_of_responsibility.md`.
+Para Command se incorporan las evidencias `codigo-command`, `ejecucion-command`, `prueba-pytest-command` y `uml-command`, referenciadas desde `docs/semana_12/command.md`. Chain of Responsibility, al no implementarse, no tiene evidencias de código ni de ejecución: su evaluación está en `docs/semana_12/chain_of_responsibility.md`.
+
+Para Iterator se incorporan las evidencias `codigo-iterator`, `ejecucion-iterator`, `prueba-pytest-iterator` y `uml-iterator`, referenciadas desde `docs/semana_13/iterator.md`. Mediator y Memento, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en `docs/semana_13/mediator.md` y `docs/semana_13/memento.md`.
 
 ---
 
@@ -1341,7 +1508,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-96 passed
+110 passed
 ```
 
 ---
@@ -1364,14 +1531,21 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Proxy** — Implementado.
 * **Chain of Responsibility** — Evaluado y no aplicado.
 * **Command** — Implementado.
+* **Iterator** — Implementado.
+* **Mediator** — Evaluado y no aplicado.
+* **Memento** — Evaluado y no aplicado.
 
-Los once patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los doce patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
 La evaluación de Flyweight, respaldada con una medición de memoria, permitió determinar que el único dato repetido en cantidad (el nombre del producto) ahorra muy poco y que `sys.intern` logra el mismo resultado sin agregar clases.
 
 La evaluación de Chain of Responsibility permitió determinar que las validaciones del MES son pocas, fijas y dependientes entre sí, y que cada una ya está resuelta junto a la operación que protege (servicio, fachada y Proxy).
+
+La evaluación de Mediator permitió determinar que los componentes del MES se conectan en un solo sentido y que `MESFacade` ya coordina el flujo, por lo que no hay comunicación entre componentes que centralizar.
+
+La evaluación de Memento permitió determinar que restaurar el estado de las órdenes contradice la inspección y la trazabilidad, y que el `undo` del equipo ya está resuelto con Command.
 
 ---
 
@@ -1392,6 +1566,7 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Facade:** permite operar el MES desde un único punto de entrada, definiendo en un solo lugar el orden del flujo de producción.
 * **Proxy:** permite controlar el acceso a las operaciones de producción por rol y auditar quién las ejecuta, sin modificar `ProductionService`.
 * **Command:** permite ejecutar las operaciones del MES de forma diferida, registrarlas en un historial y deshacer con seguridad las del equipo.
+* **Iterator:** permite recorrer las órdenes de un lote, en profundidad o por niveles y con filtro de estado, sin escribir recursión en el cliente.
 
 Adicionalmente, el análisis de **Bridge** y de **Flyweight** permitió concluir que actualmente no existe una necesidad real que justifique su implementación (en el caso de Flyweight, con una medición de memoria como respaldo). Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
@@ -1403,4 +1578,6 @@ Proxy se incorporó para cubrir una necesidad habitual de un MES, la trazabilida
 
 Command se incorporó para cubrir una necesidad que las llamadas directas no resolvían: preparar secuencias de operaciones, ejecutarlas de forma diferida, conservar un historial de lo solicitado y de lo que falló, y deshacer lo que es seguro deshacer. Usa `MESFacade` como Receiver, por lo que no duplica reglas de negocio y respeta al Proxy. Su `undo` se limitó al equipo porque `ProductionOrder` no tiene transiciones inversas seguras. Chain of Responsibility, en cambio, se evaluó y no se aplicó: las validaciones del MES son pocas, fijas y dependientes entre sí, y una cadena de manejadores habría sido sobrediseño. Con ello se mantiene el criterio que ya se había aplicado con Bridge y Flyweight.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy y Command implementados y **96 pruebas automatizadas superadas**, y con Bridge, Flyweight y Chain of Responsibility evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
+Iterator resolvió una carencia que dejó Composite: recorrer un lote obligaba a escribir la recursión en el cliente, y los reportes contaban un lote como una sola orden. Los iteradores en profundidad y por niveles, con filtro de estado, lo resuelven sin modificar `OrderGroup`. Mediator y Memento, en cambio, se evaluaron y no se aplicaron. Los componentes del MES se conectan en un solo sentido y `MESFacade` ya coordina el flujo, por lo que no hay una red de comunicación que centralizar. Y el estado de una orden no se puede retroceder sin contradecir la inspección ni la trazabilidad, mientras que el único caso reversible (el equipo) ya lo cubre Command. En ambos casos se dejó documentado cuándo volver a evaluarlos, con lo que se mantiene el criterio aplicado con Bridge, Flyweight y Chain of Responsibility.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy, Command e Iterator implementados y **110 pruebas automatizadas superadas**, y con Bridge, Flyweight, Chain of Responsibility, Mediator y Memento evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.

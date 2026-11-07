@@ -10,6 +10,7 @@ from src.production.prod_factory import (
 from datetime import datetime
 from src.production.order_builder import OrderBuilder
 from src.production.order_group import OrderGroup
+from src.production.order_iterators import create_iterator, leaf_status_counts
 from src.facade.mes_facade import MESFacade
 from src.production.prod_order import StandardOrder
 from src.equipment.inspection_decorators import (
@@ -195,3 +196,27 @@ print(f"  Tras deshacer:         {mes_cmd.equipment.equipment.status}")
 print(f"Historial completo: {len(invoker.history)} entradas")
 for h in invoker.history:
     print(f"  - {h['comando']}: {h['estado']}")
+
+seccion("ITERATOR - RECORRIDO DE UN LOTE")
+lote_it = OrderGroup("LOTE-IT", lote="L-2026-11")
+sub_it = OrderGroup("SUB-IT", lote="L-2026-11")
+lote_it.add(StandardOrder("IT-001", "Pieza A", 10))
+sub_it.add(urgent_creator.create_order(OrderBuilder("IT-002", "Pieza B", 5).build()))
+sub_it.add(StandardOrder("IT-003", "Pieza C", 8))
+lote_it.add(sub_it)
+lote_it.add(StandardOrder("IT-004", "Pieza D", 12))
+
+print("En profundidad:", [o.order_id for o in create_iterator(lote_it)])
+print("Por niveles   :", [o.order_id for o in create_iterator(lote_it, "breadth")])
+print("Con grupos    :",
+      [o.order_id for o in create_iterator(lote_it, leaves_only=False)])
+
+sub_it.start()
+print("En producción :",
+      [o.order_id for o in create_iterator(lote_it, status="En producción")])
+print("Hojas por estado:", leaf_status_counts([lote_it]))
+
+print(f"Órdenes registradas en el servicio: {len(production.orders)}")
+print(f"Órdenes individuales (hojas): "
+      f"{sum(leaf_status_counts(production.orders.values()).values())}")
+print("Hojas por estado:", leaf_status_counts(production.orders.values()))
