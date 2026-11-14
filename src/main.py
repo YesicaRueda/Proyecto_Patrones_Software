@@ -24,6 +24,13 @@ from src.commands.mes_commands import (
     RunOrderCommand,
     StartCellCommand,
 )
+from src.equipment.equipment_base import Inspection
+from src.observer.observable_facade import ObservableMESFacade
+from src.observer.observer import EventType
+from src.observer.observers import (
+    ProductionMetricsObserver,
+    RejectionAlertObserver,
+)
 
 
 def seccion(titulo):
@@ -220,3 +227,34 @@ print(f"Órdenes registradas en el servicio: {len(production.orders)}")
 print(f"Órdenes individuales (hojas): "
       f"{sum(leaf_status_counts(production.orders.values()).values())}")
 print("Hojas por estado:", leaf_status_counts(production.orders.values()))
+
+seccion("OBSERVER - EVENTOS DE PLANTA")
+
+
+class _InspeccionQueRechaza(Inspection):
+    """Inspección de demostración que siempre rechaza."""
+
+    def inspect(self, order):
+        return False
+
+
+mes_obs = ObservableMESFacade(CNCCellFactory())
+metrics = ProductionMetricsObserver()
+alerts = RejectionAlertObserver()
+
+mes_obs.attach(metrics)                                  # recibe todos los eventos
+mes_obs.attach(alerts, [EventType.INSPECTION_REJECTED])  # solo rechazos
+
+mes_obs.register_order("OB-001", "Pieza A", 10)
+mes_obs.register_order("OB-002", "Pieza B", 5)
+
+mes_obs.process_order("OB-001")                          # inspección aprobada
+mes_obs.equipment.inspection = _InspeccionQueRechaza()
+mes_obs.process_order("OB-002")                          # inspección rechazada
+
+print(f"Órdenes iniciadas: {metrics.orders_started}")
+print(f"Órdenes completadas: {metrics.orders_completed}")
+print(f"Inspecciones: {metrics.inspections_approved} aprobadas, "
+      f"{metrics.inspections_rejected} rechazadas")
+print(f"Tasa de calidad (unidades): {metrics.quality_rate():.2f}")
+print(f"Alertas de rechazo: {[a[0] for a in alerts.alerts]}")

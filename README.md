@@ -58,6 +58,7 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Control de acceso por rol y auditoría de las operaciones de producción mediante Proxy.
 * Ejecución diferida, historial y reversión segura de las operaciones del MES mediante Command.
 * Recorrido de las órdenes de un lote (en profundidad o por niveles, con filtro de estado) y conteo de órdenes individuales por estado mediante Iterator.
+* Publicación de eventos de planta (equipo, orden, inspección) a observadores independientes, con métricas para el OEE y alertas de rechazo, mediante Observer.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -89,10 +90,13 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Iterator         | Recorrer las órdenes de un lote (árbol de `OrderGroup`) sin conocer su estructura interna       | Implementado           |
 | Mediator         | Centralizar la comunicación entre componentes que se llaman entre sí de forma desordenada       | Evaluado — no aplicado |
 | Memento          | Capturar y restaurar el estado interno de un objeto sin violar su encapsulamiento               | Evaluado — no aplicado |
+| Observer         | Publicar eventos de planta a observadores independientes (métricas para OEE, alertas de rechazo) | Implementado           |
+| State            | Cambiar el comportamiento de un objeto según su estado interno mediante objetos de estado        | Evaluado — no aplicado |
+| Visitor          | Agregar operaciones sobre una jerarquía de objetos sin modificar sus clases                      | Evaluado — no aplicado |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-Además, el análisis de Bridge, Flyweight, Chain of Responsibility, Mediator y Memento permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
+Además, el análisis de Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -104,7 +108,7 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight, Chain of Responsibility, Mediator y Memento.
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor.
 
 ---
 
@@ -809,6 +813,107 @@ Memento podrá evaluarse nuevamente si se editan órdenes con varios campos modi
 
 ---
 
+## Observer
+
+El patrón **Observer** define una dependencia uno-a-muchos: cuando el sujeto produce un evento, todos sus observadores suscritos son notificados sin que el sujeto conozca qué hacen con él.
+
+En el proyecto se utiliza para **publicar los eventos de planta** (equipo en operación o detenido, orden iniciada o completada, inspección aprobada o rechazada). Anteriormente, el único destino de esa información era el `Logger`, que escribe texto no consultable por el programa, y el cálculo de OEE (tiempo operativo y calidad por unidades) no tenía de dónde obtener sus datos. Además, la evaluación de Mediator había dejado señalado que avisar a varios interesados es un problema de Observer.
+
+La implementación se encuentra en:
+
+* `src/observer/observer.py`
+* `src/observer/observers.py`
+* `src/observer/observable_facade.py`
+
+Los componentes principales son:
+
+* `EventType` y `MESEvent`: tipos de evento y evento inmutable con tipo, instante, orden y datos.
+* `Observer`: interfaz con `update(event)`.
+* `Subject`: `attach()` (con filtro opcional por tipo), `detach()` y `notify()`, que aísla a los observadores que fallan.
+* `ObservableMESFacade`: subclase de `MESFacade` que publica los eventos.
+* `ProductionMetricsObserver`: acumula contadores, tiempo operativo y tasa de calidad (`quality_rate()`, `availability(now)`), la base del futuro OEE.
+* `RejectionAlertObserver`: registra una alerta por cada inspección rechazada.
+
+Ejemplo:
+
+```python
+mes = ObservableMESFacade(CNCCellFactory())
+metrics = ProductionMetricsObserver()
+alerts = RejectionAlertObserver()
+mes.attach(metrics)
+mes.attach(alerts, [EventType.INSPECTION_REJECTED])
+
+mes.register_order("OB-001", "Pieza A", 10)
+mes.process_order("OB-001")
+
+print(metrics.quality_rate())   # 1.0
+```
+
+`MESFacade`, `ProductionService`, `ProductionServiceProxy` y Command no necesitaron modificarse. Los comandos delegan en la fachada, por lo que al construirse con una `ObservableMESFacade` también publican eventos, y una operación denegada por el Proxy no publica nada.
+
+### Interpretación dentro del MES
+
+Los participantes principales del patrón son:
+
+* **Subject:** `Subject` y `ObservableMESFacade`.
+* **Observer:** `Observer`.
+* **ConcreteObserver:** `ProductionMetricsObserver` y `RejectionAlertObserver`.
+* **Cliente:** `main.py`.
+
+### Beneficios del Observer
+
+* Agrega consumidores de eventos sin modificar a quien los publica.
+* Entrega eventos estructurados e inmutables, con el instante exacto de cada cambio.
+* Un observador defectuoso no afecta a los demás ni a la operación.
+* Proporciona los datos de disponibilidad y calidad que necesitará el cálculo de OEE.
+* Se integra con Facade, Command, Proxy y Composite sin cambios.
+
+Documentación detallada: `docs/semana_14/semana_14.md`.
+
+---
+
+## State — Evaluado y no aplicado
+
+El patrón **State** permite que un objeto cambie su comportamiento cuando cambia su estado interno, delegándolo en un objeto por estado. Se justifica cuando hay **varios estados**, un **comportamiento que varía de forma significativa** entre ellos y **condicionales repetidos** sobre el estado.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES.
+
+Al revisar el proyecto se encontró que las órdenes tienen tres estados (`Pendiente`, `En producción`, `Completada`) y dos transiciones, y el equipo dos estados (`Parada` y `Operando`). Cada transición valida su estado de origen una sola vez, junto a la operación, y las acciones hacen lo mismo en cualquier estado válido. `OrderGroup` calcula su estado a partir de sus hijos y `clone()` lo fuerza a `Pendiente`. El dominio no tiene reapertura, retrabajo, pausa ni cancelación.
+
+Implementar State habría requerido una jerarquía de clases de estado y modificar `ProductionOrder`, cuyo atributo `status` (una cadena) usan `ProductionService`, `OrderGroup`, el Iterator, la fachada, las pruebas y `main.py`.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_14/semana_14.md`.
+
+State podrá evaluarse nuevamente si aparecen un flujo de reapertura o retrabajo, nuevos estados con reglas distintas (`Pausada`, `Cancelada`, `En espera de material`), un ciclo de vida más rico del equipo (`Mantenimiento`, `Falla`) o condicionales sobre el estado que se multipliquen en varias clases.
+
+---
+
+## Visitor — Evaluado y no aplicado
+
+El patrón **Visitor** separa una operación de la estructura de objetos sobre la que actúa, permitiendo agregar operaciones nuevas sin modificar las clases. Se justifica cuando hay una **jerarquía estable**, **muchas operaciones distintas** que dependen del tipo concreto y esas operaciones no deben vivir en las clases.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al árbol de `OrderGroup` (hojas `StandardOrder` y `UrgentOrder`).
+
+Al revisar el proyecto se encontró que las operaciones sobre el árbol son pocas y ya están resueltas: cantidad y prioridad mediante polimorfismo (Composite), recorridos y filtros mediante Iterator, y conteos mediante `leaf_status_counts()`. `StandardOrder` y `UrgentOrder` solo se diferencian por una constante de prioridad, y la jerarquía se prevé ampliar (por ejemplo, `RushOrder`), lo que encarecería cada visitante. Además, Visitor exige agregar `accept()` a `ProductionOrder`, `StandardOrder`, `UrgentOrder` y `OrderGroup`.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_14/semana_14.md`.
+
+Visitor podrá evaluarse nuevamente si aparecen varios reportes o exportaciones con lógica propia por tipo de orden, una jerarquía de órdenes estable con comportamiento realmente distinto por tipo, o nuevas estructuras recorribles. Antes de adoptarlo conviene comprobar si una función sobre el Iterator es suficiente.
+
+---
+
 # Beneficios obtenidos
 
 La implementación de los patrones de diseño permitió mejorar la estructura, organización y mantenibilidad del sistema.
@@ -882,6 +987,12 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Permite contar las órdenes individuales por estado, incluso dentro de lotes y sublotes.
 * Se incorpora sin modificar `OrderGroup`, `ProductionService` ni `MESFacade`.
 
+### Observer
+
+* Permite agregar consumidores de eventos de planta sin modificar al que los publica.
+* Entrega los datos de disponibilidad y calidad que necesitará el cálculo de OEE.
+* Aísla los fallos de los observadores y se incorpora sin modificar `MESFacade`, Command ni el Proxy.
+
 ### Bridge
 
 Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
@@ -901,6 +1012,14 @@ Su evaluación mostró que los componentes del MES se conectan en un solo sentid
 ### Memento
 
 Su evaluación mostró que restaurar el estado de las órdenes contradice la inspección y la trazabilidad, y que el único caso reversible (el equipo) ya lo cubre Command, por lo que el patrón habría creado una capacidad que el dominio rechaza.
+
+### State
+
+Su evaluación mostró que el ciclo de vida de las órdenes (tres estados y dos transiciones) se valida una sola vez junto a cada operación, por lo que modelarlo con clases de estado habría obligado a modificar el atributo `status` que usa casi todo el proyecto sin eliminar condicionales repetidos.
+
+### Visitor
+
+Su evaluación mostró que hay pocas operaciones sobre el árbol de órdenes, que la jerarquía se prevé ampliar y que el Iterator ya permite escribir operaciones nuevas como funciones externas, por lo que agregar `accept()` a las clases existentes no se justificó.
 
 ---
 
@@ -1044,9 +1163,23 @@ Se verificó:
 * El conteo de órdenes individuales por estado sobre lotes y órdenes sueltas.
 * El rechazo de una estrategia de recorrido desconocida.
 
+### Observer
+
+Se verificó:
+
+* El rechazo de observadores inválidos, suscripciones duplicadas, tipos de evento desconocidos y listas vacías.
+* La entrega en orden, el filtro por tipo de evento y el retiro de observadores.
+* El aislamiento de un observador que falla (`WARNING`) sin afectar a los demás.
+* La inmutabilidad de los eventos y de sus datos.
+* Los contadores, la tasa de calidad, el tiempo operativo y la disponibilidad de `ProductionMetricsObserver`.
+* Que `RejectionAlertObserver` registra solo los rechazos.
+* La secuencia de eventos de `ObservableMESFacade`, la ausencia de duplicados de eventos de equipo y la ausencia de eventos ante operaciones fallidas.
+* La cantidad total de un lote en el evento de inicio.
+* El funcionamiento con `CommandInvoker` y con el Proxy (una operación denegada no publica eventos).
+
 Actualmente, el proyecto cuenta con:
 
-**110 pruebas automatizadas superadas** (96 anteriores + 14 de Iterator).
+**130 pruebas automatizadas superadas** (110 anteriores + 20 de Observer).
 
 Las pruebas se ejecutan mediante:
 
@@ -1130,6 +1263,15 @@ Contiene:
 * `CommandInvoker`, con la cola, el historial y el `undo` seguro.
 * El patrón Command.
 
+### Observador
+
+Contiene:
+
+* `Subject`, `Observer`, `EventType` y `MESEvent`.
+* `ProductionMetricsObserver` y `RejectionAlertObserver`.
+* `ObservableMESFacade`, que publica los eventos de planta.
+* El patrón Observer.
+
 ### Pruebas
 
 Contiene las pruebas automatizadas correspondientes a los diferentes componentes y patrones implementados.
@@ -1150,6 +1292,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── codigo-facade.png
 │   │   ├── codigo-factory-creator.jpg
 │   │   ├── codigo-iterator.png
+│   │   ├── codigo-observer.png
 │   │   ├── codigo-logger-integrado.png
 │   │   ├── codigo-logging-adapter.png
 │   │   ├── codigo-order-builder.jpeg
@@ -1172,6 +1315,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-facade.png
 │   │   ├── ejecucion-flyweight.png
 │   │   ├── ejecucion-iterator.png
+│   │   ├── ejecucion-observer.png
 │   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
 │   │   ├── ejecucion-proxy.png
@@ -1184,6 +1328,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-facade.png
 │   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-iterator.png
+│   │   ├── prueba-pytest-observer.png
 │   │   ├── prueba-pytest-prototype.jpeg
 │   │   ├── prueba-pytest-proxy.png
 │   │   ├── prueba-singleton.jpeg
@@ -1196,6 +1341,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-facade.png
 │   │   ├── uml-factory.png
 │   │   ├── uml-iterator.png
+│   │   ├── uml-observer.png
 │   │   ├── uml-prototype.png
 │   │   ├── uml-proxy.png
 │   │   └── uml-singleton.png
@@ -1225,15 +1371,22 @@ Proyecto_Patrones_de_software/
 │   │   ├── chain_of_responsibility.md
 │   │   ├── command.md
 │   │   └── uml-command.puml
-│   └── semana_13/
+│   ├── semana_13/
 │       ├── iterator.md
 │       ├── mediator.md
 │       └── memento.md
+│   └── semana_14/
+│       └── semana_14.md
 ├── src/
 │   ├── commands/
 │   │   ├── command.py
 │   │   ├── mes_commands.py
 │   │   └── invoker.py
+│   ├── observer/
+│   │   ├── __init__.py
+│   │   ├── observer.py
+│   │   ├── observers.py
+│   │   └── observable_facade.py
 │   ├── facade/
 │   │   └── mes_facade.py
 │   ├── production/
@@ -1263,6 +1416,7 @@ Proyecto_Patrones_de_software/
 │   ├── test_logger_and_order_rules.py
 │   ├── test_logging_adapter.py
 │   ├── test_mes_facade.py
+│   ├── test_observer.py
 │   ├── test_order_builder.py
 │   ├── test_order_clone.py
 │   ├── test_order_group.py
@@ -1279,6 +1433,7 @@ Proyecto_Patrones_de_software/
 │   └── proxy.mp4
 │   └── command.mp4
 │   └── iterator.mp4
+│   └──Observer.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -1438,6 +1593,23 @@ Se trabajó en:
 docs/semana_13/
 ```
 
+### Semana 14
+
+Durante esta etapa se evaluaron los patrones de comportamiento **Observer**, **State** y **Visitor**.
+
+Se trabajó en:
+
+* Implementación del patrón **Observer** (`Subject`, `Observer`, `ObservableMESFacade`, `ProductionMetricsObserver` y `RejectionAlertObserver`) para publicar los eventos de planta a observadores desacoplados, con métricas de disponibilidad y calidad para el futuro OEE y alertas de rechazo.
+* Evaluación del patrón **State** y su justificación como no aplicado: ciclo de vida corto y lineal, validado una vez junto a cada operación.
+* Evaluación del patrón **Visitor** y su justificación como no aplicado: pocas operaciones sobre el árbol de órdenes, jerarquía que se prevé ampliar y Iterator que ya cubre los recorridos.
+* Integración de Observer en `main.py`.
+* Pruebas automatizadas de Observer.
+* Documentación: `semana_14.md`.
+
+```text
+docs/semana_14/
+```
+
 ---
 
 # Evidencias
@@ -1472,6 +1644,8 @@ Para Proxy se incorporan las evidencias `codigo-proxy`, `ejecucion-proxy`, `prue
 Para Command se incorporan las evidencias `codigo-command`, `ejecucion-command`, `prueba-pytest-command` y `uml-command`, referenciadas desde `docs/semana_12/command.md`. Chain of Responsibility, al no implementarse, no tiene evidencias de código ni de ejecución: su evaluación está en `docs/semana_12/chain_of_responsibility.md`.
 
 Para Iterator se incorporan las evidencias `codigo-iterator`, `ejecucion-iterator`, `prueba-pytest-iterator` y `uml-iterator`, referenciadas desde `docs/semana_13/iterator.md`. Mediator y Memento, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en `docs/semana_13/mediator.md` y `docs/semana_13/memento.md`.
+
+Para Observer se incorporan las evidencias `codigo-observer`, `ejecucion-observer`, `prueba-pytest-observer` y `uml-observer`, referenciadas desde `docs/semana_14/semana_14.md`. State y Visitor, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en el mismo documento.
 
 ---
 
@@ -1508,7 +1682,7 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-110 passed
+130 passed
 ```
 
 ---
@@ -1534,8 +1708,11 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Iterator** — Implementado.
 * **Mediator** — Evaluado y no aplicado.
 * **Memento** — Evaluado y no aplicado.
+* **Observer** — Implementado.
+* **State** — Evaluado y no aplicado.
+* **Visitor** — Evaluado y no aplicado.
 
-Los doce patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los trece patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
@@ -1546,6 +1723,10 @@ La evaluación de Chain of Responsibility permitió determinar que las validacio
 La evaluación de Mediator permitió determinar que los componentes del MES se conectan en un solo sentido y que `MESFacade` ya coordina el flujo, por lo que no hay comunicación entre componentes que centralizar.
 
 La evaluación de Memento permitió determinar que restaurar el estado de las órdenes contradice la inspección y la trazabilidad, y que el `undo` del equipo ya está resuelto con Command.
+
+La evaluación de State permitió determinar que el ciclo de vida de las órdenes (tres estados y dos transiciones) y del equipo (dos estados) se valida una sola vez junto a cada operación, sin condicionales repetidos que eliminar.
+
+La evaluación de Visitor permitió determinar que hay pocas operaciones sobre el árbol de órdenes, que la jerarquía se prevé ampliar y que el Iterator ya cubre los recorridos sin necesidad de agregar `accept()` a las clases existentes.
 
 ---
 
@@ -1567,6 +1748,7 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Proxy:** permite controlar el acceso a las operaciones de producción por rol y auditar quién las ejecuta, sin modificar `ProductionService`.
 * **Command:** permite ejecutar las operaciones del MES de forma diferida, registrarlas en un historial y deshacer con seguridad las del equipo.
 * **Iterator:** permite recorrer las órdenes de un lote, en profundidad o por niveles y con filtro de estado, sin escribir recursión en el cliente.
+* **Observer:** permite publicar los eventos de planta a observadores desacoplados (métricas para OEE y alertas de rechazo) sin modificar la fachada ni los servicios.
 
 Adicionalmente, el análisis de **Bridge** y de **Flyweight** permitió concluir que actualmente no existe una necesidad real que justifique su implementación (en el caso de Flyweight, con una medición de memoria como respaldo). Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
@@ -1580,4 +1762,6 @@ Command se incorporó para cubrir una necesidad que las llamadas directas no res
 
 Iterator resolvió una carencia que dejó Composite: recorrer un lote obligaba a escribir la recursión en el cliente, y los reportes contaban un lote como una sola orden. Los iteradores en profundidad y por niveles, con filtro de estado, lo resuelven sin modificar `OrderGroup`. Mediator y Memento, en cambio, se evaluaron y no se aplicaron. Los componentes del MES se conectan en un solo sentido y `MESFacade` ya coordina el flujo, por lo que no hay una red de comunicación que centralizar. Y el estado de una orden no se puede retroceder sin contradecir la inspección ni la trazabilidad, mientras que el único caso reversible (el equipo) ya lo cubre Command. En ambos casos se dejó documentado cuándo volver a evaluarlos, con lo que se mantiene el criterio aplicado con Bridge, Flyweight y Chain of Responsibility.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy, Command e Iterator implementados y **110 pruebas automatizadas superadas**, y con Bridge, Flyweight, Chain of Responsibility, Mediator y Memento evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
+Observer se incorporó porque el cálculo de OEE necesita datos que nadie acumulaba (tiempo operativo y calidad por unidades) y porque la evaluación de Mediator había dejado señalado que avisar a varios interesados es un problema de Observer. `ObservableMESFacade` publica eventos tipados e inmutables a observadores desacoplados, aísla a los que fallan y, al ser una subclase de `MESFacade`, hace que también las operaciones ejecutadas como comandos publiquen eventos, sin modificar ninguna clase existente. State y Visitor, en cambio, se evaluaron y no se aplicaron. El ciclo de vida de las órdenes es corto, lineal y se valida una vez junto a cada operación, por lo que State habría obligado a modificar el atributo `status` que usa casi todo el proyecto. En Visitor, hay pocas operaciones sobre el árbol de órdenes, la jerarquía se prevé ampliar y el patrón exigiría agregar `accept()` a las clases existentes, mientras que el Iterator ya permite escribir operaciones nuevas como funciones externas. En ambos casos se dejó documentado cuándo volver a evaluarlos.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy, Command, Iterator y Observer implementados y **130 pruebas automatizadas superadas**, y con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.

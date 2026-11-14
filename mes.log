@@ -1006,3 +1006,455 @@
 2026-11-07 14:26:00,333 [INFO] Comando ejecutado: Iniciar equipo
 2026-11-07 14:26:00,334 [INFO] CNCMachine detenida
 2026-11-07 14:26:00,334 [INFO] Comando deshecho: Iniciar equipo
+2026-11-14 11:34:13,772 [INFO] CNCMachine en operación
+2026-11-14 11:34:13,772 [INFO] Orden OP-002 registrada
+2026-11-14 11:34:13,772 [INFO] Orden OP-003 registrada
+2026-11-14 11:34:13,773 [INFO] Orden OP-004 registrada
+2026-11-14 11:34:13,773 [INFO] Orden de producción OP-002 iniciada
+2026-11-14 11:34:13,774 [INFO] Orden LOTE-01 registrada
+2026-11-14 11:34:13,774 [INFO] Orden de producción LOTE-01 iniciada
+2026-11-14 11:34:13,774 [INFO] Inspección iniciada para la orden OP-002
+2026-11-14 11:34:13,775 [INFO] Inspección aprobada para la orden OP-002
+2026-11-14 11:34:13,775 [INFO] Inspección de CNCMachine: True
+2026-11-14 11:34:13,775 [INFO] Orden F-001 registrada
+2026-11-14 11:34:13,775 [INFO] Orden F-LOTE registrada
+2026-11-14 11:34:13,776 [INFO] RobotArm en operación
+2026-11-14 11:34:13,776 [INFO] Orden de producción F-001 iniciada
+2026-11-14 11:34:13,776 [INFO] Inspección de RobotArm: True
+2026-11-14 11:34:13,776 [INFO] Orden de producción F-001 completada
+2026-11-14 11:34:13,776 [INFO] Orden de producción F-LOTE iniciada
+2026-11-14 11:34:13,777 [INFO] Inspección de RobotArm: True
+2026-11-14 11:34:13,777 [INFO] Orden de producción F-LOTE completada
+2026-11-14 11:34:13,777 [INFO] Auditoría: ana (rol supervisor) ejecuta add_order P-001
+2026-11-14 11:34:13,777 [INFO] Orden P-001 registrada
+2026-11-14 11:34:13,777 [WARNING] Acceso denegado: luis (rol operador) intentó add_order P-002
+2026-11-14 11:34:13,777 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-002
+2026-11-14 11:34:13,778 [INFO] Auditoría: luis (rol operador) ejecuta start_order P-001
+2026-11-14 11:34:13,778 [INFO] Orden de producción P-001 iniciada
+2026-11-14 11:34:13,778 [INFO] Auditoría: luis (rol operador) ejecuta complete_order P-001
+2026-11-14 11:34:13,778 [INFO] Orden de producción P-001 completada
+2026-11-14 11:34:13,778 [WARNING] Acceso denegado: visita (rol consulta) intentó start_order P-001
+2026-11-14 11:34:13,779 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-009
+2026-11-14 11:34:13,779 [INFO] Orden C-001 registrada
+2026-11-14 11:34:13,779 [INFO] Comando ejecutado: Registrar orden C-001
+2026-11-14 11:34:13,779 [INFO] CNCMachine en operación
+2026-11-14 11:34:13,780 [WARNING] Comando fallido: Iniciar orden C-999: Orden C-999 no encontrada
+2026-11-14 11:34:13,780 [INFO] Orden de producción C-001 iniciada
+2026-11-14 11:34:13,780 [INFO] Inspección de CNCMachine: True
+2026-11-14 11:34:13,780 [INFO] Orden de producción C-001 completada
+2026-11-14 11:34:13,780 [INFO] Comando ejecutado: Procesar orden C-001
+2026-11-14 11:34:13,781 [INFO] CNCMachine detenida
+2026-11-14 11:34:13,781 [INFO] CNCMachine en operación
+2026-11-14 11:34:13,781 [INFO] Comando ejecutado: Iniciar equipo
+2026-11-14 11:34:13,781 [INFO] CNCMachine detenida
+2026-11-14 11:34:13,781 [INFO] Comando deshecho: Iniciar equipo
+2026-11-14 11:40:31,741 [INFO] CNCMachine en operación
+2026-11-14 11:40:31,741 [INFO] Orden OP-002 registrada
+2026-11-14 11:40:31,741 [INFO] Orden OP-003 registrada
+2026-11-14 11:40:31,742 [INFO] Orden OP-004 registrada
+2026-11-14 11:40:31,742 [INFO] Orden de producción OP-002 iniciada
+2026-11-14 11:40:31,743 [INFO] Orden LOTE-01 registrada
+2026-11-14 11:40:31,743 [INFO] Orden de producción LOTE-01 iniciada
+2026-11-14 11:40:31,743 [INFO] Inspección iniciada para la orden OP-002
+2026-11-14 11:40:31,743 [INFO] Inspección aprobada para la orden OP-002
+2026-11-14 11:40:31,744 [INFO] Inspección de CNCMachine: True
+2026-11-14 11:40:31,744 [INFO] Orden F-001 registrada
+2026-11-14 11:40:31,744 [INFO] Orden F-LOTE registrada
+2026-11-14 11:40:31,744 [INFO] RobotArm en operación
+2026-11-14 11:40:31,744 [INFO] Orden de producción F-001 iniciada
+2026-11-14 11:40:31,744 [INFO] Inspección de RobotArm: True
+2026-11-14 11:40:31,745 [INFO] Orden de producción F-001 completada
+2026-11-14 11:40:31,745 [INFO] Orden de producción F-LOTE iniciada
+2026-11-14 11:40:31,745 [INFO] Inspección de RobotArm: True
+2026-11-14 11:40:31,745 [INFO] Orden de producción F-LOTE completada
+2026-11-14 11:40:31,745 [INFO] Auditoría: ana (rol supervisor) ejecuta add_order P-001
+2026-11-14 11:40:31,745 [INFO] Orden P-001 registrada
+2026-11-14 11:40:31,746 [WARNING] Acceso denegado: luis (rol operador) intentó add_order P-002
+2026-11-14 11:40:31,746 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-002
+2026-11-14 11:40:31,746 [INFO] Auditoría: luis (rol operador) ejecuta start_order P-001
+2026-11-14 11:40:31,746 [INFO] Orden de producción P-001 iniciada
+2026-11-14 11:40:31,746 [INFO] Auditoría: luis (rol operador) ejecuta complete_order P-001
+2026-11-14 11:40:31,746 [INFO] Orden de producción P-001 completada
+2026-11-14 11:40:31,747 [WARNING] Acceso denegado: visita (rol consulta) intentó start_order P-001
+2026-11-14 11:40:31,747 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-009
+2026-11-14 11:40:31,747 [INFO] Orden C-001 registrada
+2026-11-14 11:40:31,748 [INFO] Comando ejecutado: Registrar orden C-001
+2026-11-14 11:40:31,748 [INFO] CNCMachine en operación
+2026-11-14 11:40:31,748 [WARNING] Comando fallido: Iniciar orden C-999: Orden C-999 no encontrada
+2026-11-14 11:40:31,748 [INFO] Orden de producción C-001 iniciada
+2026-11-14 11:40:31,748 [INFO] Inspección de CNCMachine: True
+2026-11-14 11:40:31,748 [INFO] Orden de producción C-001 completada
+2026-11-14 11:40:31,749 [INFO] Comando ejecutado: Procesar orden C-001
+2026-11-14 11:40:31,749 [INFO] CNCMachine detenida
+2026-11-14 11:40:31,749 [INFO] CNCMachine en operación
+2026-11-14 11:40:31,749 [INFO] Comando ejecutado: Iniciar equipo
+2026-11-14 11:40:31,749 [INFO] CNCMachine detenida
+2026-11-14 11:40:31,750 [INFO] Comando deshecho: Iniciar equipo
+2026-11-14 11:40:31,751 [INFO] Orden OB-001 registrada
+2026-11-14 11:40:31,751 [INFO] Orden OB-002 registrada
+2026-11-14 11:40:31,751 [INFO] CNCMachine en operación
+2026-11-14 11:40:31,751 [INFO] Orden de producción OB-001 iniciada
+2026-11-14 11:40:31,751 [INFO] Inspección de CNCMachine: True
+2026-11-14 11:40:31,752 [INFO] Orden de producción OB-001 completada
+2026-11-14 11:40:31,752 [INFO] Orden de producción OB-002 iniciada
+2026-11-14 11:40:31,752 [INFO] Inspección de CNCMachine: False
+2026-11-14 11:40:31,752 [WARNING] Orden OB-002 no completada: inspección rechazada
+2026-11-14 11:40:31,752 [WARNING] ALERTA: inspección rechazada para la orden OB-002
+2026-11-14 12:48:02,634 [INFO] CNCMachine en operación
+2026-11-14 12:48:02,634 [INFO] Orden OP-002 registrada
+2026-11-14 12:48:02,634 [INFO] Orden OP-003 registrada
+2026-11-14 12:48:02,634 [INFO] Orden OP-004 registrada
+2026-11-14 12:48:02,635 [INFO] Orden de producción OP-002 iniciada
+2026-11-14 12:48:02,635 [INFO] Orden LOTE-01 registrada
+2026-11-14 12:48:02,635 [INFO] Orden de producción LOTE-01 iniciada
+2026-11-14 12:48:02,636 [INFO] Inspección iniciada para la orden OP-002
+2026-11-14 12:48:02,636 [INFO] Inspección aprobada para la orden OP-002
+2026-11-14 12:48:02,636 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:48:02,636 [INFO] Orden F-001 registrada
+2026-11-14 12:48:02,636 [INFO] Orden F-LOTE registrada
+2026-11-14 12:48:02,636 [INFO] RobotArm en operación
+2026-11-14 12:48:02,637 [INFO] Orden de producción F-001 iniciada
+2026-11-14 12:48:02,637 [INFO] Inspección de RobotArm: True
+2026-11-14 12:48:02,637 [INFO] Orden de producción F-001 completada
+2026-11-14 12:48:02,637 [INFO] Orden de producción F-LOTE iniciada
+2026-11-14 12:48:02,637 [INFO] Inspección de RobotArm: True
+2026-11-14 12:48:02,637 [INFO] Orden de producción F-LOTE completada
+2026-11-14 12:48:02,637 [INFO] Auditoría: ana (rol supervisor) ejecuta add_order P-001
+2026-11-14 12:48:02,637 [INFO] Orden P-001 registrada
+2026-11-14 12:48:02,637 [WARNING] Acceso denegado: luis (rol operador) intentó add_order P-002
+2026-11-14 12:48:02,638 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-002
+2026-11-14 12:48:02,638 [INFO] Auditoría: luis (rol operador) ejecuta start_order P-001
+2026-11-14 12:48:02,638 [INFO] Orden de producción P-001 iniciada
+2026-11-14 12:48:02,638 [INFO] Auditoría: luis (rol operador) ejecuta complete_order P-001
+2026-11-14 12:48:02,638 [INFO] Orden de producción P-001 completada
+2026-11-14 12:48:02,638 [WARNING] Acceso denegado: visita (rol consulta) intentó start_order P-001
+2026-11-14 12:48:02,638 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-009
+2026-11-14 12:48:02,639 [INFO] Orden C-001 registrada
+2026-11-14 12:48:02,639 [INFO] Comando ejecutado: Registrar orden C-001
+2026-11-14 12:48:02,639 [INFO] CNCMachine en operación
+2026-11-14 12:48:02,639 [WARNING] Comando fallido: Iniciar orden C-999: Orden C-999 no encontrada
+2026-11-14 12:48:02,639 [INFO] Orden de producción C-001 iniciada
+2026-11-14 12:48:02,639 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:48:02,639 [INFO] Orden de producción C-001 completada
+2026-11-14 12:48:02,639 [INFO] Comando ejecutado: Procesar orden C-001
+2026-11-14 12:48:02,640 [INFO] CNCMachine detenida
+2026-11-14 12:48:02,640 [INFO] CNCMachine en operación
+2026-11-14 12:48:02,640 [INFO] Comando ejecutado: Iniciar equipo
+2026-11-14 12:48:02,640 [INFO] CNCMachine detenida
+2026-11-14 12:48:02,640 [INFO] Comando deshecho: Iniciar equipo
+2026-11-14 12:48:02,641 [INFO] Orden OB-001 registrada
+2026-11-14 12:48:02,641 [INFO] Orden OB-002 registrada
+2026-11-14 12:48:02,641 [INFO] CNCMachine en operación
+2026-11-14 12:48:02,641 [INFO] Orden de producción OB-001 iniciada
+2026-11-14 12:48:02,642 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:48:02,642 [INFO] Orden de producción OB-001 completada
+2026-11-14 12:48:02,642 [INFO] Orden de producción OB-002 iniciada
+2026-11-14 12:48:02,642 [INFO] Inspección de CNCMachine: False
+2026-11-14 12:48:02,642 [WARNING] Orden OB-002 no completada: inspección rechazada
+2026-11-14 12:48:02,642 [WARNING] ALERTA: inspección rechazada para la orden OB-002
+2026-11-14 12:58:50,402 [INFO] Orden O-1 registrada
+2026-11-14 12:58:50,402 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,402 [INFO] Orden de producción O-1 iniciada
+2026-11-14 12:58:50,402 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:58:50,402 [INFO] Orden de producción O-1 completada
+2026-11-14 12:58:50,486 [INFO] Orden O-2 registrada
+2026-11-14 12:58:50,486 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,486 [INFO] Orden de producción O-2 iniciada
+2026-11-14 12:58:50,486 [INFO] Inspección de CNCMachine: False
+2026-11-14 12:58:50,486 [WARNING] Orden O-2 no completada: inspección rechazada
+2026-11-14 12:58:50,487 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,487 [INFO] CNCMachine detenida
+2026-11-14 12:58:50,497 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,499 [INFO] Orden LOTE registrada
+2026-11-14 12:58:50,499 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,499 [INFO] Orden de producción LOTE iniciada
+2026-11-14 12:58:50,499 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:58:50,499 [INFO] Orden de producción LOTE completada
+2026-11-14 12:58:50,500 [INFO] Orden O-3 registrada
+2026-11-14 12:58:50,500 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,501 [INFO] Orden de producción O-3 iniciada
+2026-11-14 12:58:50,501 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:58:50,501 [INFO] Orden de producción O-3 completada
+2026-11-14 12:58:50,502 [INFO] Orden O-4 registrada
+2026-11-14 12:58:50,502 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,502 [INFO] Orden de producción O-4 iniciada
+2026-11-14 12:58:50,502 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:58:50,502 [INFO] Orden de producción O-4 completada
+2026-11-14 12:58:50,502 [INFO] CNCMachine detenida
+2026-11-14 12:58:50,509 [INFO] Orden O-5 registrada
+2026-11-14 12:58:50,509 [INFO] CNCMachine en operación
+2026-11-14 12:58:50,509 [INFO] Orden de producción O-5 iniciada
+2026-11-14 12:58:50,509 [INFO] Inspección de CNCMachine: True
+2026-11-14 12:58:50,509 [INFO] Orden de producción O-5 completada
+2026-11-14 12:58:50,509 [INFO] Comando ejecutado: Procesar orden O-5
+2026-11-14 12:58:50,510 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order O-6
+2026-11-14 13:11:54,377 [INFO] Orden O-1 registrada
+2026-11-14 13:11:54,377 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,377 [INFO] Orden de producción O-1 iniciada
+2026-11-14 13:11:54,377 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:11:54,378 [INFO] Orden de producción O-1 completada
+2026-11-14 13:11:54,379 [INFO] Orden O-2 registrada
+2026-11-14 13:11:54,379 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,379 [INFO] Orden de producción O-2 iniciada
+2026-11-14 13:11:54,379 [INFO] Inspección de CNCMachine: False
+2026-11-14 13:11:54,379 [WARNING] Orden O-2 no completada: inspección rechazada
+2026-11-14 13:11:54,382 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,382 [INFO] CNCMachine detenida
+2026-11-14 13:11:54,383 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,385 [INFO] Orden LOTE registrada
+2026-11-14 13:11:54,385 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,385 [INFO] Orden de producción LOTE iniciada
+2026-11-14 13:11:54,386 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:11:54,386 [INFO] Orden de producción LOTE completada
+2026-11-14 13:11:54,387 [INFO] Orden O-3 registrada
+2026-11-14 13:11:54,387 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,387 [INFO] Orden de producción O-3 iniciada
+2026-11-14 13:11:54,388 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:11:54,388 [INFO] Orden de producción O-3 completada
+2026-11-14 13:11:54,389 [INFO] Orden O-4 registrada
+2026-11-14 13:11:54,389 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,389 [INFO] Orden de producción O-4 iniciada
+2026-11-14 13:11:54,390 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:11:54,390 [INFO] Orden de producción O-4 completada
+2026-11-14 13:11:54,390 [INFO] CNCMachine detenida
+2026-11-14 13:11:54,391 [INFO] Orden O-5 registrada
+2026-11-14 13:11:54,392 [INFO] CNCMachine en operación
+2026-11-14 13:11:54,392 [INFO] Orden de producción O-5 iniciada
+2026-11-14 13:11:54,392 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:11:54,392 [INFO] Orden de producción O-5 completada
+2026-11-14 13:11:54,392 [INFO] Comando ejecutado: Procesar orden O-5
+2026-11-14 13:11:54,394 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order O-6
+2026-11-14 13:13:55,656 [INFO] CNCMachine en operación
+2026-11-14 13:13:55,657 [INFO] Orden OP-002 registrada
+2026-11-14 13:13:55,657 [INFO] Orden OP-003 registrada
+2026-11-14 13:13:55,657 [INFO] Orden OP-004 registrada
+2026-11-14 13:13:55,658 [INFO] Orden de producción OP-002 iniciada
+2026-11-14 13:13:55,658 [INFO] Orden LOTE-01 registrada
+2026-11-14 13:13:55,658 [INFO] Orden de producción LOTE-01 iniciada
+2026-11-14 13:13:55,659 [INFO] Inspección iniciada para la orden OP-002
+2026-11-14 13:13:55,659 [INFO] Inspección aprobada para la orden OP-002
+2026-11-14 13:13:55,659 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:13:55,659 [INFO] Orden F-001 registrada
+2026-11-14 13:13:55,659 [INFO] Orden F-LOTE registrada
+2026-11-14 13:13:55,660 [INFO] RobotArm en operación
+2026-11-14 13:13:55,660 [INFO] Orden de producción F-001 iniciada
+2026-11-14 13:13:55,660 [INFO] Inspección de RobotArm: True
+2026-11-14 13:13:55,660 [INFO] Orden de producción F-001 completada
+2026-11-14 13:13:55,660 [INFO] Orden de producción F-LOTE iniciada
+2026-11-14 13:13:55,660 [INFO] Inspección de RobotArm: True
+2026-11-14 13:13:55,660 [INFO] Orden de producción F-LOTE completada
+2026-11-14 13:13:55,661 [INFO] Auditoría: ana (rol supervisor) ejecuta add_order P-001
+2026-11-14 13:13:55,661 [INFO] Orden P-001 registrada
+2026-11-14 13:13:55,661 [WARNING] Acceso denegado: luis (rol operador) intentó add_order P-002
+2026-11-14 13:13:55,661 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-002
+2026-11-14 13:13:55,661 [INFO] Auditoría: luis (rol operador) ejecuta start_order P-001
+2026-11-14 13:13:55,661 [INFO] Orden de producción P-001 iniciada
+2026-11-14 13:13:55,662 [INFO] Auditoría: luis (rol operador) ejecuta complete_order P-001
+2026-11-14 13:13:55,662 [INFO] Orden de producción P-001 completada
+2026-11-14 13:13:55,662 [WARNING] Acceso denegado: visita (rol consulta) intentó start_order P-001
+2026-11-14 13:13:55,662 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order P-009
+2026-11-14 13:13:55,663 [INFO] Orden C-001 registrada
+2026-11-14 13:13:55,663 [INFO] Comando ejecutado: Registrar orden C-001
+2026-11-14 13:13:55,663 [INFO] CNCMachine en operación
+2026-11-14 13:13:55,663 [WARNING] Comando fallido: Iniciar orden C-999: Orden C-999 no encontrada
+2026-11-14 13:13:55,663 [INFO] Orden de producción C-001 iniciada
+2026-11-14 13:13:55,663 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:13:55,664 [INFO] Orden de producción C-001 completada
+2026-11-14 13:13:55,664 [INFO] Comando ejecutado: Procesar orden C-001
+2026-11-14 13:13:55,664 [INFO] CNCMachine detenida
+2026-11-14 13:13:55,664 [INFO] CNCMachine en operación
+2026-11-14 13:13:55,664 [INFO] Comando ejecutado: Iniciar equipo
+2026-11-14 13:13:55,665 [INFO] CNCMachine detenida
+2026-11-14 13:13:55,665 [INFO] Comando deshecho: Iniciar equipo
+2026-11-14 13:13:55,666 [INFO] Orden OB-001 registrada
+2026-11-14 13:13:55,666 [INFO] Orden OB-002 registrada
+2026-11-14 13:13:55,666 [INFO] CNCMachine en operación
+2026-11-14 13:13:55,666 [INFO] Orden de producción OB-001 iniciada
+2026-11-14 13:13:55,666 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:13:55,667 [INFO] Orden de producción OB-001 completada
+2026-11-14 13:13:55,667 [INFO] Orden de producción OB-002 iniciada
+2026-11-14 13:13:55,667 [INFO] Inspección de CNCMachine: False
+2026-11-14 13:13:55,667 [WARNING] Orden OB-002 no completada: inspección rechazada
+2026-11-14 13:13:55,667 [WARNING] ALERTA: inspección rechazada para la orden OB-002
+2026-11-14 13:14:04,027 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,027 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,051 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,053 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,055 [INFO] Orden B-1 registrada
+2026-11-14 13:14:04,056 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,057 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,057 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,059 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,059 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,059 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,059 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,060 [INFO] Orden de producción C-1 completada
+2026-11-14 13:14:04,061 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,062 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,062 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,062 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,062 [INFO] Orden de producción C-1 completada
+2026-11-14 13:14:04,064 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,065 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,067 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,067 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,070 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,070 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,070 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,071 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,071 [INFO] Orden de producción C-1 completada
+2026-11-14 13:14:04,075 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,077 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,077 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,078 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,078 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,079 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,081 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,082 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,083 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,083 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,085 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,085 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,086 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,086 [INFO] Orden de producción C-1 completada
+2026-11-14 13:14:04,086 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,089 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,094 [INFO] Orden C-1 registrada
+2026-11-14 13:14:04,094 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,094 [INFO] Orden de producción C-1 iniciada
+2026-11-14 13:14:04,095 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,095 [INFO] Orden de producción C-1 completada
+2026-11-14 13:14:04,149 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,153 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,154 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,154 [INFO] Orden de producción 1 iniciada
+2026-11-14 13:14:04,156 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,156 [INFO] Orden de producción 1 iniciada
+2026-11-14 13:14:04,156 [INFO] Orden de producción 1 completada
+2026-11-14 13:14:04,158 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,183 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,184 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,186 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,187 [INFO] Orden LOTE-1 registrada
+2026-11-14 13:14:04,190 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,190 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,191 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,192 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,194 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,194 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,195 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,195 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,196 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,196 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,196 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,197 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,198 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,198 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,198 [INFO] Inspección de CNCMachine: False
+2026-11-14 13:14:04,198 [WARNING] Orden F-1 no completada: inspección rechazada
+2026-11-14 13:14:04,199 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,200 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,201 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,201 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,201 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,201 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,202 [INFO] Orden LOTE-1 registrada
+2026-11-14 13:14:04,203 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,203 [INFO] Orden de producción LOTE-1 iniciada
+2026-11-14 13:14:04,203 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,203 [INFO] Orden de producción LOTE-1 completada
+2026-11-14 13:14:04,205 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,205 [INFO] Orden F-2 registrada
+2026-11-14 13:14:04,205 [INFO] Orden F-3 registrada
+2026-11-14 13:14:04,205 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,205 [INFO] Orden de producción F-3 iniciada
+2026-11-14 13:14:04,205 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,205 [INFO] Orden de producción F-3 completada
+2026-11-14 13:14:04,207 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,207 [INFO] RobotArm en operación
+2026-11-14 13:14:04,207 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,208 [INFO] Inspección de RobotArm: True
+2026-11-14 13:14:04,208 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,211 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,211 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,211 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,212 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,212 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,225 [INFO] Orden O-1 registrada
+2026-11-14 13:14:04,226 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,226 [INFO] Orden de producción O-1 iniciada
+2026-11-14 13:14:04,226 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,226 [INFO] Orden de producción O-1 completada
+2026-11-14 13:14:04,227 [INFO] Orden O-2 registrada
+2026-11-14 13:14:04,227 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,228 [INFO] Orden de producción O-2 iniciada
+2026-11-14 13:14:04,228 [INFO] Inspección de CNCMachine: False
+2026-11-14 13:14:04,228 [WARNING] Orden O-2 no completada: inspección rechazada
+2026-11-14 13:14:04,230 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,230 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,232 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,233 [INFO] Orden LOTE registrada
+2026-11-14 13:14:04,233 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,234 [INFO] Orden de producción LOTE iniciada
+2026-11-14 13:14:04,234 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,234 [INFO] Orden de producción LOTE completada
+2026-11-14 13:14:04,235 [INFO] Orden O-3 registrada
+2026-11-14 13:14:04,235 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,236 [INFO] Orden de producción O-3 iniciada
+2026-11-14 13:14:04,236 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,236 [INFO] Orden de producción O-3 completada
+2026-11-14 13:14:04,237 [INFO] Orden O-4 registrada
+2026-11-14 13:14:04,237 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,238 [INFO] Orden de producción O-4 iniciada
+2026-11-14 13:14:04,238 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,238 [INFO] Orden de producción O-4 completada
+2026-11-14 13:14:04,238 [INFO] CNCMachine detenida
+2026-11-14 13:14:04,239 [INFO] Orden O-5 registrada
+2026-11-14 13:14:04,239 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,240 [INFO] Orden de producción O-5 iniciada
+2026-11-14 13:14:04,240 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,240 [INFO] Orden de producción O-5 completada
+2026-11-14 13:14:04,240 [INFO] Comando ejecutado: Procesar orden O-5
+2026-11-14 13:14:04,242 [WARNING] Acceso denegado: visita (rol consulta) intentó add_order O-6
+2026-11-14 13:14:04,262 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,262 [INFO] Orden G-1 registrada
+2026-11-14 13:14:04,262 [INFO] Orden OP-9 registrada
+2026-11-14 13:14:04,262 [INFO] Orden de producción G-1 iniciada
+2026-11-14 13:14:04,262 [INFO] Orden de producción G-1 completada
+2026-11-14 13:14:04,283 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,283 [INFO] Orden de producción OP-1 iniciada
+2026-11-14 13:14:04,284 [INFO] Orden de producción OP-1 completada
+2026-11-14 13:14:04,286 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,286 [INFO] Orden de producción OP-1 iniciada
+2026-11-14 13:14:04,286 [INFO] Orden de producción OP-1 completada
+2026-11-14 13:14:04,288 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,288 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,288 [INFO] Orden de producción OP-1 iniciada
+2026-11-14 13:14:04,289 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,289 [INFO] Orden OP-2 registrada
+2026-11-14 13:14:04,290 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,293 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,294 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,295 [INFO] Orden OP-1 registrada
+2026-11-14 13:14:04,296 [INFO] Orden de producción OP-1 iniciada
+2026-11-14 13:14:04,297 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,297 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,297 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,297 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,297 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,299 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,300 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,300 [INFO] Orden de producción F-1 iniciada
+2026-11-14 13:14:04,300 [INFO] Inspección de CNCMachine: True
+2026-11-14 13:14:04,300 [INFO] Orden de producción F-1 completada
+2026-11-14 13:14:04,301 [INFO] Orden F-1 registrada
+2026-11-14 13:14:04,302 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,305 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,305 [INFO] Orden 2 registrada
+2026-11-14 13:14:04,305 [INFO] Orden 3 registrada
+2026-11-14 13:14:04,306 [INFO] Orden 1 registrada
+2026-11-14 13:14:04,306 [INFO] Orden de producción 1 iniciada
+2026-11-14 13:14:04,308 [INFO] Orden OP-200 registrada
+2026-11-14 13:14:04,310 [INFO] CNCMachine en operación
+2026-11-14 13:14:04,310 [INFO] Orden OP-201 registrada
+2026-11-14 13:14:04,310 [INFO] Orden de producción OP-201 iniciada
