@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MES · Observer en vivo</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --surface: #ffffff; --surface2: #f0f2f5; --line: #dde1e7;
+    --ink: #1c2330; --muted: #637083; --accent: #2f5fd0;
+    --ok: #1f9d55; --ok-bg: #e3f5ea; --warn: #b7791f; --warn-bg: #fdf3dc;
+    --bad: #c93636; --bad-bg: #fbe6e6; --teal: #0f8b8d; --teal-bg: #dff3f3;
+    --blue: #2f5fd0; --blue-bg: #e4ebfb; --violet: #7048c9;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161d; --surface: #1a2029; --surface2: #222a35; --line: #2c3541;
+      --ink: #e6eaf0; --muted: #91a0b4; --accent: #6f93f0;
+      --ok: #4cc382; --ok-bg: #173226; --warn: #e0a94a; --warn-bg: #36290f;
+      --bad: #ef6a6a; --bad-bg: #3a1c1f; --teal: #44c2c4; --teal-bg: #12302f;
+      --blue: #6f93f0; --blue-bg: #1b2842; --violet: #a283ec;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.45 system-ui, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface);
+    border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; font-weight: 650; }
+  header .sub { color: var(--muted); font-size: 12.5px; }
+  header .spacer { flex: 1; }
+  select, input[type=number], input[type=text] { font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 7px; padding: 6px 9px; }
+  button { font: inherit; font-weight: 550; color: var(--ink); background: var(--surface); cursor: pointer;
+    border: 1px solid var(--line); border-radius: 7px; padding: 7px 12px; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger { color: var(--bad); }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 14px; padding: 14px; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; } body { overflow: auto; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; min-height: 0;
+    display: flex; flex-direction: column; overflow: hidden; }
+  .panel > h2 { margin: 0; padding: 11px 16px; font-size: 13px; letter-spacing: .02em; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 8px; }
+  .panel > h2 .num { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 11px; }
+  .panel > h2 .hint { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .body { padding: 14px 16px; overflow: auto; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .label { color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: 6px; }
+
+  /* equipo */
+  .machine { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--surface2); }
+  .lamp { width: 16px; height: 16px; border-radius: 50%; background: var(--muted); flex: none; }
+  .machine.on .lamp { background: var(--ok); box-shadow: 0 0 0 5px var(--ok-bg); }
+  .machine .name { font-weight: 650; }
+  .machine .state { color: var(--muted); font-size: 12.5px; }
+  .machine.on .state { color: var(--ok); font-weight: 600; }
+  .gear { width: 34px; height: 34px; color: var(--muted); flex: none; }
+  .machine.on .gear { color: var(--ok); animation: spin 3s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* kanban */
+  .board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .col { background: var(--surface2); border-radius: 10px; padding: 8px; min-height: 130px; border: 1px solid var(--line); }
+  .col h3 { margin: 2px 4px 8px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; font-weight: 650; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 7px;
+    cursor: pointer; border-left: 4px solid var(--muted); transition: transform .15s, box-shadow .15s; }
+  .card:hover { transform: translateY(-1px); }
+  .card.sel { outline: 2px solid var(--accent); }
+  .card.s-prod { border-left-color: var(--blue); }
+  .card.s-done { border-left-color: var(--ok); }
+  .card.is-rejected { border-left-color: var(--bad); }
+  .card .id { font-weight: 650; font-family: var(--mono); font-size: 12.5px; }
+  .card .meta { color: var(--muted); font-size: 12px; }
+  .badge { display: inline-block; font-size: 10.5px; font-weight: 650; padding: 1px 7px; border-radius: 99px; margin-left: 4px; }
+  .badge.urg { background: var(--warn-bg); color: var(--warn); }
+  .badge.rej { background: var(--bad-bg); color: var(--bad); }
+  .card.enter { animation: pop .45s ease; }
+  @keyframes pop { from { transform: scale(.92); opacity: .3; } to { transform: none; opacity: 1; } }
+  .empty { color: var(--muted); font-size: 12px; text-align: center; padding: 14px 4px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--surface2); border-radius: 9px; padding: 9px 11px; border: 1px solid var(--line); }
+  .kpi .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .kpi .k { color: var(--muted); font-size: 11px; }
+  .kpi.flash { animation: kpi .6s ease; }
+  @keyframes kpi { 0% { background: var(--blue-bg); } 100% { background: var(--surface2); } }
+
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .switch input { position: absolute; opacity: 0; }
+  .switch .track { width: 34px; height: 19px; border-radius: 99px; background: var(--line); position: relative; transition: background .15s; flex: none; }
+  .switch .track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 15px; height: 15px; border-radius: 50%;
+    background: #fff; transition: transform .15s; }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track::after { transform: translateX(15px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* interno */
+  .dispatch { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--surface2); }
+  .dispatch .flow { display: grid; grid-template-columns: auto 22px auto 22px 1fr; align-items: center; gap: 4px; }
+  .node { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 12px; }
+  .node b { display: block; font-size: 12.5px; }
+  .node small { color: var(--muted); }
+  .arrow { color: var(--muted); text-align: center; font-size: 16px; }
+  .targets { display: flex; flex-direction: column; gap: 6px; }
+  .target { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-radius: 8px; padding: 6px 10px;
+    border: 1px solid var(--line); background: var(--surface); font-size: 12.5px; }
+  .target .st { font-size: 11.5px; font-weight: 650; }
+  .target.delivered { border-color: var(--ok); background: var(--ok-bg); }
+  .target.delivered .st { color: var(--ok); }
+  .target.filtered { opacity: .6; }
+  .target.filtered .st { color: var(--muted); }
+  .target.failed { border-color: var(--bad); background: var(--bad-bg); }
+  .target.failed .st { color: var(--bad); }
+  .target.pulse { animation: pulse .7s ease both; }
+  @keyframes pulse { 0% { transform: translateX(-8px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .pill { display: inline-block; font: 650 11.5px var(--mono); padding: 2px 8px; border-radius: 99px; }
+  .t-CELL { background: var(--teal-bg); color: var(--teal); }
+  .t-ORDER { background: var(--blue-bg); color: var(--blue); }
+  .t-APPROVED { background: var(--ok-bg); color: var(--ok); }
+  .t-REJECTED { background: var(--bad-bg); color: var(--bad); }
+
+  .obs { display: flex; flex-direction: column; gap: 8px; }
+  .obs .item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 8px; }
+  .obs .item small { color: var(--muted); display: block; }
+  .obs .item b { font-size: 13px; }
+
+  .tracewrap { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+  .trace { flex: 1; min-height: 220px; max-height: 46vh; overflow: auto; background: var(--surface2); border: 1px solid var(--line);
+    border-radius: 10px; padding: 8px 10px; font: 12px/1.55 var(--mono); }
+  .ln { display: flex; gap: 8px; white-space: pre-wrap; word-break: break-word; }
+  .ln .tm { color: var(--muted); flex: none; width: 46px; text-align: right; }
+  .ln.call { color: var(--blue); }
+  .ln.return { color: var(--muted); }
+  .ln.error { color: var(--bad); font-weight: 600; }
+  .ln.log { color: var(--violet); }
+  .ln.log.WARNING { color: var(--warn); }
+  .ln.event { color: var(--ink); background: var(--warn-bg); border-radius: 5px; margin: 2px -4px; padding: 1px 4px; }
+  .chip { font-size: 10.5px; border-radius: 99px; padding: 0 6px; margin-left: 4px; white-space: nowrap; display: inline-block; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .actions button { flex: 1 1 auto; }
+  .chip.delivered { background: var(--ok-bg); color: var(--ok); }
+  .chip.filtered { background: var(--line); color: var(--muted); }
+  .chip.failed { background: var(--bad-bg); color: var(--bad); }
+  .legend { color: var(--muted); font-size: 11.5px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* planificación (Strategy) */
+  .plan { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--surface2); }
+  .policies { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .chipbtn { border-radius: 99px; padding: 5px 12px; font-size: 12.5px; }
+  .chipbtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .plan .pdesc { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .queue { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; min-height: 40px; }
+  .qrow { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 10px; font-size: 12.5px; transition: transform .25s; }
+  .qrow.next { border-color: var(--accent); box-shadow: 0 0 0 2px var(--blue-bg); }
+  .qrow .rk { width: 20px; height: 20px; border-radius: 50%; background: var(--line); display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; flex: none; }
+  .qrow.next .rk { background: var(--accent); color: #fff; }
+  .qrow .qid { font: 650 12.5px var(--mono); }
+  .qrow .qmeta { color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap; }
+  .qrow .hl { color: var(--ink); font-weight: 700; background: var(--warn-bg); border-radius: 4px; padding: 0 4px; }
+  /* historial de comandos (Command) */
+  .cmdlist { display: flex; flex-direction: column; gap: 5px; max-height: 150px; overflow: auto; }
+  .cmd { display: flex; gap: 10px; align-items: baseline; font-size: 12.5px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface); }
+  .cmd .cs { font: 650 10.5px var(--mono); border-radius: 99px; padding: 1px 8px; flex: none; }
+  .cmd.EJECUTADO .cs { background: var(--ok-bg); color: var(--ok); }
+  .cmd.FALLIDO .cs { background: var(--bad-bg); color: var(--bad); }
+  .cmd.DESHECHO .cs { background: var(--warn-bg); color: var(--warn); }
+  .cmd em { color: var(--muted); font-style: normal; }
+  .ln.command { color: var(--ink); }
+  .ln.command.EJECUTADO { color: var(--ok); }
+  .ln.command.FALLIDO { color: var(--bad); font-weight: 600; }
+  .ln.command.DESHECHO { color: var(--warn); }
+  .strat { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .strat b { font: 650 13px var(--mono); }
+  .strat span { font-size: 12.5px; }
+  .strat code { font: 12px var(--mono); }
+
+  #toast { position: fixed; bottom: 18px; left: 50%; transform: translate(-50%, 20px); background: var(--bad); color: #fff;
+    padding: 9px 16px; border-radius: 8px; opacity: 0; transition: .25s; pointer-events: none; max-width: 80vw; z-index: 5; }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MES · Observer en vivo</h1>
+    <div class="sub">Izquierda: la planta. Derecha: lo que ocurre por debajo.</div>
+  </div>
+  <span class="spacer"></span>
+  <label class="row" style="gap:6px">Línea
+    <select id="line"></select>
+  </label>
+  <button id="demo" class="primary">▶ Demo automática</button>
+  <button id="reset">Reiniciar</button>
+</header>
+
+<main>
+  <!-- ===================== PRODUCCIÓN ===================== -->
+  <section class="panel" aria-labelledby="h-prod">
+    <h2 id="h-prod"><span class="num">1</span> Vista de producción <span class="hint">lo que ve el operador</span></h2>
+    <div class="body">
+      <div class="machine" id="machine">
+        <svg class="gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.2"/>
+          <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>
+        </svg>
+        <span class="lamp"></span>
+        <div style="flex:1">
+          <div class="name" id="m-name">Equipo</div>
+          <div class="state" id="m-state">—</div>
+        </div>
+        <button id="b-start">Iniciar equipo</button>
+        <button id="b-stop" class="danger">Detener equipo</button>
+        <button id="b-undo" title="Deshace el último comando reversible (iniciar o detener el equipo)">Deshacer</button>
+      </div>
+
+      <div>
+        <div class="label">Órdenes (clic para seleccionar)</div>
+        <div class="board">
+          <div class="col"><h3>Pendiente <span id="c-0">0</span></h3><div id="col-0"></div></div>
+          <div class="col"><h3>En producción <span id="c-1">0</span></h3><div id="col-1"></div></div>
+          <div class="col"><h3>Completada <span id="c-2">0</span></h3><div id="col-2"></div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Planificación de la cola (cambie la política y vea el orden)</div>
+        <div class="plan">
+          <div class="policies" id="policies"></div>
+          <div class="pdesc" id="policy-desc"></div>
+          <div class="queue" id="queue"></div>
+          <button id="b-dispatch" class="primary" disabled>Despachar la siguiente</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="label" id="sel-label">Sin orden seleccionada</div>
+        <div class="actions">
+          <button id="b-run" disabled>Iniciar orden</button>
+          <button id="b-finish" disabled>Inspeccionar y finalizar</button>
+          <button id="b-process" disabled>Procesar completa</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Nueva orden</div>
+        <div class="row">
+          <select id="f-product" aria-label="Producto">
+            <option>Pieza A</option><option>Pieza B</option><option>Pieza C</option><option>Eje de transmisión</option>
+          </select>
+          <input id="f-qty" type="number" min="1" value="10" style="width:84px" aria-label="Cantidad">
+          <input id="f-due" type="date" aria-label="Fecha de entrega" title="Fecha de entrega (opcional)">
+          <label class="switch"><input type="checkbox" id="f-urgent"><span class="track"></span>Urgente</label>
+          <button id="b-register" class="primary">Registrar orden</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label class="switch"><input type="checkbox" id="f-reject"><span class="track"></span>La próxima inspección rechaza</label>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Indicadores (calculados por el observador de métricas)</div>
+        <div class="kpis">
+          <div class="kpi" id="k-started"><div class="v">0</div><div class="k">Órdenes iniciadas</div></div>
+          <div class="kpi" id="k-completed"><div class="v">0</div><div class="k">Completadas</div></div>
+          <div class="kpi" id="k-quality"><div class="v">—</div><div class="k">Calidad (unidades)</div></div>
+          <div class="kpi" id="k-avail"><div class="v">—</div><div class="k">Disponibilidad</div></div>
+          <div class="kpi" id="k-time"><div class="v">0 s</div><div class="k">Tiempo operativo</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INTERNO ===================== -->
+  <section class="panel" aria-labelledby="h-int">
+    <h2 id="h-int"><span class="num">2</span> Vista interna <span class="hint">lo que ocurre por debajo</span></h2>
+    <div class="body">
+      <div>
+        <div class="label">Último evento y a quién llegó</div>
+        <div class="dispatch" id="dispatch">
+          <div class="empty">Aún no hay eventos. Opere la planta a la izquierda.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Política de planificación vigente (Strategy)</div>
+        <div class="dispatch strat">
+          <b id="strategy-class">PriorityStrategy</b>
+          <span class="sub" style="color:var(--muted)">aplicada por <code>ProductionScheduler.queue()</code> sobre las órdenes pendientes; el servicio de producción no cambia</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="label">Observadores suscritos al Subject</div>
+        <div class="obs" id="obs"></div>
+      </div>
+
+      <div>
+        <div class="label">Historial de comandos (Command · CommandInvoker)</div>
+        <div class="cmdlist" id="cmds"></div>
+      </div>
+
+      <div class="tracewrap">
+        <div class="row" style="justify-content:space-between; margin-bottom:6px">
+          <div class="label" style="margin:0">Traza cronológica</div>
+          <div class="legend">
+            <span style="color:var(--blue)">→ llamada</span>
+            <span>← retorno</span>
+            <span style="color:var(--warn)">⚡ evento publicado</span>
+            <span style="color:var(--violet)">● registro</span>
+            <span style="color:var(--ok)">▣ comando</span>
+            <span style="color:var(--bad)">✕ error</span>
+          </div>
+        </div>
+        <div class="trace" id="trace" role="log" aria-live="off"></div>
+      </div>
+    </div>
+  </section>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const state = { since: 0, epoch: null, selected: null, last: null, orderIds: new Set(), busy: false, demo: null };
+
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+async function action(name, params = {}) {
+  const r = await fetch('/api/action', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: name, ...params }) });
+  const j = await r.json();
+  if (!j.ok) toast(j.error);
+  await poll();
+  return j;
+}
+
+async function poll() {
+  if (state.busy) return; state.busy = true;
+  try {
+    const r = await fetch('/api/state?since=' + state.since);
+    render(await r.json());
+  } catch (e) { /* servidor cerrado: se reintenta */ }
+  state.busy = false;
+}
+
+const fmtPct = v => v == null ? '—' : Math.round(v * 100) + ' %';
+const fmtSec = v => v < 60 ? v.toFixed(1) + ' s' : Math.floor(v / 60) + ' min ' + Math.round(v % 60) + ' s';
+
+function setKpi(id, text) {
+  const el = $('#' + id + ' .v');
+  if (el.textContent !== text) { el.textContent = text; const k = $('#' + id); k.classList.remove('flash'); void k.offsetWidth; k.classList.add('flash'); }
+}
+
+function render(s) {
+  if (state.epoch !== null && s.epoch !== state.epoch) {
+    state.epoch = s.epoch; state.since = 0; state.last = null; state.selected = null; state.orderIds = new Set();
+    $('#trace').innerHTML = ''; $('#dispatch').innerHTML = '<div class="empty">Aún no hay eventos. Opere la planta a la izquierda.</div>';
+    state.busy = false; return poll();
+  }
+  state.epoch = s.epoch;
+
+  // línea
+  const sel = $('#line');
+  if (!sel.options.length) for (const [k, v] of Object.entries(s.lines)) sel.add(new Option(v, k));
+  sel.value = s.line;
+
+  // equipo
+  $('#machine').classList.toggle('on', s.cell.operating);
+  $('#m-name').textContent = 'Equipo · ' + s.line_label;
+  $('#m-state').textContent = s.cell.status;
+  $('#b-start').disabled = s.cell.operating; $('#b-stop').disabled = !s.cell.operating;
+
+  // kanban
+  const cols = [[], [], []];
+  for (const o of s.orders) cols[o.status === 'En producción' ? 1 : o.status === 'Completada' ? 2 : 0].push(o);
+  cols.forEach((list, i) => {
+    $('#c-' + i).textContent = list.length;
+    $('#col-' + i).innerHTML = list.length ? list.map(o => cardHtml(o, i)).join('') : '<div class="empty">—</div>';
+  });
+  document.querySelectorAll('.card').forEach(c => c.onclick = () => { state.selected = c.dataset.id; updateSel(s); renderCardsSel(); });
+  s.orders.forEach(o => state.orderIds.add(o.id));
+  if (state.selected && !s.orders.some(o => o.id === state.selected)) state.selected = null;
+  updateSel(s); renderCardsSel();
+
+  // KPIs
+  setKpi('k-started', String(s.kpis.started)); setKpi('k-completed', String(s.kpis.completed));
+  setKpi('k-quality', fmtPct(s.kpis.quality)); setKpi('k-avail', fmtPct(s.kpis.availability));
+  setKpi('k-time', fmtSec(s.kpis.operating_seconds));
+
+  if (document.activeElement !== $('#f-reject')) $('#f-reject').checked = s.reject_next;
+  renderPlanning(s); renderCommands(s);
+
+  // observadores
+  $('#obs').innerHTML = s.observers.map(o => `
+    <div class="item"><div><b>${o.name}</b><small>${o.desc}${o.filter ? ' · filtro: ' + o.filter.join(', ') : ' · recibe todos los eventos'}</small></div>
+      <label class="switch"><input type="checkbox" data-key="${o.key}" ${o.subscribed ? 'checked' : ''}><span class="track"></span>${o.subscribed ? 'suscrito' : 'retirado'}</label></div>`).join('');
+  document.querySelectorAll('#obs input').forEach(i => i.onchange = () => action('observer', { key: i.dataset.key, on: i.checked }));
+
+  // traza
+  const box = $('#trace'); const atEnd = box.scrollTop + box.clientHeight >= box.scrollHeight - 30;
+  for (const e of s.trace) {
+    if (e.seq <= state.since) continue;
+    box.insertAdjacentHTML('beforeend', lineHtml(e));
+    if (e.kind === 'event') { state.last = e; renderDispatch(e); }
+  }
+  if (s.trace.length && atEnd) box.scrollTop = box.scrollHeight;
+  state.since = Math.max(state.since, s.next);
+}
+
+function renderPlanning(s) {
+  const cur = s.strategies.find(p => p.key === s.strategy);
+  $('#policies').innerHTML = s.strategies.map(p =>
+    `<button class="chipbtn ${p.key === s.strategy ? 'on' : ''}" data-key="${p.key}" title="${esc(p.description)}">${esc(p.label)}</button>`).join('');
+  document.querySelectorAll('#policies button').forEach(b => b.onclick = () => action('strategy', { key: b.dataset.key }));
+  $('#policy-desc').textContent = cur.description;
+  $('#strategy-class').textContent = cur.class;
+  const hl = (key, on, text) => `<span class="${on === key ? 'hl' : ''}">${text}</span>`;
+  $('#queue').innerHTML = s.queue.length ? s.queue.map(q => `
+    <div class="qrow ${q.rank === 1 ? 'next' : ''}"><span class="rk">${q.rank}</span><span class="qid">${esc(q.id)}</span>
+      <span class="qmeta"><span>${esc(q.product)}</span>
+        ${hl(s.strategy, 'smallest', q.quantity + ' u')}
+        ${hl(s.strategy, 'priority', 'prioridad ' + (q.priority ?? '—'))}
+        ${hl(s.strategy, 'due_date', q.due ? 'entrega ' + q.due : 'sin fecha')}</span></div>`).join('')
+    : '<div class="empty">No hay órdenes pendientes</div>';
+  $('#b-dispatch').disabled = !s.queue.length;
+}
+
+function renderCommands(s) {
+  $('#cmds').innerHTML = s.commands.length ? s.commands.map(c =>
+    `<div class="cmd ${c.estado}"><span class="cs">${c.estado}</span><span>${esc(c.comando)}${c.resultado ? ' → ' + esc(c.resultado) : ''}${c.error ? ' <em>' + esc(c.error) + '</em>' : ''}</span></div>`).join('')
+    : '<div class="empty">Aún no se ha ejecutado ningún comando</div>';
+}
+
+function cardHtml(o, col) {
+  const cls = ['card', col === 1 ? 's-prod' : '', col === 2 ? 's-done' : '', o.rejected ? 'is-rejected' : '',
+    state.orderIds.has(o.id) ? '' : 'enter'].join(' ');
+  return `<div class="${cls}" data-id="${o.id}"><div class="id">${o.id}
+    ${o.kind === 'UrgentOrder' ? '<span class="badge urg">urgente</span>' : ''}${o.rejected ? '<span class="badge rej">rechazada</span>' : ''}</div>
+    <div class="meta">${esc(o.product)} · ${o.quantity} u</div></div>`;
+}
+function renderCardsSel() { document.querySelectorAll('.card').forEach(c => c.classList.toggle('sel', c.dataset.id === state.selected)); }
+function updateSel(s) {
+  const o = s.orders.find(x => x.id === state.selected);
+  $('#sel-label').textContent = o ? `Seleccionada: ${o.id} (${o.status})` : 'Sin orden seleccionada';
+  $('#b-run').disabled = !o || o.status !== 'Pendiente';
+  $('#b-finish').disabled = !o || o.status !== 'En producción';
+  $('#b-process').disabled = !o || o.status !== 'Pendiente';
+}
+
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const typeClass = t => t.startsWith('CELL') ? 't-CELL' : t === 'INSPECTION_APPROVED' ? 't-APPROVED' : t === 'INSPECTION_REJECTED' ? 't-REJECTED' : 't-ORDER';
+const sym = { call: '→', return: '←', error: '✕', log: '●', event: '⚡', command: '▣' };
+const stText = { delivered: '✓ entregado', filtered: '— filtrado', failed: '✕ falló (aislado)' };
+
+function lineHtml(e) {
+  const pad = '  '.repeat(e.depth);
+  let text = esc(e.text);
+  if (e.kind === 'event') {
+    const data = Object.entries(e.data || {}).filter(([, v]) => v != null).map(([k, v]) => `${k}=${v}`).join(' ');
+    text = `${esc(e.text)}${e.order_id ? ' · ' + esc(e.order_id) : ''}${data ? ' · ' + esc(data) : ''}` +
+      e.deliveries.map(d => `<span class="chip ${d.status}" title="${stText[d.status]}">${esc(d.observer.replace('Observer', ''))} ${d.status === 'delivered' ? '✓' : d.status === 'failed' ? '✕' : '—'}</span>`).join('');
+  }
+  const lvl = e.kind === 'log' ? ' ' + (e.level || '') : e.kind === 'command' ? ' ' + (e.state || '') : '';
+  return `<div class="ln ${e.kind}${lvl}"><span class="tm">${e.t.toFixed(1)}s</span><span>${pad}${sym[e.kind]} ${text}</span></div>`;
+}
+
+function renderDispatch(e) {
+  const targets = e.deliveries.length ? e.deliveries.map((d, i) => `
+    <div class="target ${d.status} pulse" style="animation-delay:${i * 130}ms"><span>${esc(d.observer)}</span><span class="st">${stText[d.status]}</span></div>`).join('')
+    : '<div class="empty">Ningún observador suscrito: el evento se publica pero nadie lo recibe.</div>';
+  $('#dispatch').innerHTML = `
+    <div class="row" style="margin-bottom:10px"><span class="pill ${typeClass(e.text)}">${e.text}</span>
+      <span class="sub" style="color:var(--muted)">${e.order_id ? 'orden ' + esc(e.order_id) : 'equipo'} · t=${e.t.toFixed(1)} s</span></div>
+    <div class="flow">
+      <div class="node"><b>ObservableMESFacade</b><small>publica el evento</small></div><div class="arrow">→</div>
+      <div class="node"><b>Subject.notify()</b><small>recorre suscripciones</small></div><div class="arrow">→</div>
+      <div class="targets">${targets}</div>
+    </div>`;
+}
+
+// ---- acciones de la planta
+$('#b-start').onclick = () => action('start_cell');
+$('#b-stop').onclick = () => action('stop_cell');
+$('#b-undo').onclick = () => action('undo');
+$('#b-dispatch').onclick = async () => { const j = await action('dispatch'); if (j.ok) { state.selected = j.order_id; poll(); } };
+$('#b-run').onclick = () => action('run', { order_id: state.selected });
+$('#b-finish').onclick = () => action('finish', { order_id: state.selected });
+$('#b-process').onclick = () => action('process', { order_id: state.selected });
+$('#b-register').onclick = async () => {
+  const j = await action('register', { product: $('#f-product').value, quantity: +$('#f-qty').value || 1,
+    urgent: $('#f-urgent').checked, due: $('#f-due').value || null });
+  if (j.ok) { state.selected = j.order_id; poll(); }
+};
+$('#f-reject').onchange = e => action('reject_next', { value: e.target.checked });
+$('#reset').onclick = () => { stopDemo(); action('reset', { line: $('#line').value }); };
+$('#line').onchange = () => { stopDemo(); action('reset', { line: $('#line').value }); };
+
+// ---- demo automática (recorre un escenario completo para exponer)
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function stopDemo() { if (state.demo) { state.demo.cancel = true; state.demo = null; } $('#demo').textContent = '▶ Demo automática'; }
+$('#demo').onclick = async () => {
+  if (state.demo) return stopDemo();
+  const run = { cancel: false }; state.demo = run; $('#demo').textContent = '■ Detener demo';
+  const step = async (name, p, wait = 1500) => { if (run.cancel) throw 0; const j = await action(name, p); await sleep(wait); return j; };
+  try {
+    await action('reset', { line: $('#line').value }); await sleep(900);
+    const day = n => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+    // 1) tres órdenes con criterios distintos
+    const a = await step('register', { product: 'Pieza A', quantity: 40, urgent: false, due: day(20) }, 900);
+    const b = await step('register', { product: 'Pieza B', quantity: 25, urgent: true, due: day(30) }, 900);
+    const c = await step('register', { product: 'Pieza C', quantity: 10, urgent: false, due: day(10) }, 1100);
+    // 2) Strategy: la misma cola, cuatro órdenes de atención
+    for (const key of ['fifo', 'due_date', 'smallest', 'priority']) await step('strategy', { key }, 1700);
+    // 3) Command: despachar según la política; el equipo se arranca solo
+    await step('strategy', { key: 'due_date' }, 1200);
+    const first = await step('dispatch', {}, 1800);                 // la de entrega más próxima
+    await step('finish', { order_id: first.order_id }, 2200);       // inspección aprobada
+    // 4) un rechazo y un observador defectuoso
+    await step('strategy', { key: 'priority' }, 1200);
+    await step('reject_next', { value: true }, 800);
+    const second = await step('dispatch', {}, 1800);                // la urgente
+    await step('finish', { order_id: second.order_id }, 2400);      // inspección rechazada
+    await step('observer', { key: 'faulty', on: true }, 1200);
+    await step('reject_next', { value: false }, 800);
+    const third = await step('dispatch', {}, 1600);
+    await step('finish', { order_id: third.order_id }, 2400);
+    // 5) Command: detener el equipo y deshacerlo
+    await step('stop_cell', {}, 1500);
+    await step('undo', {}, 1200);
+  } catch (e) { /* cancelada */ }
+  if (state.demo === run) stopDemo();
+};
+
+poll(); setInterval(poll, 500);
+</script>
+</body>
+</html>

@@ -236,6 +236,21 @@ def test_metrics_observer_end_to_end_with_clock():
     assert metrics.units_completed == 8
 
 
+def test_cell_status_reads_the_machine_when_the_service_has_no_status():
+    """EquipmentService no expone `status`: el estado vive en equipment.equipment."""
+    mes = make_mes()
+
+    class Machine:
+        status = "Operando"
+
+    class Service:
+        equipment = Machine()
+
+    mes.equipment = Service()
+    assert mes.cell_status() == "Operando"
+    assert mes._cell_operating() is True
+
+
 def test_commands_publish_events_through_the_facade():
     mes, rec = make_mes(), Recorder()
     mes.attach(rec)

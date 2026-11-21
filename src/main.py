@@ -31,6 +31,7 @@ from src.observer.observers import (
     ProductionMetricsObserver,
     RejectionAlertObserver,
 )
+from src.strategy.scheduling import STRATEGIES, ProductionScheduler
 
 
 def seccion(titulo):
@@ -258,3 +259,36 @@ print(f"Inspecciones: {metrics.inspections_approved} aprobadas, "
       f"{metrics.inspections_rejected} rechazadas")
 print(f"Tasa de calidad (unidades): {metrics.quality_rate():.2f}")
 print(f"Alertas de rechazo: {[a[0] for a in alerts.alerts]}")
+
+seccion("STRATEGY - PLANIFICACIÓN DE LA COLA")
+planta = ProductionService()
+
+
+def registrar_plan(creator, order_id, producto, cantidad, dia):
+    datos = (
+        OrderBuilder(order_id, producto, cantidad)
+        .with_fecha_entrega(datetime(2026, 12, dia))
+        .build()
+    )
+    planta.add_order(creator.create_order(datos))
+
+
+registrar_plan(StandardOrderCreator(), "ST-001", "Pieza A", 40, 20)
+registrar_plan(UrgentOrderCreator(), "ST-002", "Pieza B", 25, 28)
+registrar_plan(StandardOrderCreator(), "ST-003", "Pieza C", 10, 15)
+registrar_plan(UrgentOrderCreator(), "ST-004", "Pieza D", 60, 18)
+
+planificador = ProductionScheduler()
+for estrategia in STRATEGIES.values():
+    planificador.set_strategy(estrategia)
+    print(f"{estrategia.label:<18}", [o.order_id for o in planificador.queue(planta)])
+
+print("Despacho con la política de fecha de entrega (mediante Command):")
+planificador.set_strategy(STRATEGIES["due_date"])
+mes_plan = MESFacade(CNCCellFactory(), production_service=planta)
+invoker_plan = CommandInvoker()
+siguiente = planificador.next_order(planta)
+print(f"  Siguiente orden: {siguiente.order_id}")
+invoker_plan.execute(RunOrderCommand(mes_plan, siguiente.order_id))
+print(f"  Estado de {siguiente.order_id}: {siguiente.status}")
+print("  Cola restante:", [o.order_id for o in planificador.queue(planta)])

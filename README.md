@@ -59,6 +59,8 @@ El sistema contempla diferentes funcionalidades relacionadas con la gestión de 
 * Ejecución diferida, historial y reversión segura de las operaciones del MES mediante Command.
 * Recorrido de las órdenes de un lote (en profundidad o por niveles, con filtro de estado) y conteo de órdenes individuales por estado mediante Iterator.
 * Publicación de eventos de planta (equipo, orden, inspección) a observadores independientes, con métricas para el OEE y alertas de rechazo, mediante Observer.
+* Planificación de la cola de producción con políticas intercambiables (prioridad, orden de llegada, fecha de entrega y menor cantidad) mediante Strategy.
+* Visual del MES que muestra en paralelo la planta y el proceso interno de la misma ejecución.
 * Registro de eventos con niveles de severidad.
 * Persistencia de eventos en archivo.
 * Asignación y control de equipos de producción.
@@ -93,10 +95,12 @@ Durante el desarrollo del proyecto se han implementado y evaluado los siguientes
 | Observer         | Publicar eventos de planta a observadores independientes (métricas para OEE, alertas de rechazo) | Implementado           |
 | State            | Cambiar el comportamiento de un objeto según su estado interno mediante objetos de estado        | Evaluado — no aplicado |
 | Visitor          | Agregar operaciones sobre una jerarquía de objetos sin modificar sus clases                      | Evaluado — no aplicado |
+| Strategy         | Planificar la cola de producción con políticas de ordenamiento intercambiables en ejecución       | Implementado           |
+| Template Method  | Definir el esqueleto de un algoritmo y dejar que las subclases redefinan algunos pasos             | Evaluado — no aplicado |
 
 La aplicación de estos patrones permite separar responsabilidades y reducir el acoplamiento entre los diferentes componentes del sistema.
 
-Además, el análisis de Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
+Además, el análisis de Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State, Visitor y Template Method permitió determinar que un patrón no debe incorporarse únicamente para cumplir con una estructura teórica, sino cuando existe una necesidad real dentro del diseño del sistema.
 
 ---
 
@@ -108,7 +112,7 @@ Para el desarrollo de cada patrón se siguió la siguiente secuencia:
 
 Esta metodología permite identificar primero el problema existente y posteriormente seleccionar el patrón de diseño que mejor se adapta a la necesidad del sistema.
 
-También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor.
+También permite justificar cuándo un patrón no resulta necesario dentro del estado actual del proyecto, como ocurrió con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State, Visitor y Template Method.
 
 ---
 
@@ -868,7 +872,7 @@ Los participantes principales del patrón son:
 * Proporciona los datos de disponibilidad y calidad que necesitará el cálculo de OEE.
 * Se integra con Facade, Command, Proxy y Composite sin cambios.
 
-Documentación detallada: `docs/semana_14/semana_14.md`.
+Documentación detallada: `docs/semana_15/semana_15.md`.
 
 ---
 
@@ -888,7 +892,7 @@ Por esta razón, el patrón fue:
 
 ### Justificación
 
-La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_14/semana_14.md`.
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_15/semana_15.md`.
 
 State podrá evaluarse nuevamente si aparecen un flujo de reapertura o retrabajo, nuevos estados con reglas distintas (`Pausada`, `Cancelada`, `En espera de material`), un ciclo de vida más rico del equipo (`Mantenimiento`, `Falla`) o condicionales sobre el estado que se multipliquen en varias clases.
 
@@ -908,9 +912,78 @@ Por esta razón, el patrón fue:
 
 ### Justificación
 
-La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_14/semana_14.md`.
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_15/semana_15.md`.
 
 Visitor podrá evaluarse nuevamente si aparecen varios reportes o exportaciones con lógica propia por tipo de orden, una jerarquía de órdenes estable con comportamiento realmente distinto por tipo, o nuevas estructuras recorribles. Antes de adoptarlo conviene comprobar si una función sobre el Iterator es suficiente.
+
+---
+
+## Strategy
+
+El patrón **Strategy** define una familia de algoritmos, encapsula cada uno y los hace intercambiables, de modo que el algoritmo puede variar independientemente de quien lo usa.
+
+En el proyecto se utiliza para **planificar la cola de producción**. La planificación y programación de la producción es una funcionalidad central del MES, pero `get_pending_queue()` solo ordena por prioridad y esa regla está fija dentro de `ProductionService`, aunque las órdenes ya traen la fecha de entrega, la cantidad y el orden de registro para decidir de otras formas.
+
+La implementación se encuentra en:
+
+* `src/strategy/scheduling.py`
+
+Los componentes principales son:
+
+* `SchedulingStrategy`: interfaz con `order(orders)`.
+* `PriorityStrategy`, `FifoStrategy`, `DueDateStrategy` y `SmallestFirstStrategy`: las cuatro políticas.
+* `STRATEGIES` y `get_strategy()`: registro de políticas, para construir un selector sin `if`/`elif`.
+* `ProductionScheduler`: contexto que mantiene la política vigente y la aplica sobre las órdenes pendientes (`queue()`, `next_order()`, `set_strategy()`).
+
+Ejemplo:
+
+```python
+planificador = ProductionScheduler()                 # prioridad por defecto
+planificador.set_strategy(STRATEGIES["due_date"])    # cambio en ejecución
+
+siguiente = planificador.next_order(planta)
+invoker.execute(RunOrderCommand(mes, siguiente.order_id))
+```
+
+`ProductionService`, `MESFacade`, las órdenes y Command no necesitaron modificarse. `PriorityStrategy` reproduce la regla de `get_pending_queue()` (una prueba lo verifica), y el despacho de la orden elegida se hace con el `RunOrderCommand` ya existente.
+
+### Interpretación dentro del MES
+
+* **Strategy:** `SchedulingStrategy`.
+* **ConcreteStrategy:** `PriorityStrategy`, `FifoStrategy`, `DueDateStrategy` y `SmallestFirstStrategy`.
+* **Context:** `ProductionScheduler`.
+* **Client:** `main.py` y la visual.
+
+### Beneficios del Strategy
+
+* Permite agregar una política nueva sin modificar el servicio de producción ni las existentes.
+* Permite cambiar el criterio de planificación en ejecución.
+* Cada regla se prueba por separado y sin estado.
+* Se integra con Command, Builder, Composite y Facade sin cambios.
+
+Documentación detallada: `docs/semana_15/semana_15.md`.
+
+---
+
+## Template Method — Evaluado y no aplicado
+
+El patrón **Template Method** define en una clase base el esqueleto de un algoritmo y deja que las subclases redefinan algunos de sus pasos sin cambiar la estructura. Se justifica cuando hay un algoritmo de varios pasos, al menos dos subclases que hoy repiten ese esqueleto y pasos que cambian entre ellas.
+
+Durante esta etapa se analizó la posibilidad de incorporarlo al MES.
+
+Al revisar el proyecto se encontró que las operaciones de equipos e inspecciones son breves, que `inspect()` es una sola operación, que el flujo de una orden (`process_order`) es una secuencia de dos pasos definida en la fachada y sin pasos variables, y que la variación entre líneas ya se resuelve con composición (Abstract Factory, Decorator y Strategy). Los módulos de Calidad y OEE todavía no existen.
+
+Implementar Template Method habría requerido modificar las bases `Equipment` e `Inspection` y sus clases concretas para introducir métodos gancho sin un uso real.
+
+Por esta razón, el patrón fue:
+
+**Evaluado — no aplicado.**
+
+### Justificación
+
+La decisión mantiene el criterio utilizado durante todo el proyecto: los patrones se incorporan únicamente cuando existe un problema concreto que justifique su utilización. El detalle de la evaluación se encuentra en `docs/semana_15/semana_15.md`.
+
+Template Method podrá evaluarse nuevamente si el módulo de Calidad define un protocolo de inspección de varios pasos (preparar, medir, comparar con la tolerancia, decidir y registrar) con mediciones distintas por tipo de equipo, si el OEE se calcula por tipo de equipo con el mismo flujo y fórmulas de rendimiento distintas, o si aparecen reportes con estructura fija y variantes por formato.
 
 ---
 
@@ -993,6 +1066,12 @@ La implementación de los patrones de diseño permitió mejorar la estructura, o
 * Entrega los datos de disponibilidad y calidad que necesitará el cálculo de OEE.
 * Aísla los fallos de los observadores y se incorpora sin modificar `MESFacade`, Command ni el Proxy.
 
+### Strategy
+
+* Permite elegir y cambiar en ejecución la política de planificación de la cola.
+* Se incorpora sin modificar `ProductionService`, `MESFacade` ni las órdenes.
+* Reutiliza Command para despachar la orden que la política elige.
+
 ### Bridge
 
 Su evaluación permitió comprobar que no todos los patrones deben implementarse obligatoriamente. Incorporar un patrón solamente se justifica cuando existe un problema de diseño que realmente requiera la solución que ofrece.
@@ -1020,6 +1099,11 @@ Su evaluación mostró que el ciclo de vida de las órdenes (tres estados y dos 
 ### Visitor
 
 Su evaluación mostró que hay pocas operaciones sobre el árbol de órdenes, que la jerarquía se prevé ampliar y que el Iterator ya permite escribir operaciones nuevas como funciones externas, por lo que agregar `accept()` a las clases existentes no se justificó.
+
+
+### Template Method
+
+Su evaluación mostró que no existe un algoritmo de varios pasos que se repita en varias subclases, y que la variación entre líneas ya se resuelve con composición, por lo que introducir métodos gancho en `Equipment` e `Inspection` no se justificó.
 
 ---
 
@@ -1176,10 +1260,25 @@ Se verificó:
 * La secuencia de eventos de `ObservableMESFacade`, la ausencia de duplicados de eventos de equipo y la ausencia de eventos ante operaciones fallidas.
 * La cantidad total de un lote en el evento de inicio.
 * El funcionamiento con `CommandInvoker` y con el Proxy (una operación denegada no publica eventos).
+* Que el estado del equipo se lee de la máquina cuando `EquipmentService` no expone `status`.
+
+### Strategy
+
+Se verificó:
+
+* Que cada política ordena como corresponde, conserva el orden de registro en los empates y no modifica la entrada.
+* Que las órdenes sin fecha de entrega van al final en `DueDateStrategy`.
+* El registro de políticas, el rechazo de una clave desconocida y que `SchedulingStrategy` no se puede instanciar.
+* Que `ProductionScheduler` considera solo las órdenes pendientes, cambia de política en ejecución, rechaza objetos que no son políticas y devuelve `None` sin pendientes.
+* Con órdenes reales: que `PriorityStrategy` produce la misma secuencia que `get_pending_queue()`, que cada política ordena distinto las mismas órdenes y que el planificador no altera el servicio.
+
+### Visual
+
+Se verificó el estado inicial, la traza de llamadas y eventos, quién recibe cada evento, el aislamiento de un observador que falla, las cuatro políticas, el despacho mediante comandos, el historial de comandos fallidos y deshechos, el rechazo de un `undo` inseguro, el reinicio y el servidor HTTP.
 
 Actualmente, el proyecto cuenta con:
 
-**130 pruebas automatizadas superadas** (110 anteriores + 20 de Observer).
+**172 pruebas automatizadas superadas** (110 anteriores + 21 de Observer + 20 de Strategy + 21 de la visual).
 
 Las pruebas se ejecutan mediante:
 
@@ -1272,6 +1371,21 @@ Contiene:
 * `ObservableMESFacade`, que publica los eventos de planta.
 * El patrón Observer.
 
+### Estrategia
+
+Contiene:
+
+* `SchedulingStrategy` y las cuatro políticas de planificación.
+* `ProductionScheduler`, el contexto que las aplica.
+* El patrón Strategy.
+
+### Visual
+
+Contiene:
+
+* `DashboardController`, que conecta la pantalla con `ObservableMESFacade`, `CommandInvoker` y `ProductionScheduler`.
+* El servidor local y la pantalla (`dashboard.html`).
+
 ### Pruebas
 
 Contiene las pruebas automatizadas correspondientes a los diferentes componentes y patrones implementados.
@@ -1293,6 +1407,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── codigo-factory-creator.jpg
 │   │   ├── codigo-iterator.png
 │   │   ├── codigo-observer.png
+│   │   ├── codigo-strategy.png
 │   │   ├── codigo-logger-integrado.png
 │   │   ├── codigo-logging-adapter.png
 │   │   ├── codigo-order-builder.jpeg
@@ -1316,6 +1431,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── ejecucion-flyweight.png
 │   │   ├── ejecucion-iterator.png
 │   │   ├── ejecucion-observer.png
+│   │   ├── ejecucion-strategy.png
 │   │   ├── ejecucion-main.jpg
 │   │   ├── ejecucion-prototype.jpeg
 │   │   ├── ejecucion-proxy.png
@@ -1329,6 +1445,7 @@ Proyecto_Patrones_de_software/
 │   │   ├── prueba-pytest-factory.jpg
 │   │   ├── prueba-pytest-iterator.png
 │   │   ├── prueba-pytest-observer.png
+│   │   ├── prueba-pytest-strategy.png
 │   │   ├── prueba-pytest-prototype.jpeg
 │   │   ├── prueba-pytest-proxy.png
 │   │   ├── prueba-singleton.jpeg
@@ -1342,6 +1459,8 @@ Proyecto_Patrones_de_software/
 │   │   ├── uml-factory.png
 │   │   ├── uml-iterator.png
 │   │   ├── uml-observer.png
+│   │   ├── uml-strategy.png
+│   │   ├── visual-mes.png
 │   │   ├── uml-prototype.png
 │   │   ├── uml-proxy.png
 │   │   └── uml-singleton.png
@@ -1375,13 +1494,23 @@ Proyecto_Patrones_de_software/
 │       ├── iterator.md
 │       ├── mediator.md
 │       └── memento.md
-│   └── semana_14/
-│       └── semana_14.md
+│   ├── semana_14/
+│   │   └── semana_14.md
+│   └── semana_15/
+│       └── semana_15.md
 ├── src/
 │   ├── commands/
 │   │   ├── command.py
 │   │   ├── mes_commands.py
 │   │   └── invoker.py
+│   ├── gui/
+│   │   ├── __init__.py
+│   │   ├── controller.py
+│   │   ├── server.py
+│   │   └── dashboard.html
+│   ├── strategy/
+│   │   ├── __init__.py
+│   │   └── scheduling.py
 │   ├── observer/
 │   │   ├── __init__.py
 │   │   ├── observer.py
@@ -1416,6 +1545,7 @@ Proyecto_Patrones_de_software/
 │   ├── test_logger_and_order_rules.py
 │   ├── test_logging_adapter.py
 │   ├── test_mes_facade.py
+│   ├── test_gui_controller.py
 │   ├── test_observer.py
 │   ├── test_order_builder.py
 │   ├── test_order_clone.py
@@ -1423,7 +1553,8 @@ Proyecto_Patrones_de_software/
 │   ├── test_order_iterators.py
 │   ├── test_prod_service_proxy.py
 │   ├── test_production_order.py
-│   └── test_start_with_equipment.py
+│   ├── test_start_with_equipment.py
+│   └── test_strategy.py
 ├── videos/
 │   ├── Adapter.mp4
 │   ├── facade.mp4
@@ -1433,7 +1564,6 @@ Proyecto_Patrones_de_software/
 │   └── proxy.mp4
 │   └── command.mp4
 │   └── iterator.mp4
-│   └──Observer.mp4
 ├── mes.log
 ├── pytest.ini
 ├── .gitignore
@@ -1610,6 +1740,25 @@ Se trabajó en:
 docs/semana_14/
 ```
 
+### Semana 15
+
+Durante esta etapa se evaluaron los patrones de comportamiento **Command**, **Strategy** y **Template Method**.
+
+Se trabajó en:
+
+* **Command:** ya estaba implementado, por lo que no se repitió; se reutiliza para despachar la orden que elige la planificación y para operar la visual.
+* Implementación del patrón **Strategy** (`SchedulingStrategy`, cuatro políticas y `ProductionScheduler`) para planificar la cola de producción sin modificar `ProductionService`.
+* Evaluación del patrón **Template Method** y su justificación como no aplicado: no hay un algoritmo de varios pasos que se repita en subclases.
+* Corrección de Observer: el estado del equipo se lee de la máquina (`cell_status()`), porque `EquipmentService` no expone `status`.
+* Visual del MES (`src/gui/`) con la vista de producción y la vista interna.
+* Integración de Strategy en `main.py`.
+* Pruebas automatizadas de Strategy y de la visual.
+* Documentación: `semana_15.md` (acumulado de las semanas anteriores).
+
+```text
+docs/semana_15/
+```
+
 ---
 
 # Evidencias
@@ -1645,7 +1794,9 @@ Para Command se incorporan las evidencias `codigo-command`, `ejecucion-command`,
 
 Para Iterator se incorporan las evidencias `codigo-iterator`, `ejecucion-iterator`, `prueba-pytest-iterator` y `uml-iterator`, referenciadas desde `docs/semana_13/iterator.md`. Mediator y Memento, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en `docs/semana_13/mediator.md` y `docs/semana_13/memento.md`.
 
-Para Observer se incorporan las evidencias `codigo-observer`, `ejecucion-observer`, `prueba-pytest-observer` y `uml-observer`, referenciadas desde `docs/semana_14/semana_14.md`. State y Visitor, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en el mismo documento.
+Para Observer se incorporan las evidencias `codigo-observer`, `ejecucion-observer`, `prueba-pytest-observer` y `uml-observer`, referenciadas desde `docs/semana_15/semana_15.md`. State y Visitor, al no implementarse, no tienen evidencias de código ni de ejecución: sus evaluaciones están en el mismo documento.
+
+Para Strategy se incorporan las evidencias `codigo-strategy`, `ejecucion-strategy`, `prueba-pytest-strategy` y `uml-strategy`, y para la visual `visual-mes`, referenciadas desde `docs/semana_15/semana_15.md`. Template Method, al no implementarse, no tiene evidencias de código ni de ejecución: su evaluación está en el mismo documento.
 
 ---
 
@@ -1682,8 +1833,16 @@ python -m pytest
 Actualmente la ejecución completa de las pruebas debe mostrar:
 
 ```text
-130 passed
+172 passed
 ```
+
+Para abrir la visual del MES (planta y proceso interno en paralelo):
+
+```bash
+python -m src.gui.server
+```
+
+Se abre en `http://127.0.0.1:8765`. Usa solo la biblioteca estándar de Python, el botón **Demo automática** recorre un escenario completo y `--no-browser` evita que se abra sola.
 
 ---
 
@@ -1711,8 +1870,10 @@ Actualmente el Sistema de Control de Producción cuenta con los siguientes patro
 * **Observer** — Implementado.
 * **State** — Evaluado y no aplicado.
 * **Visitor** — Evaluado y no aplicado.
+* **Strategy** — Implementado.
+* **Template Method** — Evaluado y no aplicado.
 
-Los trece patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
+Los catorce patrones implementados se encuentran integrados dentro del MES y cuentan con pruebas asociadas.
 
 La evaluación de Bridge permitió determinar que actualmente no existe dentro del sistema una necesidad que justifique introducir las dos dimensiones independientes de variación requeridas por este patrón.
 
@@ -1727,6 +1888,10 @@ La evaluación de Memento permitió determinar que restaurar el estado de las ó
 La evaluación de State permitió determinar que el ciclo de vida de las órdenes (tres estados y dos transiciones) y del equipo (dos estados) se valida una sola vez junto a cada operación, sin condicionales repetidos que eliminar.
 
 La evaluación de Visitor permitió determinar que hay pocas operaciones sobre el árbol de órdenes, que la jerarquía se prevé ampliar y que el Iterator ya cubre los recorridos sin necesidad de agregar `accept()` a las clases existentes.
+
+Strategy resolvió una necesidad de la planificación: la cola solo podía ordenarse por prioridad y esa regla estaba fija en `ProductionService`. Las cuatro políticas y el planificador permiten cambiar el criterio en ejecución sin modificar el servicio.
+
+La evaluación de Template Method permitió determinar que no existe un algoritmo de varios pasos que se repita en subclases y que la variación entre líneas ya se resuelve con composición, sin necesidad de métodos gancho en `Equipment` e `Inspection`.
 
 ---
 
@@ -1749,6 +1914,7 @@ Cada patrón incorporado responde a una necesidad específica:
 * **Command:** permite ejecutar las operaciones del MES de forma diferida, registrarlas en un historial y deshacer con seguridad las del equipo.
 * **Iterator:** permite recorrer las órdenes de un lote, en profundidad o por niveles y con filtro de estado, sin escribir recursión en el cliente.
 * **Observer:** permite publicar los eventos de planta a observadores desacoplados (métricas para OEE y alertas de rechazo) sin modificar la fachada ni los servicios.
+* **Strategy:** permite planificar la cola de producción con políticas intercambiables en ejecución, sin modificar el servicio de producción.
 
 Adicionalmente, el análisis de **Bridge** y de **Flyweight** permitió concluir que actualmente no existe una necesidad real que justifique su implementación (en el caso de Flyweight, con una medición de memoria como respaldo). Esta decisión mantiene el criterio aplicado durante el desarrollo: **identificar primero el problema y posteriormente seleccionar el patrón que realmente lo resuelve**.
 
@@ -1764,4 +1930,6 @@ Iterator resolvió una carencia que dejó Composite: recorrer un lote obligaba a
 
 Observer se incorporó porque el cálculo de OEE necesita datos que nadie acumulaba (tiempo operativo y calidad por unidades) y porque la evaluación de Mediator había dejado señalado que avisar a varios interesados es un problema de Observer. `ObservableMESFacade` publica eventos tipados e inmutables a observadores desacoplados, aísla a los que fallan y, al ser una subclase de `MESFacade`, hace que también las operaciones ejecutadas como comandos publiquen eventos, sin modificar ninguna clase existente. State y Visitor, en cambio, se evaluaron y no se aplicaron. El ciclo de vida de las órdenes es corto, lineal y se valida una vez junto a cada operación, por lo que State habría obligado a modificar el atributo `status` que usa casi todo el proyecto. En Visitor, hay pocas operaciones sobre el árbol de órdenes, la jerarquía se prevé ampliar y el patrón exigiría agregar `accept()` a las clases existentes, mientras que el Iterator ya permite escribir operaciones nuevas como funciones externas. En ambos casos se dejó documentado cuándo volver a evaluarlos.
 
-Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy, Command, Iterator y Observer implementados y **130 pruebas automatizadas superadas**, y con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State y Visitor evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
+Strategy se incorporó porque la planificación es una funcionalidad central del MES y su única regla estaba fija dentro de `ProductionService`; las órdenes ya traían los datos para decidir de otras formas. Command no se repitió porque ya estaba aplicado: se reutilizó para despachar la orden que elige la política. Template Method, en cambio, se evaluó y no se aplicó, porque no hay un algoritmo de varios pasos que se repita en subclases. Esta etapa también corrigió Observer: el estado del equipo debía leerse de la máquina y no de `EquipmentService`, y se agregó una visual que muestra la planta y el proceso interno en paralelo.
+
+Con los patrones Singleton, Factory Method, Abstract Factory, Builder, Prototype, Adapter, Composite, Decorator, Facade, Proxy, Command, Iterator, Observer y Strategy implementados y **172 pruebas automatizadas superadas**, y con Bridge, Flyweight, Chain of Responsibility, Mediator, Memento, State, Visitor y Template Method evaluados y justificados como no aplicables, el proyecto mantiene una base organizada y escalable.
