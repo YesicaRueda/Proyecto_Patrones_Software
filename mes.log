@@ -63,3 +63,80 @@
 2026-09-26 11:10:21,049 [INFO] Orden OP-003 registrada
 2026-09-26 11:10:21,049 [INFO] Orden OP-004 registrada
 2026-09-26 11:10:21,050 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 11:44:07,066 [INFO] CNCMachine en operación
+2026-10-03 11:44:07,099 [INFO] CNCMachine detenida
+2026-10-03 11:44:07,119 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,122 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,122 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:44:07,125 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,125 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:44:07,125 [INFO] Orden de producción 1 completada
+2026-10-03 11:44:07,128 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,177 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,177 [INFO] Orden 2 registrada
+2026-10-03 11:44:07,177 [INFO] Orden 3 registrada
+2026-10-03 11:44:07,182 [INFO] Orden 1 registrada
+2026-10-03 11:44:07,182 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:44:07,186 [INFO] Orden OP-200 registrada
+2026-10-03 11:44:07,189 [INFO] CNCMachine en operación
+2026-10-03 11:44:07,189 [INFO] Orden OP-201 registrada
+2026-10-03 11:44:07,189 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:48:12,964 [INFO] CNCMachine en operación
+2026-10-03 11:48:12,964 [INFO] CNCMachine detenida
+2026-10-03 11:48:12,989 [INFO] Orden 1 registrada
+2026-10-03 11:48:12,992 [INFO] Orden 1 registrada
+2026-10-03 11:48:12,993 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:48:12,997 [INFO] Orden 1 registrada
+2026-10-03 11:48:12,997 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:48:12,997 [INFO] Orden de producción 1 completada
+2026-10-03 11:48:13,002 [INFO] Orden 1 registrada
+2026-10-03 11:48:13,052 [INFO] CNCMachine en operación
+2026-10-03 11:48:13,052 [INFO] RobotArm en operación
+2026-10-03 11:48:13,053 [INFO] CNCMachine detenida
+2026-10-03 11:48:13,053 [INFO] RobotArm detenida
+2026-10-03 11:48:13,056 [INFO] CNCMachine en operación
+2026-10-03 11:48:13,064 [INFO] Orden 1 registrada
+2026-10-03 11:48:13,064 [INFO] Orden 2 registrada
+2026-10-03 11:48:13,066 [INFO] Orden 3 registrada
+2026-10-03 11:48:13,072 [INFO] Orden 1 registrada
+2026-10-03 11:48:13,072 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:48:13,077 [INFO] Orden OP-200 registrada
+2026-10-03 11:48:13,082 [INFO] CNCMachine en operación
+2026-10-03 11:48:13,082 [INFO] Orden OP-201 registrada
+2026-10-03 11:48:13,083 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:50:56,659 [INFO] CNCMachine en operación
+2026-10-03 11:50:56,659 [INFO] CNCMachine detenida
+2026-10-03 11:50:56,755 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,759 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,760 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:50:56,774 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,774 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:50:56,774 [INFO] Orden de producción 1 completada
+2026-10-03 11:50:56,777 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,825 [INFO] CNCMachine en operación
+2026-10-03 11:50:56,826 [INFO] RobotArm en operación
+2026-10-03 11:50:56,826 [INFO] CNCMachine detenida
+2026-10-03 11:50:56,826 [INFO] RobotArm detenida
+2026-10-03 11:50:56,830 [INFO] CNCMachine en operación
+2026-10-03 11:50:56,837 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,837 [INFO] Orden 2 registrada
+2026-10-03 11:50:56,838 [INFO] Orden 3 registrada
+2026-10-03 11:50:56,840 [INFO] Orden 1 registrada
+2026-10-03 11:50:56,841 [INFO] Orden de producción 1 iniciada
+2026-10-03 11:50:56,846 [INFO] Orden OP-200 registrada
+2026-10-03 11:50:56,851 [INFO] CNCMachine en operación
+2026-10-03 11:50:56,851 [INFO] Orden OP-201 registrada
+2026-10-03 11:50:56,851 [INFO] Orden de producción OP-201 iniciada
+2026-10-03 11:51:11,020 [INFO] CNCMachine en operación
+2026-10-03 11:51:11,020 [INFO] RobotArm en operación
+2026-10-03 11:51:11,021 [INFO] CNCMachine en operación
+2026-10-03 11:51:11,021 [INFO] Orden OP-002 registrada
+2026-10-03 11:51:11,021 [INFO] Orden OP-003 registrada
+2026-10-03 11:51:11,021 [INFO] Orden OP-004 registrada
+2026-10-03 11:51:11,022 [INFO] Orden de producción OP-002 iniciada
+2026-10-03 14:02:50,755 [INFO] CNCMachine en operación
+2026-10-03 14:02:50,755 [INFO] RobotArm en operación
+2026-10-03 14:02:50,756 [INFO] Orden OP-002 registrada
+2026-10-03 14:02:50,757 [INFO] Orden OP-003 registrada
+2026-10-03 14:02:50,757 [INFO] Orden OP-004 registrada
+2026-10-03 14:02:50,760 [INFO] Orden de producción OP-002 iniciada

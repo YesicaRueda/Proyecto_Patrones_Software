@@ -8,6 +8,8 @@ from src.production.prod_factory import (
 )
 from datetime import datetime
 from src.production.order_builder import OrderBuilder
+from src.equipment.production_line import ProductionLine
+from src.equipment.cell_factory import RobotCellFactory
 
 
 def seccion(titulo):
@@ -22,7 +24,13 @@ print(f"Logger1 y Logger2 son la misma instancia: {logger1 is logger2}")
 seccion("INICIALIZACIÓN DE SERVICIOS")
 production = ProductionService()
 equipment = EquipmentService(CNCCellFactory())
-equipment.start_machine()
+seccion("COMPOSITE - LÍNEA DE PRODUCCIÓN")
+linea = ProductionLine("Línea Norte")
+linea.add_unit(equipment)
+linea.add_unit(EquipmentService(RobotCellFactory()))
+
+linea.start()
+print("Estado de la línea:", linea.status())
 
 seccion("CREACIÓN DE ÓRDENES (Builder + Factory Method + Prototype)")
 

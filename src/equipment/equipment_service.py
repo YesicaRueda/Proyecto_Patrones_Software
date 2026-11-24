@@ -1,7 +1,7 @@
 
 from src.infrastructure.logger import Logger
 from src.equipment.cell_factory import AbstractProductionCellFactory
-
+from src.equipment.production_unit import ProductionUnit
 
 class EquipmentService:
 
@@ -25,3 +25,14 @@ class EquipmentService:
         logger = Logger.getInstance()
         logger.log(f"Inspección de {type(self.equipment).__name__}: {result}")
         return result
+
+# --- Implementación de la interfaz ProductionUnit (Composite) ---
+
+    def start(self):
+        self.start_machine()
+
+    def stop(self):
+        self.stop_machine()
+
+    def status(self):
+        return self.equipment.status
